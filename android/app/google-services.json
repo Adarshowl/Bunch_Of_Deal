@@ -1,0 +1,161 @@
+{
+  "project_info": {
+    "project_number": "719363581249",
+    "firebase_url": "https://bunch-of-deals.firebaseio.com",
+    "project_id": "bunch-of-deals",
+    "storage_bucket": "bunch-of-deals.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719363581249:android:cebb216d6e789bb163adc0",
+        "android_client_info": {
+          "package_name": "com.bunch.of.dealss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719363581249-7r2mbaaanli2h0rfh9org7mpfp7oht1k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "c45abe07212bba29fab335a1517478fb9e99dfa8"
+          }
+        },
+        {
+          "client_id": "719363581249-93vrgmqg1752cpu8u658vi7mi3vb4fuh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "5bb58c87bee7cd85d013ecaadbab64ca8bdbaed3"
+          }
+        },
+        {
+          "client_id": "719363581249-du881l29g6lqas7gseu8m0906lbig17u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "97ecd73e97794156e7bb355e1cbe0cbf8b2e5c2a"
+          }
+        },
+        {
+          "client_id": "719363581249-i3h5g8qs71pk3bc4njho5ira22jovjl3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "81605bfdca0c559340bdc3f7e58c67e4f7150665"
+          }
+        },
+        {
+          "client_id": "719363581249-ke0c309b8u8fq91tf53nq2b7tbat92gj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "711ab42a5b4f2c253d3dddec068f02e3870e935f"
+          }
+        },
+        {
+          "client_id": "719363581249-ocjkrlpadbsja2lq1s6i651m3du9c7i6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "5d177416d64c39d522031580652c2d0ab6b0aba5"
+          }
+        },
+        {
+          "client_id": "719363581249-uv673qlk1aivis0lhiah2decsh64g5g1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunch.of.dealss",
+            "certificate_hash": "cc3ca58ebd2dc60a375e698a33f60123ac2a678e"
+          }
+        },
+        {
+          "client_id": "719363581249-bkjvh6ll5663rdvk2f43fu7n2msnopio.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGTXJwZR6pv5lhuLD9eBkvUAA2tmlcm7Y"
+        },
+        {
+          "current_key": "AIzaSyB0grIoEL2gHeYeEYL_gg6cru-6_7veqQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719363581249-573fb72dq2ttellaf8b8ba0h6bqu873v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719363581249-gsrd2mqkgnrffo1ib4q2t0tjqi87pn6e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bunchodDeals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719363581249:android:c220322de16c6a2263adc0",
+        "android_client_info": {
+          "package_name": "com.bunchofdeals"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719363581249-lj3e13e04l88b565s5qgsa9k18p86089.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunchofdeals",
+            "certificate_hash": "e08dd181f21732fe938698e591761ec66d7376ef"
+          }
+        },
+        {
+          "client_id": "719363581249-ur5odi3asrsosq4cdffbkn50blkptf2j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bunchofdeals",
+            "certificate_hash": "ec40d7587d1c84f9681c5e054311dfe39d006926"
+          }
+        },
+        {
+          "client_id": "719363581249-bkjvh6ll5663rdvk2f43fu7n2msnopio.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGTXJwZR6pv5lhuLD9eBkvUAA2tmlcm7Y"
+        },
+        {
+          "current_key": "AIzaSyB0grIoEL2gHeYeEYL_gg6cru-6_7veqQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719363581249-573fb72dq2ttellaf8b8ba0h6bqu873v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719363581249-gsrd2mqkgnrffo1ib4q2t0tjqi87pn6e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bunchodDeals"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
