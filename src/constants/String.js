@@ -50,6 +50,7 @@ export const STRING = {
   offers: 'Offers',
   recent: 'Recent',
   nearby: 'Nearby',
+  order: 'ORDER',
 
   whoops: 'Whooops!',
   network_not_available: "Couldn't load data from server",

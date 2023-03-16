@@ -169,6 +169,10 @@ export default StyleSheet.create({
     height: 45,
     // backgroundColor: 'red',
     padding: 10,
-    flexGrow: 1,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    left: 0,
+    // flexGrow: 1,
   },
 });

@@ -1,6 +1,6 @@
 import {StyleSheet, Dimensions} from 'react-native';
 import {COLORS} from '../constants/Colors';
-import {SIZES} from '../constants/themes';
+import {FONTS, SIZES} from '../constants/themes';
 
 export default StyleSheet.create({
   mainContainer: {
@@ -164,27 +164,29 @@ export default StyleSheet.create({
   },
   Pricetext: {
     color: COLORS.white,
-    position: 'absolute',
     justifyContent: 'center',
+    textAlign: 'center',
     alignSelf: 'center',
-    marginTop: 10,
+    fontSize: 13,
   },
   product_amount: {
     height: 50,
     width: '100%',
-    backgroundColor: COLORS.crimson,
+    backgroundColor: COLORS.colorPromo,
   },
   amount_text: {
     position: 'absolute',
     justifyContent: 'center',
     alignSelf: 'center',
     color: COLORS.white,
+    fontSize: 17,
+    fontFamily: 'Montserrat-SemiBold',
   },
   minute: {
     height: 38,
     width: '85%',
-    backgroundColor: COLORS.goldenrod,
-    borderRadius: 5,
+    backgroundColor: COLORS.colorCountdownView,
+    borderRadius: 2,
     justifyContent: 'center',
     alignSelf: 'center',
   },
