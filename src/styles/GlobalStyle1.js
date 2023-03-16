@@ -11,6 +11,10 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.backgroundColor,
   },
+  mainContainerBgRedColor: {
+    flex: 1,
+    backgroundColor: COLORS.red,
+  },
   mainContainerwhiteColor: {
     flex: 1,
     backgroundColor: COLORS.white,
