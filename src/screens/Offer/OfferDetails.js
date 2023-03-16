@@ -1,29 +1,26 @@
 import React, {useState} from 'react';
-import {useEffect} from 'react';
 import {
-  Image,
+  ImageBackground,
   SafeAreaView,
+  ScrollView,
   Text,
   View,
-  ScrollView,
-  ImageBackground,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {
+  default as Entypo,
+  default as Entypofrom,
+} from 'react-native-vector-icons/Entypo';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
-import images from '../../constants/images';
 import {STRING} from '../../constants/String';
 import {FONTS} from '../../constants/themes';
-import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
+import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
-import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
-import {ShowToastMessage} from '../../utils/Utility';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Entypofrom from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
 // import {ShowToastMessage} from '../../../utils/Utility';
+import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 
 const OfferDetails = ({navigation, route}) => {
   const [intentCause, setIntentCause] = useState(false);
@@ -44,34 +41,53 @@ const OfferDetails = ({navigation, route}) => {
               uri: 'https://c4.wallpaperflare.com/wallpaper/92/475/600/coffee-sandwich-breakfast-food-wallpaper-preview.jpg',
             }}
             style={GlobalStyle1.Product_image}>
-            <View style={GlobalStyle1.FontICON}>
-              <FontAwesome
-                name="arrow-left"
-                size={20}
+            <LinearGradient
+              //  colors={[COLORS.black, COLORS.red]}
+              //  style={{flex: 1}}
+              colors={[
+                COLORS.shimmer_loading_color,
+                COLORS.lightGrey,
+                COLORS.transparent,
+              ]}
+              style={GlobalStyle.offerDetailToolBar}>
+              {/* <View style={GlobalStyle.offerDetailToolBar}> */}
+              <BunchDealVectorIcon
+                title={Ionicons}
+                name={'arrow-back'}
                 color={COLORS.colorAccent}
-                style={{
-                  marginEnd: 200,
-                  marginBottom: 10,
+                size={25}
+                style={{}}
+                onPress={() => {
+                  navigation.goBack();
                 }}
               />
-              <Entypofrom
-                name="share"
-                size={20}
-                color={COLORS.colorAccent}
+              <View
                 style={{
-                  marginStart: 10,
-                  marginBottom: 10,
-                }}
-              />
-              <FontAwesome
-                name="heart-o"
-                size={20}
-                color={COLORS.colorAccent}
-                style={{
-                  marginBottom: 10,
-                }}
-              />
-            </View>
+                  flexGrow: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                }}>
+                <Entypofrom
+                  name="share"
+                  size={22}
+                  color={COLORS.colorAccent}
+                  style={{
+                    marginHorizontal: 15,
+                  }}
+                />
+                <FontAwesome
+                  name="heart-o"
+                  size={22}
+                  color={COLORS.colorAccent}
+                  style={{
+                    marginHorizontal: 5,
+                  }}
+                />
+              </View>
+              {/* </View> */}
+            </LinearGradient>
+
             <View
               style={[
                 GlobalStyle1.price,
@@ -557,3 +573,9 @@ const OfferDetails = ({navigation, route}) => {
 };
 
 export default OfferDetails;
+/**
+id -  gouravcarpenter45@gmail.com 
+Team viewer pass - q0VD0&PN1!kD2MJ1mi!cwR#ak
+
+ * 
+ */

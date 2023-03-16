@@ -361,10 +361,12 @@ export default StyleSheet.create({
     marginStart: 10,
   },
 });
-// git command
-/**
- * 
- 1. git add .
- 2. git commit -m "type your message"
- 3. git push origin main
-  */
+// git command -
+/*
+ git init
+ git remote add origin "repository url"
+ 1. git status
+ 2. git add .
+ 3. git commit -m "type your message"
+ 4. git push origin main
+*/

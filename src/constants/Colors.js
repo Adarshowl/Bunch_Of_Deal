@@ -32,4 +32,7 @@ export const COLORS = {
   dot_light_screen2: '#8cf9eb',
   dot_light_screen3: '#93c6fd',
   dot_light_screen4: '#e4b5fc',
+
+  transparent: '#00000000',
+  startColor: '#A6000000',
 };

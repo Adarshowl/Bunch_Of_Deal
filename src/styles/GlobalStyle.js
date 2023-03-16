@@ -161,4 +161,14 @@ export default StyleSheet.create({
     height: 20,
     resizeMode: 'cover',
   },
+
+  offerDetailToolBar: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 45,
+    // backgroundColor: 'red',
+    padding: 10,
+    flexGrow: 1,
+  },
 });
