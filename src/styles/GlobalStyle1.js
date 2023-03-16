@@ -346,6 +346,25 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     alignSelf: 'center',
+    // marginStart: 10,
+    marginStart: 10,
+  },
+  Locationimage1: {
+    height: 300,
+    width: '97%',
+    justifyContent: 'space-around',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    alignSelf: 'center',
+    // marginStart: 10,
     marginStart: 10,
   },
 });
+// git command
+/**
+ * 
+ 1. git add .
+ 2. git commit -m "type your message"
+ 3. git push origin main
+  */
