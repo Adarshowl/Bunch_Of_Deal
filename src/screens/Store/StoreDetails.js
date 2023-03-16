@@ -1,30 +1,25 @@
-import React, {useState} from 'react';
-import {useEffect} from 'react';
+import React from 'react';
 import {
   Image,
+  ImageBackground,
   SafeAreaView,
+  ScrollView,
   Text,
   View,
-  ScrollView,
-  ImageBackground,
 } from 'react-native';
-import {COLORS} from '../../constants/Colors';
-import images from '../../constants/images';
-import {STRING} from '../../constants/String';
-import {FONTS} from '../../constants/themes';
-import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
-import GlobalStyle1 from '../../styles/GlobalStyle1';
-import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
-import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
-import {ShowToastMessage} from '../../utils/Utility';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Entypofrom from 'react-native-vector-icons/Entypo';
+import LinearGradient from 'react-native-linear-gradient';
+import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
+
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypofrom from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {COLORS} from '../../constants/Colors';
+import {FONTS} from '../../constants/themes';
+import GlobalStyle from '../../styles/GlobalStyle';
+import GlobalStyle1 from '../../styles/GlobalStyle1';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
@@ -43,13 +38,18 @@ const StoreDetails = ({navigation}) => {
               style={GlobalStyle1.store_image}>
               <View
                 style={[
-                  GlobalStyle1.storeprice,
+                  GlobalStyle1.price,
                   {
-                    marginVertical: 205,
                     alignSelf: 'flex-end',
+                    // backgroundColor: 'red',
+                    // flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    bottom: 0,
                   },
                 ]}>
-                <Text style={[FONTS.body5, GlobalStyle1.storetext]}>
+                <Text style={[FONTS.body5, GlobalStyle1.Pricetext]}>
                   +100 km
                 </Text>
               </View>
@@ -63,7 +63,7 @@ const StoreDetails = ({navigation}) => {
               style={GlobalStyle1.storeimage}>
               <Text
                 style={[
-                  FONTS.h2,
+                  FONTS.h3,
                   {
                     textAlign: 'center',
                     color: COLORS.black,
@@ -76,66 +76,98 @@ const StoreDetails = ({navigation}) => {
           <View
             style={{
               flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              marginHorizontal: 10,
+              marginTop: 10,
+              width: '94%',
             }}>
             <View
               style={[
                 GlobalStyle1.OfferBOX,
                 {
-                  marginTop: 10,
-                  marginStart: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 15,
+                  justifyContent: 'center',
+                  backgroundColor: COLORS.white,
                 },
               ]}>
               <AntDesign
                 name="tags"
                 size={18}
                 color={COLORS.colorAccent}
+                style={{}}
+              />
+              <View
                 style={{
-                  position: 'absolute',
-                  marginStart: 15,
-                  marginVertical: 12,
+                  marginHorizontal: 5,
                 }}
               />
               <Text style={[FONTS.body5, GlobalStyle1.Offertext]}>OFFERS</Text>
             </View>
             <View
               style={[
-                GlobalStyle1.ReviewsBox,
+                GlobalStyle1.OfferBOX,
                 {
-                  marginTop: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 15,
+                  justifyContent: 'center',
+                  backgroundColor: COLORS.colorAccent,
                 },
               ]}>
               <Feather
                 name="message-square"
                 size={18}
                 color={COLORS.white}
+                style={{}}
+              />
+              <View
                 style={{
-                  position: 'absolute',
-                  marginStart: 15,
-                  marginVertical: 12,
+                  marginHorizontal: 5,
                 }}
               />
-              <Text style={[FONTS.body5, GlobalStyle1.Reviewstext]}>
+              <Text
+                style={[
+                  FONTS.body5,
+                  GlobalStyle1.Offertext,
+                  {
+                    color: COLORS.white,
+                  },
+                ]}>
                 REVIEWS
               </Text>
             </View>
             <View
               style={[
-                GlobalStyle1.GalleryBOX,
+                GlobalStyle1.OfferBOX,
                 {
-                  marginTop: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 15,
+                  justifyContent: 'center',
+                  backgroundColor: COLORS.colorAccent,
                 },
               ]}>
               <MaterialCommunityIcons
                 name="view-gallery-outline"
                 size={18}
                 color={COLORS.white}
+                style={{}}
+              />
+              <View
                 style={{
-                  position: 'absolute',
-                  marginStart: 15,
-                  marginVertical: 12,
+                  marginHorizontal: 5,
                 }}
               />
-              <Text style={[FONTS.body5, GlobalStyle1.Gallerytext]}>
+              <Text
+                style={[
+                  FONTS.body5,
+                  GlobalStyle1.Offertext,
+                  {
+                    color: COLORS.white,
+                  },
+                ]}>
                 GALLERY
               </Text>
             </View>
@@ -183,15 +215,14 @@ const StoreDetails = ({navigation}) => {
           <View
             style={{
               flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 15,
+              marginHorizontal: 15,
+              marginBottom: 15,
+              backgroundColor: COLORS.white,
             }}>
-            <View
-              style={[
-                GlobalStyle1.iconBOX,
-                {
-                  marginTop: 10,
-                  marginStart: 10,
-                },
-              ]}>
+            <View style={[GlobalStyle1.iconBOX, {}]}>
               <FontAwesome
                 name="phone"
                 size={18}
@@ -202,14 +233,7 @@ const StoreDetails = ({navigation}) => {
                 }}
               />
             </View>
-            <View
-              style={[
-                GlobalStyle1.iconBOX1,
-                {
-                  marginTop: 10,
-                  marginHorizontal: 5,
-                },
-              ]}>
+            <View style={[GlobalStyle1.iconBOX, {}]}>
               <MaterialCommunityIcons
                 name="directions"
                 size={18}
@@ -220,13 +244,7 @@ const StoreDetails = ({navigation}) => {
                 }}
               />
             </View>
-            <View
-              style={[
-                GlobalStyle1.iconBOX2,
-                {
-                  marginTop: 10,
-                },
-              ]}>
+            <View style={[GlobalStyle1.iconBOX, {}]}>
               <FontAwesome
                 name="heart-o"
                 size={18}
@@ -297,6 +315,46 @@ const StoreDetails = ({navigation}) => {
             style={GlobalStyle1.Locationimage}></ImageBackground>
         </SafeAreaView>
       </ScrollView>
+
+      <LinearGradient
+        colors={['#00000090', '#00000090', COLORS.transparent]}
+        style={GlobalStyle.offerDetailToolBar}>
+        <BunchDealVectorIcon
+          title={Ionicons}
+          name={'arrow-back'}
+          color={COLORS.colorAccent}
+          size={25}
+          style={{}}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}>
+          <Entypofrom
+            name="share"
+            size={22}
+            color={COLORS.colorAccent}
+            style={{
+              marginHorizontal: 15,
+            }}
+          />
+          <FontAwesome
+            name="heart-o"
+            size={22}
+            color={COLORS.colorAccent}
+            style={{
+              marginHorizontal: 5,
+            }}
+          />
+        </View>
+        {/* </View> */}
+      </LinearGradient>
     </SafeAreaView>
   );
 };

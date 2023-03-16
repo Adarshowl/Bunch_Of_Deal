@@ -17,7 +17,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import GlobalStyle from '../styles/GlobalStyle';
-const DrawerContent = () => {
+import {useNavigation} from '@react-navigation/native';
+const DrawerContent = props => {
   return (
     <SafeAreaView
       style={{
@@ -42,8 +43,20 @@ const DrawerContent = () => {
             source={images.profile_placeholder}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>{STRING.login_create_account}</Text>
-          <Text style={styles.email}>test1@gmail.com</Text>
+          <Text
+            style={styles.name}
+            onPress={() => {
+              props?.navigation.navigate('Category');
+            }}>
+            {STRING.login_create_account}
+          </Text>
+          <Text
+            style={styles.email}
+            onPress={() => {
+              props?.navigation.navigate('Setting');
+            }}>
+            test1@gmail.com
+          </Text>
         </View>
       </ImageBackground>
       <View
@@ -84,8 +97,12 @@ const DrawerContent = () => {
 export default DrawerContent;
 
 const DrawerItem = ({name, title, iconName, iconSize}) => {
+  const navigation = useNavigation();
   return (
     <TouchableOpacity
+      onPress={() => {
+        navigation.navigate('GeoStore');
+      }}
       style={{
         paddingVertical: 12,
         width: '100%',

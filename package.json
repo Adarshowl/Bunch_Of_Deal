@@ -38,6 +38,7 @@
     "react-native-shimmer": "^0.6.0",
     "react-native-simple-toast": "^2.0.0",
     "react-native-swiper-flatlist": "^3.0.18",
+    "react-native-table-component": "^1.2.2",
     "react-native-vector-icons": "^9.2.0",
     "react-native-webview": "^11.26.1",
     "react-redux": "^8.0.5",

@@ -19,7 +19,6 @@ import {FONTS} from '../../constants/themes';
 import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-// import {ShowToastMessage} from '../../../utils/Utility';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 
 const OfferDetails = ({navigation, route}) => {
@@ -27,7 +26,7 @@ const OfferDetails = ({navigation, route}) => {
   const [fav, setFav] = useState(false);
 
   const onOrderClick = () => {
-    navigation.navigate('StoreDetails');
+    navigation.navigate('Invoice');
   };
 
   return (

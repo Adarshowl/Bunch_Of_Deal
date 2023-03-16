@@ -38,7 +38,9 @@ const Home = ({navigation}) => {
           color={COLORS.colorPrimary}
           size={18}
           style={GlobalStyle.marginHorizontal10}
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate('About');
+          }}
         />
         <BunchDealVectorIcon
           title={MaterialIcons}
@@ -46,7 +48,9 @@ const Home = ({navigation}) => {
           color={COLORS.colorPrimary}
           size={25}
           style={GlobalStyle.marginHorizontal15}
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate('Notification');
+          }}
         />
       </View>
 
