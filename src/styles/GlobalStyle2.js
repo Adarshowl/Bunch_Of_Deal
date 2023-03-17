@@ -377,11 +377,11 @@ export default StyleSheet.create({
     paddingBottom: 50,
   },
   AboutIcon: {
-    height: 132,
-    width: 132,
+    height: 200,
+    width: '100%',
     alignSelf: 'center',
-
-    marginTop: 60,
+    resizeMode: 'center',
+    marginTop: 40,
   },
   AboutDes: {
     padding: 10,
@@ -390,7 +390,7 @@ export default StyleSheet.create({
     backgroundColor: COLORS.white,
     marginBottom: 8,
     marginHorizontal: 4,
-    marginTop: 2,
+    marginTop: 5,
   },
   AboutMail: {
     padding: 10,

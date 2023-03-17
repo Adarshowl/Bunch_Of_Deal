@@ -18,6 +18,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import GlobalStyle from '../styles/GlobalStyle';
 import {useNavigation} from '@react-navigation/native';
+import {ShowToastMessage} from '../utils/Utility';
 const DrawerContent = props => {
   return (
     <SafeAreaView
@@ -40,22 +41,16 @@ const DrawerContent = props => {
             padding: 25,
           }}>
           <Image
-            source={images.profile_placeholder}
+            source={{
+              uri: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
+            }}
             style={styles.profileImage}
           />
-          <Text
-            style={styles.name}
-            onPress={() => {
-              props?.navigation.navigate('Category');
-            }}>
+          <Text style={styles.name} onPress={() => {}}>
             {STRING.login_create_account}
           </Text>
-          <Text
-            style={styles.email}
-            onPress={() => {
-              props?.navigation.navigate('Setting');
-            }}>
-            test1@gmail.com
+          <Text style={styles.email} onPress={() => {}}>
+            email address
           </Text>
         </View>
       </ImageBackground>
@@ -69,40 +64,85 @@ const DrawerContent = props => {
         name={'Categories'}
         title={Ionicons}
         iconName="md-reorder-three-outline"
+        onPress={() => {
+          props?.navigation?.navigate('Category');
+        }}
       />
-      <DrawerItem name={'Geo Stores'} title={Entypo} iconName="location" />
-      <DrawerItem name={'Orders'} title={Ionicons} iconName="ios-cart" />
+      <DrawerItem
+        name={'Geo Stores'}
+        title={Entypo}
+        iconName="location"
+        onPress={() => {
+          props?.navigation?.navigate('GeoStore');
+        }}
+      />
+      <DrawerItem
+        name={'Orders'}
+        title={Ionicons}
+        iconName="ios-cart"
+        onPress={() => {
+          props?.navigation?.navigate('Invoice');
+        }}
+      />
       <DrawerItem
         name={'Edit Profile'}
         title={Ionicons}
         iconName="ios-person-sharp"
+        onPress={() => {
+          ShowToastMessage('Coming soon!');
+        }}
       />
       <DrawerItem
         name={'Favorite Store'}
         title={Fontisto}
         iconName="favorite"
+        onPress={() => {
+          ShowToastMessage('Coming soon!');
+        }}
       />
       <DrawerItem
         name={'Favorite Offer'}
         title={Fontisto}
         iconName="favorite"
+        onPress={() => {
+          ShowToastMessage('Coming soon!');
+        }}
       />
-      <DrawerItem name={'Settings'} title={Feather} iconName="settings" />
-      <DrawerItem name={'About Us'} title={Feather} iconName="info" />
-      <DrawerItem name={'Logout'} title={Feather} iconName="log-in" />
+      <DrawerItem
+        name={'Settings'}
+        title={Feather}
+        iconName="settings"
+        onPress={() => {
+          props?.navigation.navigate('Setting');
+        }}
+      />
+      <DrawerItem
+        name={'About Us'}
+        title={Feather}
+        iconName="info"
+        onPress={() => {
+          props?.navigation?.navigate('About');
+        }}
+      />
+      <DrawerItem
+        name={'Logout'}
+        title={Feather}
+        iconName="log-in"
+        onPress={() => {
+          props?.navigation?.replace('Auth');
+        }}
+      />
     </SafeAreaView>
   );
 };
 
 export default DrawerContent;
 
-const DrawerItem = ({name, title, iconName, iconSize}) => {
+const DrawerItem = ({name, title, iconName, iconSize, onPress}) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('GeoStore');
-      }}
+      onPress={onPress}
       style={{
         paddingVertical: 12,
         width: '100%',
@@ -127,6 +167,7 @@ const DrawerItem = ({name, title, iconName, iconSize}) => {
         style={{
           fontSize: 16,
           fontFamily: 'Montserrat-SemiBold',
+          color: COLORS.editTextBorder,
         }}>
         {name}
       </Text>

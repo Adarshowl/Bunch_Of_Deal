@@ -19,6 +19,7 @@ const Router = () => {
       screenOptions={{
         headerShown: false,
         header: 'none',
+        animation: 'slide_from_right',
       }}>
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="StoreDetails" component={StoreDetails} />

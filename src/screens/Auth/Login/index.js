@@ -20,6 +20,10 @@ const Login = ({navigation}) => {
 
   const [loading, setLoading] = useState(false);
 
+  // const onLoginClick = () => {
+  //   navigation.replace('MainContainer');
+  // };
+
   const onLoginClick = () => {
     if (validateFieldNotEmpty(email)) {
       ShowToastMessage('Email is required');
@@ -42,8 +46,8 @@ const Login = ({navigation}) => {
         'Content-Type': 'multipart/form-data',
       })
         .then(response => {
+          console.log(response?.data);
           if (response?.data?.success == 1) {
-            // console.log(response);
             ShowToastMessage('Login successful');
             setLoading(false);
             AsyncStorage.setItem(STRING.userEmail, email);

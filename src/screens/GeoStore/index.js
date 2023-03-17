@@ -21,8 +21,11 @@ const GeoStore = ({navigation}) => {
 
         <Text
           style={[
-            FONTS.h3,
-            {color: COLORS.colorPrimary, marginHorizontal: 10},
+            FONTS.body2,
+            {
+              color: COLORS.colorPrimary,
+              marginHorizontal: 10,
+            },
           ]}>
           Business Locator
         </Text>

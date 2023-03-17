@@ -9,29 +9,38 @@ import GlobalStyle2 from '../../styles/GlobalStyle2';
 
 const About = ({navigation}) => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.lightGrey}}>
+    <SafeAreaView style={{flex: 1}}>
       <View style={GlobalStyle2.headerFooterAbout}>
-        <View style={{flexDirection: 'row', alignContent: 'space-around'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignContent: 'space-around',
+            alignItems: 'center',
+          }}>
           <Ionicons
             onPress={() => {
               navigation.goBack();
             }}
-            marginStart={10}
+            marginStart={5}
+            marginEnd={5}
             color={COLORS.colorPrimary}
             name="ios-arrow-back-sharp"
             size={25}
           />
           <Text
             style={[
-              FONTS.h5,
-              {color: COLORS.colorPrimary, marginHorizontal: 10},
+              FONTS.body2,
+              {
+                color: COLORS.colorPrimary,
+                marginHorizontal: 10,
+              },
             ]}>
             Bunch of Deals
           </Text>
         </View>
         <Image source={images.splash_new_beta} style={GlobalStyle2.AboutIcon} />
         <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-          <Text style={{fontSize: 12}}>version :</Text>
+          <Text style={{fontSize: 14}}>version : </Text>
           <Text style={{fontSize: 14, color: COLORS.colorPrimary}}>2.0.2</Text>
         </View>
       </View>
@@ -56,7 +65,7 @@ const About = ({navigation}) => {
         <Text style={[FONTS.h6, {marginBottom: 20, marginStart: 10}]}>
           Mail
         </Text>
-        <Text style={[FONTS.body5, {marginStart: 10}]}>
+        <Text style={[FONTS.body3, {marginStart: 10}]}>
           contact@bunchofdeals.com.au
         </Text>
       </View>

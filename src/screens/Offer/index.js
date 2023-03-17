@@ -11,6 +11,8 @@ import {requestLocationPermission} from '../../utils/RequestUserPermission';
 import {getMacAddress, Timezone} from '../../utils/Utility';
 import moment from 'moment';
 import OfferCardView from './OfferCardView';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 
 const Offer = ({navigation}) => {
   const [percent, setPercent] = useState(true);
@@ -50,6 +52,57 @@ const Offer = ({navigation}) => {
     params.append(STRING.API_SEARCH, '');
     params.append(STRING.API_DATE, moment().format('yyyy-MM-dd H:m:s'));
     params.append(STRING.API_TIME_ZONE, timeZone);
+  };
+
+  useEffect(() => {
+    getAllOffers();
+  }, []);
+
+  const getAllOffers = () => {
+    let d = {
+      date: '2023-03-17 16:24:57',
+      mac_adr: '',
+      search: '',
+      timezone: 'Asia/Kolkata',
+      latitude: 22.955682,
+      limit: 30,
+      order_by: 'recent',
+      page: 1,
+      longitude: 76.0328272,
+      token: '',
+    };
+
+    console.log(d);
+
+    const params = new FormData();
+    params.append('date', '2023-03-17 16:24:57');
+    params.append('mac_adr', '02:00:00:00:00');
+    params.append('search', '');
+    params.append('timezone', 'Asia/Kolkata');
+    params.append('latitude', '22.955682,');
+    params.append('limit', 30);
+    params.append('order_by', 'recent');
+    params.append('page', '1');
+    params.append('longitude', '76.0328272');
+    params.append('token', '');
+
+    ApiCall(
+      'post',
+      JSON.stringify(d),
+      'https://bunchofdeals.com.au/APP_CLONE/index.php/1.0/offer/getOffers',
+      {
+        // ApiCall('post', JSON.stringify(d), API_END_POINTS.API_GET_OFFERS, {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    )
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+      .finally(() => {});
   };
 
   return (

@@ -9,6 +9,7 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealCommonToolBar from '../../utils/BunchDealCommonToolBar';
 import BunchDealImage from '../../utils/BunchDealImage';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
+import {ShowToastMessage} from '../../utils/Utility';
 import Offer from '../Offer';
 import Store from '../Store';
 
@@ -39,7 +40,7 @@ const Home = ({navigation}) => {
           size={18}
           style={GlobalStyle.marginHorizontal10}
           onPress={() => {
-            navigation.navigate('About');
+            ShowToastMessage('Coming soon!');
           }}
         />
         <BunchDealVectorIcon
