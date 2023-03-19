@@ -3,8 +3,8 @@ export const BASE_URL =
   'https://bunchofdeals.com.au/APP_CLONE/index.php/api/1.0/';
 
 export const API_END_POINTS = {
-  signUp: `${BASE_URL}signup`,
-  signin: `${BASE_URL}signin`,
+  signUp: `${BASE_URL}user/signUp`,
+  signin: `${BASE_URL}user/signIn`,
 
   //user API's
   SIGN_UP: `${BASE_URL}signup`,
@@ -12,7 +12,7 @@ export const API_END_POINTS = {
   VERIFY_OTP: `${BASE_URL}verifyOTP`,
   RESEND_OTP: `${BASE_URL}resendOTP`,
   VERIFY_FACEBOOK: `${BASE_URL}verifyfacebook`,
-  VERIFY_GOOGLEPLUS: `${BASE_URL}verifygoogleplus`,
+  VERIFY_GOOGLE_PLUS: `${BASE_URL}verifygoogleplus`,
   CHECK_USER_CONNECTION: `${BASE_URL}checkUserConnection`,
   BLOCK_USER: `${BASE_URL}blockUser`,
   GET_USERS: `${BASE_URL}getUsers`,

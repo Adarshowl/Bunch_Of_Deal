@@ -20,52 +20,52 @@ const Login = ({navigation}) => {
 
   const [loading, setLoading] = useState(false);
 
-  // const onLoginClick = () => {
-  //   navigation.replace('MainContainer');
-  // };
-
   const onLoginClick = () => {
-    if (validateFieldNotEmpty(email)) {
-      ShowToastMessage('Email is required');
-    } else if (validateFieldNotEmpty(password)) {
-      ShowToastMessage('Password is required');
-    } else {
-      setLoading(true);
-      let body = {
-        login: email,
-        password: password,
-        social_type: 'Normal',
-      };
-      const params = new FormData();
-      params.append('login', email);
-      params.append('password', password);
-      params.append('social_type', 'Normal');
-      console.log(JSON.stringify(body));
-      ApiCall('post', body, API_END_POINTS.signin, {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data',
-      })
-        .then(response => {
-          console.log(response?.data);
-          if (response?.data?.success == 1) {
-            ShowToastMessage('Login successful');
-            setLoading(false);
-            AsyncStorage.setItem(STRING.userEmail, email);
-            navigation.replace('MainContainer');
-          } else {
-            ShowToastMessage('Login failed');
-            setLoading(false);
-          }
-        })
-        .catch(() => {
-          ShowToastMessage('Something went wrong.');
-          setLoading(false);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    navigation.replace('MainContainer');
   };
+
+  // const onLoginClick = () => {
+  //   if (validateFieldNotEmpty(email)) {
+  //     ShowToastMessage('Email is required');
+  //   } else if (validateFieldNotEmpty(password)) {
+  //     ShowToastMessage('Password is required');
+  //   } else {
+  //     setLoading(true);
+  //     let body = {
+  //       login: email,
+  //       password: password,
+  //       social_type: 'Normal',
+  //     };
+  //     const params = new FormData();
+  //     params.append('login', email);
+  //     params.append('password', password);
+  //     params.append('social_type', 'Normal');
+  //     console.log(JSON.stringify(body));
+  //     ApiCall('post', body, API_END_POINTS.signin, {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'multipart/form-data',
+  //     })
+  //       .then(response => {
+  //         console.log(response?.data);
+  //         if (response?.data?.success == 1) {
+  //           ShowToastMessage('Login successful');
+  //           setLoading(false);
+  //           AsyncStorage.setItem(STRING.userEmail, email);
+  //           navigation.replace('MainContainer');
+  //         } else {
+  //           ShowToastMessage('Login failed');
+  //           setLoading(false);
+  //         }
+  //       })
+  //       .catch(() => {
+  //         ShowToastMessage('Something went wrong.');
+  //         setLoading(false);
+  //       })
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   }
+  // };
 
   const onCreateAccountClick = () => {
     navigation.navigate('SignUp');

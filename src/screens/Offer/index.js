@@ -72,7 +72,7 @@ const Offer = ({navigation}) => {
       token: '',
     };
 
-    console.log(d);
+    // console.log(d);
 
     const params = new FormData();
     params.append('date', '2023-03-17 16:24:57');
@@ -97,7 +97,7 @@ const Offer = ({navigation}) => {
       },
     )
       .then(response => {
-        console.log(response.data);
+        // console.log(response.data);
       })
       .catch(err => {
         console.log(err);

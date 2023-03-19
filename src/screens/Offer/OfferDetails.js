@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   ImageBackground,
   SafeAreaView,
@@ -16,8 +16,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
 import {STRING} from '../../constants/String';
 import {FONTS} from '../../constants/themes';
-import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
@@ -28,7 +26,7 @@ const OfferDetails = ({navigation, route}) => {
   const [fav, setFav] = useState(false);
 
   const onOrderClick = () => {
-    navigation.navigate('Invoice');
+    navigation.navigate('Order');
   };
 
   return (

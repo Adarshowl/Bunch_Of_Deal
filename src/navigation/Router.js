@@ -11,6 +11,10 @@ import Setting from '../screens/Setting/Setting';
 import InvoiceDetail from '../screens/Invoice/InvoiceDetail';
 import Category from '../screens/Category';
 import GeoStore from '../screens/GeoStore';
+import Order from '../screens/Order';
+import FavStore from '../screens/Favorite/FavStore';
+import FavOffer from '../screens/Favorite/FavOffer';
+import Account from '../screens/Account';
 const Stack = createNativeStackNavigator();
 const Router = () => {
   return (
@@ -31,6 +35,10 @@ const Router = () => {
       <Stack.Screen name="InvoiceDetail" component={InvoiceDetail} />
       <Stack.Screen name="Category" component={Category} />
       <Stack.Screen name="GeoStore" component={GeoStore} />
+      <Stack.Screen name="Order" component={Order} />
+      <Stack.Screen name="FavStore" component={FavStore} />
+      <Stack.Screen name="FavOffer" component={FavOffer} />
+      <Stack.Screen name="Account" component={Account} />
     </Stack.Navigator>
   );
 };

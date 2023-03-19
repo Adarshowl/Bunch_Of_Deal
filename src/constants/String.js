@@ -35,7 +35,7 @@ export const STRING = {
   login_create_account: 'Log In / Create Account',
   register_now: 'Register Now',
   skip: 'SKIP',
-  next: 'NEXT',
+  next: 'Next',
 
   transaction_history: 'Transaction History',
   tell_friend: 'Tell Your Friend',

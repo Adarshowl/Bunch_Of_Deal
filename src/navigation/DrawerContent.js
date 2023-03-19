@@ -89,7 +89,7 @@ const DrawerContent = props => {
         title={Ionicons}
         iconName="ios-person-sharp"
         onPress={() => {
-          ShowToastMessage('Coming soon!');
+          props?.navigation?.navigate('Account');
         }}
       />
       <DrawerItem
@@ -97,7 +97,7 @@ const DrawerContent = props => {
         title={Fontisto}
         iconName="favorite"
         onPress={() => {
-          ShowToastMessage('Coming soon!');
+          props?.navigation?.navigate('FavStore');
         }}
       />
       <DrawerItem
@@ -105,7 +105,7 @@ const DrawerContent = props => {
         title={Fontisto}
         iconName="favorite"
         onPress={() => {
-          ShowToastMessage('Coming soon!');
+          props?.navigation?.navigate('FavOffer');
         }}
       />
       <DrawerItem
