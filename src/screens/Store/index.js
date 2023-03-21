@@ -8,9 +8,15 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealImageText from '../../utils/BunchDealImageText';
 import BunchDealVectorIconText from '../../utils/BunchDealVectorIconText';
 import {requestLocationPermission} from '../../utils/RequestUserPermission';
-import {getMacAddress, Timezone} from '../../utils/Utility';
+import {
+  getMacAddress,
+  ShowConsoleLogMessage,
+  Timezone,
+} from '../../utils/Utility';
 import moment from 'moment';
 import StoreCardView from './StoreCardView';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 
 const Store = ({navigation}) => {
   const [percent, setPercent] = useState(true);
@@ -21,6 +27,10 @@ const Store = ({navigation}) => {
   const [longitude, setLongitude] = useState(0.0);
   const [haveLocationPermission, setHaveLocationPermission] = useState(false);
 
+  const [recentData, setRecentData] = useState([]);
+
+  const [showError, setShowError] = useState(false);
+
   useEffect(() => {
     const permission = requestLocationPermission();
     setHaveLocationPermission(permission);
@@ -28,28 +38,48 @@ const Store = ({navigation}) => {
       // console.log(result);
       setTimezone(result);
     });
+    getStoreList();
   }, []);
 
-  const getOfferList = () => {
-    const params = new FormData();
-    if (STRING.CURRENT_LAT != 0.0 || STRING.CURRENT_LONG != 0.0) {
-      params.append(STRING.API_LATITUDE, STRING.CURRENT_LAT + '');
-      params.append(STRING.API_LONGITUDE, STRING.CURRENT_LONG + '');
-      //order by geo
-      params.append(STRING.API_ORDER_BY, STRING.ORDER_NEARBY);
-    } else {
-      //order by date
-      params.append(STRING.API_ORDER_BY, STRING.ORDER_RECENT);
-    }
-    params.append(STRING.API_OFFER_IDS, '0');
+  const getStoreList = val => {
+    let body = {
+      latitude: STRING.CURRENT_LAT + '',
+      longitude: STRING.CURRENT_LONG + '',
+      radius: '',
+      category_id: '',
+      search: '',
+      order_by: 'nearby',
+      current_date: moment().format('yyyy-MM-dd H:m:s'),
+      current_tz: 'Asia/Kolkata',
+      limit: '30',
+      page: '1',
+    };
 
-    params.append(STRING.API_TOKEN, STRING.FCM_TOKEN);
-    params.append(STRING.API_MAC_ADR, getMacAddress());
-    params.append(STRING.API_LIMIT, '30');
-    params.append(STRING.API_PAGE, '1');
-    params.append(STRING.API_SEARCH, '');
-    params.append(STRING.API_DATE, moment().format('yyyy-MM-dd H:m:s'));
-    params.append(STRING.API_TIME_ZONE, timeZone);
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setShowError(result.length <= 0);
+          setRecentData(result);
+        } else {
+          setRecentData([]);
+          setShowError(true);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
   };
 
   return (
@@ -60,15 +90,13 @@ const Store = ({navigation}) => {
             flex: 1,
           }}>
           <FlatList
-            data={[1, 2, 3, 4, 5, 6]}
+            data={recentData}
             style={{
               backgroundColor: COLORS.lightGrey,
-              paddingBottom: 5,
+              marginBottom: 15,
             }}
-            renderItem={item => {
-              return (
-                <StoreCardView image="https://images.pexels.com/photos/1081685/pexels-photo-1081685.jpeg" />
-              );
+            renderItem={({item}) => {
+              return <StoreCardView item={item} />;
             }}
           />
         </View>

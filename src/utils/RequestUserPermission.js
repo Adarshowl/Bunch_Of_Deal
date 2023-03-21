@@ -39,6 +39,7 @@ export const requestLocationPermission = async () => {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        STRING.CAN_ACCESS_LOCATION = true;
         RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({
           interval: 10000,
           fastInterval: 5000,
@@ -47,6 +48,7 @@ export const requestLocationPermission = async () => {
           .catch(err => {});
         getCurrentLatLong();
       } else if (granted === 'never_ask_again') {
+        STRING.CAN_ACCESS_LOCATION = false;
         RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({
           interval: 10000,
           fastInterval: 5000,
@@ -73,10 +75,9 @@ export const getCurrentLatLong = () => {
       //getting the Latitude from the location json
       currentLatitude = JSON.stringify(position.coords.latitude);
       STRING.CURRENT_LAT = currentLatitude;
+      STRING.CAN_ACCESS_LOCATION = true;
     },
-    error => {
-      setLocationStatus(error.message);
-    },
+    error => {},
     {
       timeout: 30000,
     },

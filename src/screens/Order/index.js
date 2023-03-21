@@ -34,7 +34,15 @@ const Order = ({navigation}) => {
               navigation.goBack();
             }}
           />
-          <Text style={styles.toolBarTitle}>Checkout</Text>
+          <Text
+            style={[
+              styles.toolBarTitle,
+              {
+                marginStart: -15,
+              },
+            ]}>
+            Checkout
+          </Text>
         </View>
         <View
           style={{

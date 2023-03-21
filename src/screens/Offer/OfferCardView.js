@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
 import {
   ActivityIndicator,
@@ -8,32 +9,39 @@ import {
 } from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {icons} from '../../constants';
+import {icons, images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-import {useNavigation} from '@react-navigation/native';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
 
-const OfferCardView = ({image}) => {
+const OfferCardView = ({item}) => {
   const navigation = useNavigation();
-
+  // ShowConsoleLogMessage(item?.distance);
   return (
     <TouchableOpacity
       style={styles.wrapper}
       activeOpacity={0.9}
       onPress={() => {
-        navigation.navigate('OfferDetails');
+        navigation.navigate('OfferDetails', {item: item});
       }}>
       <View>
-        <Image
+        {/* <Image
           source={{
-            uri: image,
+            uri: item?.images['0']['560_560'].url + '',
           }}
           resizeMode="cover"
           PlaceholderContent={
             <ActivityIndicator color={COLORS.black} size={'large'} />
           }
           style={styles.image}
+        /> */}
+
+        <BunchDealImageLoader
+          defaultImg={images.def_logo}
+          source={item?.images['0']['560_560'].url + ''}
+          styles={styles.image}
         />
         <View
           style={{
@@ -51,23 +59,38 @@ const OfferCardView = ({image}) => {
               color: COLORS.white,
               fontSize: 11,
             }}></Text> */}
-          <Text
-            style={{
-              paddingHorizontal: 15,
-              fontFamily: 'Montserrat-Medium',
-              paddingVertical: 6,
-              color: COLORS.white,
-              fontSize: 11,
-              backgroundColor: COLORS.colorPrimary,
-            }}>
-            +100km
-          </Text>
+          {item?.distance != null ? (
+            item?.distance >= 100 ? (
+              <Text
+                style={{
+                  paddingHorizontal: 15,
+                  fontFamily: 'Montserrat-Medium',
+                  paddingVertical: 6,
+                  color: COLORS.white,
+                  fontSize: 11,
+                  backgroundColor: COLORS.colorPrimary,
+                }}>
+                +100km
+              </Text>
+            ) : item?.distance < 100 ? (
+              <Text
+                style={{
+                  paddingHorizontal: 15,
+                  fontFamily: 'Montserrat-Medium',
+                  paddingVertical: 6,
+                  color: COLORS.white,
+                  fontSize: 11,
+                  backgroundColor: COLORS.colorPrimary,
+                }}>
+                {item?.distance}km
+              </Text>
+            ) : null
+          ) : null}
         </View>
       </View>
       <View style={styles.details}>
         <Text style={[FONTS.body7, styles.name]} numberOfLines={1}>
-          HSP Combo - $14 HSP Combo - $14 HSP Combo - $14HSP Combo - $14HSP
-          Combo - $14HSP
+          {item?.name}
         </Text>
         <View
           style={{
@@ -84,7 +107,7 @@ const OfferCardView = ({image}) => {
             onPress={() => {}}
           />
           <Text style={[FONTS.body5, styles.dealName]} numberOfLines={1}>
-            Turkish Kebabs and pides
+            {item?.store_name}
           </Text>
         </View>
       </View>
@@ -92,19 +115,26 @@ const OfferCardView = ({image}) => {
       <View style={styles.dealPriceWrapper}>
         <View
           style={{
-            backgroundColor: '#1565C0',
+            backgroundColor:
+              item?.featured != null && item?.featured == 0
+                ? '#1565C0'
+                : COLORS.transparent,
             margin: 5,
             borderRadius: 5,
+            width: 24,
+            height: 24,
           }}>
-          <Image
-            style={{
-              width: 24,
-              height: 24,
-              tintColor: COLORS.white,
-              padding: 5,
-            }}
-            source={icons.ic_lnr_pushpin}
-          />
+          {item?.featured != null && item?.featured == 0 ? (
+            <Image
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: COLORS.white,
+                padding: 5,
+              }}
+              source={icons.ic_lnr_pushpin}
+            />
+          ) : null}
         </View>
         <View
           style={{
@@ -112,7 +142,10 @@ const OfferCardView = ({image}) => {
             marginStart: 'auto',
           }}>
           <Text style={styles.dealText}>Deal</Text>
-          <Text style={styles.dealPriceText}>AU $34</Text>
+          <Text style={styles.dealPriceText}>
+            {item?.currency?.symbol + '' + item?.offer_value}
+            .0
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -136,6 +169,7 @@ const styles = StyleSheet.create({
     height: 195,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
+    resizeMode: 'cover',
   },
   details: {
     padding: 10,

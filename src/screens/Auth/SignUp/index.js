@@ -24,7 +24,10 @@ const SignUp = ({navigation}) => {
   }, []);
 
   const onLoginClick = () => {
-    ShowToastMessage('login success');
+    // ShowToastMessage('login success');
+    navigation.navigate('OtpVerification', {
+      data: {},
+    });
   };
 
   const onPickPhotoClick = () => {

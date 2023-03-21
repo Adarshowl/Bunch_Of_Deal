@@ -150,10 +150,11 @@ export default StyleSheet.create({
     textDecorationLine: 'underline',
   },
   Product_image: {
-    height: 350,
+    height: 390,
     backgroundColor: COLORS.colorPrimary,
     alignItems: 'center',
-    resizeMode: 'contain',
+    // resizeMode: 'contain',
+    width: '100%',
   },
   price: {
     height: 40,
@@ -170,7 +171,7 @@ export default StyleSheet.create({
     fontSize: 13,
   },
   product_amount: {
-    height: 50,
+    height: 57,
     width: '100%',
     backgroundColor: COLORS.colorPromo,
   },
@@ -183,7 +184,7 @@ export default StyleSheet.create({
     fontFamily: 'Montserrat-SemiBold',
   },
   minute: {
-    height: 38,
+    height: 44,
     width: '85%',
     backgroundColor: COLORS.colorCountdownView,
     borderRadius: 2,
@@ -200,10 +201,12 @@ export default StyleSheet.create({
   accentColorTextUnderline: {
     textAlign: 'center',
     textAlignVertical: 'center',
-    marginTop: 0,
+    marginTop: 5,
     marginStart: 5,
     color: COLORS.colorAccent,
     textDecorationLine: 'underline',
+    fontFamily: 'Montserrat-Light',
+    fontSize: 14,
   },
   FontICON: {
     height: 56,
@@ -214,9 +217,10 @@ export default StyleSheet.create({
   },
   store_image: {
     height: 300,
-    backgroundColor: COLORS.colorPrimary,
+    // backgroundColor: COLORS.colorPrimary,
     alignItems: 'center',
-    resizeMode: 'contain',
+    // resizeMode: 'contain',
+    width: '100%',
   },
   Fonticon: {
     height: 56,
@@ -229,8 +233,6 @@ export default StyleSheet.create({
     height: 60,
     width: '97%',
     marginStart: 10,
-    justifyContent: 'space-around',
-    flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
   },

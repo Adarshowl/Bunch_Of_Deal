@@ -1,4 +1,5 @@
 export const app_logo = require('../assets/images/app_logo_new_512.png');
+export const def_logo = require('../assets/images/def_logo.png');
 export const bg_no_item_cactus = require('../assets/images/bg_no_item_cactus.png');
 export const facebook = require('../assets/images/facebook.png');
 export const img_no_chat = require('../assets/images/img_no_chat.png');
@@ -39,4 +40,5 @@ export default {
   intro_3,
   intro_2,
   intro_1,
+  def_logo,
 };

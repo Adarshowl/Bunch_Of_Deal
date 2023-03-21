@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Image,
   ImageBackground,
@@ -20,10 +20,30 @@ import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import {images} from '../../constants';
+import TopTabBar from './top_tab_nav';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
-const StoreDetails = ({navigation}) => {
+const StoreDetails = ({navigation, route}) => {
+  const [imageUrl, setImageUrl] = useState(
+    'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600',
+  );
+
+  const [catImageUrl, setCatImageUrl] = useState(
+    'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600',
+  );
+  const [receivedData, setReceivedData] = useState({});
+
+  useEffect(() => {
+    let {item} = route.params;
+    console.log(JSON.stringify(item));
+    setImageUrl(item?.images['0']['560_560'].url);
+    setCatImageUrl(item?.images['0']['200_200'].url);
+    setReceivedData(item);
+  }, []);
+
   return (
     <SafeAreaView
       style={GlobalStyle1.mainContainerBgColor}
@@ -31,49 +51,77 @@ const StoreDetails = ({navigation}) => {
       <ScrollView>
         <SafeAreaView style={GlobalStyle1.mainContainerBgColor}>
           <View>
-            <ImageBackground
-              source={{
-                uri: 'https://aalamsalon.com/wp-content/uploads/2015/10/Dallas-Hair-salon-Best-Plano-Hair-Salon-Best-Frisco-Hair-Salon-Top-Allen-Hair-salon-Best-McKinney-Addison-TX-DFW-Hair-Colorist-Hair-Stylist-Men-Haircut-Mens-Hair-Cut-Hair-Salons-Best-Salons-A-.jpg',
-              }}
-              style={GlobalStyle1.store_image}>
-              <View
-                style={[
-                  GlobalStyle1.price,
-                  {
-                    alignSelf: 'flex-end',
-                    // backgroundColor: 'red',
-                    // flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    bottom: 0,
-                  },
-                ]}>
-                <Text style={[FONTS.body5, GlobalStyle1.Pricetext]}>
-                  +100 km
-                </Text>
-              </View>
-            </ImageBackground>
-          </View>
-          <View>
-            <ImageBackground
-              source={{
-                uri: 'https://thumbs.dreamstime.com/b/nail-salon-interior-as-creative-abstract-blur-background-pedicure-armchairs-modern-inside-beauty-studio-white-blue-140835941.jpg',
-              }}
-              style={GlobalStyle1.storeimage}>
+            <BunchDealImageLoader
+              defaultImg={images.def_logo}
+              source={imageUrl + ''}
+              styles={GlobalStyle1.store_image}
+            />
+            <View
+              style={[
+                GlobalStyle1.price,
+                {
+                  alignSelf: 'flex-end',
+                  // backgroundColor: 'red',
+                  // flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'absolute',
+                  bottom: 0,
+                },
+              ]}>
               <Text
                 style={[
-                  FONTS.h3,
+                  FONTS.body5,
+                  GlobalStyle1.Pricetext,
                   {
-                    textAlign: 'center',
-                    color: COLORS.black,
+                    fontFamily: 'MontSerrat-SemiBold',
                   },
                 ]}>
-                Salon and Message
+                +100 km
               </Text>
-            </ImageBackground>
+            </View>
           </View>
+          <View style={{}}>
+            <BunchDealImageLoader
+              defaultImg={images.def_logo}
+              source={catImageUrl}
+              styles={[
+                GlobalStyle1.storeimage,
+                {
+                  opacity: 1,
+                },
+              ]}
+              viewStyle={{
+                opacity: 0.2,
+              }}
+            />
+            <Text
+              style={[
+                {
+                  textAlign: 'center',
+                  color: COLORS.black,
+                  position: 'absolute',
+                  // bottom: 0,
+                  top: 25,
+                  right: 0,
+                  left: 0,
+                  fontFamily: 'Montserrat-SemiBold',
+                  fontSize: 20,
+                },
+              ]}>
+              {receivedData?.category_name}
+            </Text>
+          </View>
+
           <View
+            style={{
+              marginHorizontal: 8,
+              backgroundColor: COLORS.white,
+              paddingVertical: 5,
+            }}>
+            <TopTabBar items={receivedData} />
+          </View>
+          {/* <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-evenly',
@@ -171,8 +219,8 @@ const StoreDetails = ({navigation}) => {
                 GALLERY
               </Text>
             </View>
-          </View>
-          <View style={[GlobalStyle1.StoreBOX]}>
+          </View> */}
+          {/* <View style={[GlobalStyle1.StoreBOX]}>
             <Image
               source={{
                 uri: 'https://thumbs.dreamstime.com/b/nail-salon-interior-as-creative-abstract-blur-background-pedicure-armchairs-modern-inside-beauty-studio-white-blue-140835941.jpg',
@@ -211,7 +259,8 @@ const StoreDetails = ({navigation}) => {
               ]}>
               <Text style={[FONTS.body5, GlobalStyle1.priceText]}>AU$15.0</Text>
             </View>
-          </View>
+          </View> */}
+
           <View
             style={{
               flexDirection: 'row',

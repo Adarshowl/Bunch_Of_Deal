@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {icons, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
+import {FONTS} from '../../constants/themes';
 import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealCommonToolBar from '../../utils/BunchDealCommonToolBar';
 import BunchDealImage from '../../utils/BunchDealImage';
@@ -60,51 +61,43 @@ const Home = ({navigation}) => {
           GlobalStyle.commonToolbarBG,
           {
             justifyContent: 'space-around',
-            height: 35,
+            height: 45,
           },
         ]}>
-        <BunchDealImage
-          source={icons.ic_percent}
+        <Text
           style={[
+            FONTS.h6,
             {
-              tintColor: percent
-                ? COLORS.colorPrimary
+              color: percent
+                ? COLORS.colorAccent
                 : COLORS.shimmer_loading_color,
+              fontSize: 16,
             },
-            GlobalStyle.homeTabImageStyle,
           ]}
-          wrapperStyle={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
           onPress={() => {
             setPercent(true);
             setStoreFront(false);
-            setToolbarTitle(STRING.offers);
-          }}
-        />
-        <BunchDealImage
-          source={icons.ic_storefront}
+            setToolbarTitle('Offers');
+          }}>
+          Offers
+        </Text>
+        <Text
           style={[
+            FONTS.h6,
             {
-              tintColor: storeFront
-                ? COLORS.colorPrimary
+              color: storeFront
+                ? COLORS.colorAccent
                 : COLORS.shimmer_loading_color,
+              fontSize: 16,
             },
-            GlobalStyle.homeTabImageStyle,
           ]}
-          wrapperStyle={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
           onPress={() => {
-            setStoreFront(true);
             setPercent(false);
-            setToolbarTitle(STRING.stores);
-          }}
-        />
+            setStoreFront(true);
+            setToolbarTitle('Store');
+          }}>
+          Store
+        </Text>
       </View>
       <View
         style={{

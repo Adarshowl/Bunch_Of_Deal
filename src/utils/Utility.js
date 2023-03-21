@@ -6,15 +6,19 @@ export const ShowToastMessage = msg => {
   Toast.showWithGravity(msg + '' || '', Toast.SHORT, Toast.BOTTOM);
 };
 
+export const ShowConsoleLogMessage = msg => {
+  console.log(msg, '');
+};
+
 export const validateFieldNotEmpty = text => {
   return text ? false : true;
 };
 
 export const getMacAddress = async () => {
   if (Platform.OS == 'ios') {
-    return await DeviceInfo.getUniqueId();
+    return await DeviceInfo.getUniqueId().toString();
   } else {
-    return await DeviceInfo.getMacAddress();
+    return await DeviceInfo.getMacAddress().toString();
   }
 };
 

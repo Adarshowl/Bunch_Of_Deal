@@ -98,11 +98,21 @@ const Account = ({navigation}) => {
             // bottom: -150,
             borderRadius: 6,
             backgroundColor: COLORS.white,
-
             marginTop: 150,
           },
         ]}>
-        <View style={GlobalStyle.pickPhotoBg}>
+        <View
+          style={[
+            {
+              // height: 100,
+              // backgroundColor: 'red',
+              paddingHorizontal: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 5,
+            },
+          ]}>
           {image ? (
             <Image
               source={{

@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, LogBox} from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Splash from './src/screens/Auth/Splash';
+import React, {useEffect, useState} from 'react';
+import {LogBox, StyleSheet} from 'react-native';
 import {COLORS} from './src/constants/Colors';
-import Login from './src/screens/Auth/Login';
-import SignUp from './src/screens/Auth/SignUp';
-import Home from './src/screens/Home';
-import OnBoarding from './src/screens/Auth/OnBoarding';
-import DrawerNav from './src/navigation/DrawerNav';
-import NetInfo from '@react-native-community/netinfo';
-import NoInternetConnection from './src/utils/NoInternetConnection';
 import {requestUserPermission} from './src/firebase/notificationService';
+import DrawerNav from './src/navigation/DrawerNav';
+import Login from './src/screens/Auth/Login';
+import OnBoarding from './src/screens/Auth/OnBoarding';
+import OtpVerification from './src/screens/Auth/OtpVerification';
+import SignUp from './src/screens/Auth/SignUp';
+import Splash from './src/screens/Auth/Splash';
+import NoInternetConnection from './src/utils/NoInternetConnection';
 LogBox.ignoreAllLogs();
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +28,7 @@ const Auth = () => {
       <Stack.Screen name="OnBoarding" component={OnBoarding} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="OtpVerification" component={OtpVerification} />
     </Stack.Navigator>
   );
 };

@@ -7,9 +7,11 @@ import GlobalStyle from '../../../styles/GlobalStyle';
 
 const Splash = ({navigation}) => {
   useEffect(() => {
-    setTimeout(async () => {
-      await getUserFromStorage();
-    }, 2000);
+    navigation.replace('MainContainer');
+
+    // setTimeout(async () => {
+    //   await getUserFromStorage();
+    // }, 2000);
   }, []);
 
   const getUserFromStorage = async () => {

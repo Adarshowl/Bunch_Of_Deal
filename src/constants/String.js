@@ -37,6 +37,20 @@ export const STRING = {
   skip: 'SKIP',
   next: 'Next',
 
+  fine_print_1:
+    'Voucher Cannot be combined or used with any other offers or promotions',
+  fine_print_2: 'Standard Fine Print apply for all the offers in app',
+  fine_print_3:
+    'General Terms and Conditions and User’s Terms and Conditions apply',
+  how_to_red_1: 'Expiry: 30 days from purchase',
+  how_to_red_2: 'Standard Redeem procedure apply',
+  how_to_red_3: 'No booking required, unless stated by Business',
+  how_to_red_4: 'Payment method will be Cash or Credit/Debit Card.',
+  how_to_red_5: 'Credit/Debit Card may require at the time of claim the deal',
+  how_to_red_6:
+    'Present printed Invoice,  app purchase on arrival, or call prior for confirmation',
+  how_to_red_7: 'Download free Bunch Of Deals app on Google and IOS.',
+
   transaction_history: 'Transaction History',
   tell_friend: 'Tell Your Friend',
   notifications: 'Notifications',
@@ -88,4 +102,8 @@ export const STRING = {
   CURRENT_LAT: 0.0,
   CURRENT_LONG: 0.0,
   FCM_TOKEN: '',
+  MAC_ADR: '00:02:00:00:00',
+
+  CAN_ACCESS_LOCATION: false,
+  IS_LOGGED_IN: false,
 };

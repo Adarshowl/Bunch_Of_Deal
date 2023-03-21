@@ -12,26 +12,36 @@ import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {useNavigation} from '@react-navigation/native';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import {images} from '../../constants';
+import LinearGradient from 'react-native-linear-gradient';
 
-const StoreCardView = ({image}) => {
+const StoreCardView = ({item}) => {
   const navigation = useNavigation();
+  // ShowConsoleLogMessage(item);
   return (
     <TouchableOpacity
       style={styles.wrapper}
       activeOpacity={0.9}
       onPress={() => {
-        navigation.navigate('StoreDetails');
+        navigation.navigate('StoreDetails', {item: item});
       }}>
       <View>
-        <Image
-          source={{
-            uri: image,
+        <BunchDealImageLoader
+          defaultImg={images.def_logo}
+          source={item?.images['0']['560_560'].url + ''}
+          styles={styles.image}
+        />
+        <LinearGradient
+          colors={[COLORS.transparent, '#00000000', '#00000050', '#00000090']}
+          style={{
+            paddingVertical: 25,
+            position: 'absolute',
+            right: 0,
+            left: 0,
+            bottom: 0,
           }}
-          resizeMode="cover"
-          PlaceholderContent={
-            <ActivityIndicator color={COLORS.black} size={'large'} />
-          }
-          style={styles.image}
         />
         <View
           style={{
@@ -64,7 +74,7 @@ const StoreCardView = ({image}) => {
                 fontSize: 13,
                 marginStart: 5,
               }}>
-              4 (2)
+              {item?.votes?.toFixed(2)}
             </Text>
           </View>
           <Text
@@ -76,25 +86,40 @@ const StoreCardView = ({image}) => {
               color: COLORS.white,
               fontSize: 11,
             }}>
-            1 offer
+            {item?.nbrOffers} {item?.nbrOffers > 1 ? 'offers' : 'offer'}
           </Text>
-          <Text
-            style={{
-              paddingHorizontal: 15,
-              fontFamily: 'Montserrat-Medium',
-              paddingVertical: 6,
-              color: COLORS.white,
-              fontSize: 11,
-              backgroundColor: COLORS.colorPrimary,
-            }}>
-            +100km
-          </Text>
+          {item?.distance != null ? (
+            item?.distance >= 100 ? (
+              <Text
+                style={{
+                  paddingHorizontal: 15,
+                  fontFamily: 'Montserrat-Medium',
+                  paddingVertical: 6,
+                  color: COLORS.white,
+                  fontSize: 11,
+                  backgroundColor: COLORS.colorPrimary,
+                }}>
+                +100km
+              </Text>
+            ) : item?.distance < 100 ? (
+              <Text
+                style={{
+                  paddingHorizontal: 15,
+                  fontFamily: 'Montserrat-Medium',
+                  paddingVertical: 6,
+                  color: COLORS.white,
+                  fontSize: 11,
+                  backgroundColor: COLORS.colorPrimary,
+                }}>
+                {item?.distance}km
+              </Text>
+            ) : null
+          ) : null}
         </View>
       </View>
       <View style={styles.details}>
         <Text style={[FONTS.body7, styles.name]} numberOfLines={1}>
-          HSP Combo - $14 HSP Combo - $14 HSP Combo - $14HSP Combo - $14HSP
-          Combo - $14HSP
+          {item?.name}
         </Text>
         <View
           style={{
@@ -111,7 +136,7 @@ const StoreCardView = ({image}) => {
             onPress={() => {}}
           />
           <Text style={[FONTS.body5, styles.dealName]} numberOfLines={1}>
-            Turkish Kebabs and pides
+            {item?.address}
           </Text>
         </View>
       </View>
@@ -138,7 +163,7 @@ const StoreCardView = ({image}) => {
             flexDirection: 'row',
             marginStart: 'auto',
           }}>
-          <Text style={styles.dealPriceText}>AU $34</Text>
+          <Text style={styles.dealPriceText}>{item?.lastOffer}</Text>
         </View>
       </View>
     </TouchableOpacity>

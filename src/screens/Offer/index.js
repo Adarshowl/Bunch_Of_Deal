@@ -8,7 +8,11 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealImageText from '../../utils/BunchDealImageText';
 import BunchDealVectorIconText from '../../utils/BunchDealVectorIconText';
 import {requestLocationPermission} from '../../utils/RequestUserPermission';
-import {getMacAddress, Timezone} from '../../utils/Utility';
+import {
+  getMacAddress,
+  ShowConsoleLogMessage,
+  Timezone,
+} from '../../utils/Utility';
 import moment from 'moment';
 import OfferCardView from './OfferCardView';
 import ApiCall from '../../network/ApiCall';
@@ -23,6 +27,11 @@ const Offer = ({navigation}) => {
   const [longitude, setLongitude] = useState(0.0);
   const [haveLocationPermission, setHaveLocationPermission] = useState(false);
 
+  const [recentData, setRecentData] = useState([]);
+  const [nearByData, setNearByData] = useState([]);
+
+  const [showError, setShowError] = useState(false);
+
   useEffect(() => {
     const permission = requestLocationPermission();
     setHaveLocationPermission(permission);
@@ -30,77 +39,89 @@ const Offer = ({navigation}) => {
       // console.log(result);
       setTimezone(result);
     });
+    getOfferList('recent');
   }, []);
 
-  const getOfferList = () => {
-    const params = new FormData();
-    if (STRING.CURRENT_LAT != 0.0 || STRING.CURRENT_LONG != 0.0) {
-      params.append(STRING.API_LATITUDE, STRING.CURRENT_LAT + '');
-      params.append(STRING.API_LONGITUDE, STRING.CURRENT_LONG + '');
-      //order by geo
-      params.append(STRING.API_ORDER_BY, STRING.ORDER_NEARBY);
-    } else {
-      //order by date
-      params.append(STRING.API_ORDER_BY, STRING.ORDER_RECENT);
-    }
-    params.append(STRING.API_OFFER_IDS, '0');
-
-    params.append(STRING.API_TOKEN, STRING.FCM_TOKEN);
-    params.append(STRING.API_MAC_ADR, getMacAddress());
-    params.append(STRING.API_LIMIT, '30');
-    params.append(STRING.API_PAGE, '1');
-    params.append(STRING.API_SEARCH, '');
-    params.append(STRING.API_DATE, moment().format('yyyy-MM-dd H:m:s'));
-    params.append(STRING.API_TIME_ZONE, timeZone);
-  };
-
-  useEffect(() => {
-    getAllOffers();
-  }, []);
-
-  const getAllOffers = () => {
-    let d = {
-      date: '2023-03-17 16:24:57',
-      mac_adr: '',
-      search: '',
-      timezone: 'Asia/Kolkata',
-      latitude: 22.955682,
-      limit: 30,
+  const getOfferList = val => {
+    let body = {
+      latitude: STRING.CURRENT_LAT + '',
+      longitude: STRING.CURRENT_LONG + '',
       order_by: 'recent',
-      page: 1,
-      longitude: 76.0328272,
-      token: '',
+      offer_ids: '0',
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
+      limit: '30',
+      page: '1',
+      search: '',
+      date: moment().format('yyyy-MM-dd H:m:s'),
+      timezone: timeZone,
     };
 
-    // console.log(d);
+    // ShowConsoleLogMessage(JSON.stringify(body));
 
-    const params = new FormData();
-    params.append('date', '2023-03-17 16:24:57');
-    params.append('mac_adr', '02:00:00:00:00');
-    params.append('search', '');
-    params.append('timezone', 'Asia/Kolkata');
-    params.append('latitude', '22.955682,');
-    params.append('limit', 30);
-    params.append('order_by', 'recent');
-    params.append('page', '1');
-    params.append('longitude', '76.0328272');
-    params.append('token', '');
-
-    ApiCall(
-      'post',
-      JSON.stringify(d),
-      'https://bunchofdeals.com.au/APP_CLONE/index.php/1.0/offer/getOffers',
-      {
-        // ApiCall('post', JSON.stringify(d), API_END_POINTS.API_GET_OFFERS, {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data',
-      },
-    )
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
       .then(response => {
-        // console.log(response.data);
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setShowError(result.length <= 0);
+          setRecentData(result);
+        } else {
+          setRecentData([]);
+          setShowError(true);
+        }
       })
       .catch(err => {
-        console.log(err);
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
+
+  const getNearbyList = val => {
+    let body = {
+      latitude: STRING.CURRENT_LAT + '',
+      longitude: STRING.CURRENT_LONG + '',
+      order_by: 'nearby',
+      offer_ids: '0',
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
+      limit: '30',
+      page: '1',
+      search: '',
+      date: moment().format('yyyy-MM-dd H:m:s'),
+      timezone: timeZone,
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setShowError(result.length <= 0);
+          setNearByData(result);
+        } else {
+          setNearByData([]);
+          setShowError(true);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
       })
       .finally(() => {});
   };
@@ -139,6 +160,7 @@ const Offer = ({navigation}) => {
           onPress={() => {
             setPercent(true);
             setStoreFront(false);
+            getOfferList('recent');
           }}
         />
         <BunchDealVectorIconText
@@ -161,6 +183,7 @@ const Offer = ({navigation}) => {
           onPress={() => {
             setPercent(false);
             setStoreFront(true);
+            getNearbyList('nearby');
           }}
         />
       </View>
@@ -170,15 +193,13 @@ const Offer = ({navigation}) => {
             flex: 1,
           }}>
           <FlatList
-            data={[1, 2, 3, 4, 5, 6]}
+            data={recentData}
             style={{
               backgroundColor: COLORS.lightGrey,
-              paddingBottom: 5,
+              marginBottom: 15,
             }}
-            renderItem={item => {
-              return (
-                <OfferCardView image="https://images.pexels.com/photos/1081685/pexels-photo-1081685.jpeg" />
-              );
+            renderItem={({item}) => {
+              return <OfferCardView item={item} />;
             }}
           />
         </View>
@@ -190,15 +211,13 @@ const Offer = ({navigation}) => {
             flex: 1,
           }}>
           <FlatList
-            data={[1, 2, 3, 4, 5, 6]}
+            data={nearByData}
             style={{
               backgroundColor: COLORS.lightGrey,
               paddingBottom: 5,
             }}
-            renderItem={item => {
-              return (
-                <OfferCardView image="https://images.pexels.com/photos/1559486/pexels-photo-1559486.jpeg" />
-              );
+            renderItem={({item}) => {
+              return <OfferCardView item={item} />;
             }}
           />
         </View>
