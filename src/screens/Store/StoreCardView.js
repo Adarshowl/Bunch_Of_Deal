@@ -1,21 +1,13 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {Image} from 'react-native-elements';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
-import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-import {useNavigation} from '@react-navigation/native';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {images} from '../../constants';
-import LinearGradient from 'react-native-linear-gradient';
+import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 
 const StoreCardView = ({item}) => {
   const navigation = useNavigation();
@@ -75,6 +67,7 @@ const StoreCardView = ({item}) => {
                 marginStart: 5,
               }}>
               {item?.votes?.toFixed(2)}
+              {' (' + item?.nbr_votes + ')'}
             </Text>
           </View>
           <Text

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Text} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -6,12 +6,15 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {icons, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealCommonToolBar from '../../utils/BunchDealCommonToolBar';
 import BunchDealImage from '../../utils/BunchDealImage';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-import {ShowToastMessage} from '../../utils/Utility';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import Offer from '../Offer';
+import SearchDialog from '../Search';
 import Store from '../Store';
 
 const Home = ({navigation}) => {
@@ -19,6 +22,55 @@ const Home = ({navigation}) => {
 
   const [percent, setPercent] = useState(true);
   const [storeFront, setStoreFront] = useState(false);
+
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  const [showSearchModal, setShowSearchModal] = useState(false);
+
+  const [searchText, setSearchText] = useState('');
+
+  const closeSearchModal = () => {
+    setShowSearchModal(!showSearchModal);
+  };
+
+  useEffect(() => {
+    getNotificationCount();
+  }, []);
+
+  const getNotificationCount = val => {
+    let body = {
+      user_id: '578',
+      guest_id: '0',
+      // auth_type: '', // if login not sent
+      // auth_id: '', // if login sent not
+      status: '0', // 0 for getting unread notifications
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_NOTIFICATIONS_COUNT_GET);
+    ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_COUNT_GET, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(response.data);
+          // let result = Object.values(response.data?.result);
+          setNotificationCount(response?.data?.result);
+        } else {
+          setNotificationCount(0);
+        }
+      })
+      .catch(err => {
+        setNotificationCount(0);
+
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
 
   return (
     <View style={GlobalStyle.mainContainerBgColor}>
@@ -41,19 +93,39 @@ const Home = ({navigation}) => {
           size={18}
           style={GlobalStyle.marginHorizontal10}
           onPress={() => {
-            ShowToastMessage('Coming soon!');
+            // ShowToastMessage('Coming soon!');
+            closeSearchModal();
           }}
         />
-        <BunchDealVectorIcon
-          title={MaterialIcons}
-          name={'notifications'}
-          color={COLORS.colorPrimary}
-          size={25}
-          style={GlobalStyle.marginHorizontal15}
-          onPress={() => {
-            navigation.navigate('Notification');
-          }}
-        />
+        <View>
+          <BunchDealVectorIcon
+            title={MaterialIcons}
+            name={'notifications'}
+            color={COLORS.colorPrimary}
+            size={25}
+            style={GlobalStyle.marginHorizontal15}
+            onPress={() => {
+              navigation.navigate('Notification');
+            }}
+          />
+          {notificationCount > 0 ? (
+            <Text
+              style={{
+                fontSize: 13,
+                fontFamily: 'Montserrat-Regular',
+                backgroundColor: COLORS.colorPromo,
+                textAlign: 'center',
+                color: COLORS.white,
+                position: 'absolute',
+                right: 10,
+                top: -5,
+                paddingHorizontal: 5,
+                borderRadius: 5,
+              }}>
+              {notificationCount}
+            </Text>
+          ) : null}
+        </View>
       </View>
 
       <View
@@ -108,6 +180,17 @@ const Home = ({navigation}) => {
       />
       {percent ? <Offer /> : null}
       {storeFront ? <Store /> : null}
+      <SearchDialog
+        show={showSearchModal}
+        onPress={closeSearchModal}
+        title={percent ? 'offers' : 'stores'}
+        onRequestClose={closeSearchModal}
+        searchText={searchText}
+        onChangeText={val => {
+          ShowConsoleLogMessage(val);
+          setSearchText(val);
+        }}
+      />
     </View>
   );
 };

@@ -57,7 +57,7 @@ const Offer = ({navigation}) => {
       timezone: timeZone,
     };
 
-    // ShowConsoleLogMessage(JSON.stringify(body));
+    ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -65,6 +65,8 @@ const Offer = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
+        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
@@ -77,6 +79,7 @@ const Offer = ({navigation}) => {
         }
       })
       .catch(err => {
+        // console.log('eorir < ', err);
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -99,7 +102,7 @@ const Offer = ({navigation}) => {
       timezone: timeZone,
     };
 
-    // ShowConsoleLogMessage(JSON.stringify(body));
+    ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -107,8 +110,8 @@ const Offer = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
+        // ShowConsoleLogMessage('response 1> ' + JSON.stringify(response?.data));
         if (response?.data?.success == 1) {
-          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
           // ShowConsoleLogMessage(JSON.stringify(result));
           setShowError(result.length <= 0);
@@ -119,6 +122,8 @@ const Offer = ({navigation}) => {
         }
       })
       .catch(err => {
+        // console.log('Erro -> ', err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );

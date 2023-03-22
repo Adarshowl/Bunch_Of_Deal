@@ -2,7 +2,9 @@ import React from 'react';
 import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {SIZES} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import StoreOffer from './StoreOffer';
@@ -69,15 +71,46 @@ const MyTabBar = ({state, descriptors, navigation, position}) => {
               justifyContent: 'center',
               alignItems: 'center',
               height: 45,
-              backgroundColor: isFocused ? COLORS.white : COLORS.colorPrimary,
+              backgroundColor: isFocused ? COLORS.white : COLORS.colorAccent,
               paddingHorizontal: 10,
               borderColor: COLORS.white,
               borderWidth: 0.5,
+              flexDirection: 'row',
             }}>
+            {label == 'Review' ? (
+              <Ionicons
+                name="chatbox-sharp"
+                color={isFocused ? COLORS.colorAccent : COLORS.white}
+                size={18}
+                style={{
+                  marginEnd: 10,
+                }}
+              />
+            ) : label == 'Gallery' ? (
+              <MaterialCommunityIcons
+                name="view-gallery"
+                color={isFocused ? COLORS.colorPrimary : COLORS.white}
+                size={18}
+                style={{
+                  marginEnd: 10,
+                }}
+              />
+            ) : label == 'Offers' ? (
+              <MaterialIcons
+                name="local-offer"
+                color={isFocused ? COLORS.colorPrimary : COLORS.white}
+                size={18}
+                style={{
+                  marginEnd: 10,
+                }}
+              />
+            ) : null}
             <Animated.Text
               style={{
                 color: isFocused ? COLORS.colorPrimary : COLORS.white,
-                fontFamily: 'Montserrat-Regular',
+                fontFamily: 'Montserrat-Medium',
+                textTransform: 'uppercase',
+                fontSize: 12,
               }}>
               {label}
             </Animated.Text>
@@ -96,7 +129,10 @@ const TopTabBar = ({items}) => {
       style={{
         backgroundColor: COLORS.transparent,
       }}>
-      <Tab.Screen name="Offer" children={item => <StoreOffer item={items} />} />
+      <Tab.Screen
+        name="Offers"
+        children={item => <StoreOffer item={items} />}
+      />
       <Tab.Screen
         name="Review"
         children={item => <StoreReview item={items} />}

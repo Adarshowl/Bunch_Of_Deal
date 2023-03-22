@@ -1,20 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import {
-  ImageBackground,
+  Image,
+  Modal,
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  Modal,
-  Image,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import {
   default as Entypo,
   default as Entypofrom,
 } from 'react-native-vector-icons/Entypo';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
@@ -25,8 +24,9 @@ import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 // import CountDown from 'react-native-countdown-component';
-import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {images} from '../../constants';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import {ShowToastMessage} from '../../utils/Utility';
 
 const OfferDetails = ({navigation, route}) => {
   const [intentCause, setIntentCause] = useState(false);
@@ -35,19 +35,22 @@ const OfferDetails = ({navigation, route}) => {
   const [receivedData, setReceivedData] = useState({});
 
   const [count, setCount] = useState(1);
+  const [price, setPrice] = useState(0);
+  const [originalPrice, setOriginalPrice] = useState(0);
 
   const onOrderClick = () => {
     // navigation.navigate('Order');
     // if (STRING.IS_LOGGED_IN == true) {
 
-    closeQtyModal();
-    // if (parseInt(receivedData?.qty_enabled) == 1) {
-    //   console.log('show dialog with');
-    // } else {
-    //   navigation.navigate('Order', {
-    //     item: receivedData,
-    //   });
-    // }
+    if (parseInt(receivedData?.qty_enabled) > 0) {
+      closeQtyModal();
+      // console.log('show dialog with');
+    } else {
+      navigation.navigate('Order', {
+        item: receivedData,
+      });
+      ShowToastMessage('Work in progress!');
+    }
 
     // } else {
     //   navigation.replace('Auth');
@@ -61,6 +64,8 @@ const OfferDetails = ({navigation, route}) => {
     // console.log(JSON.stringify(item));
     setImageUrl(item?.images['0']['560_560'].url);
     setReceivedData(item);
+    setPrice(item?.offer_value);
+    setOriginalPrice(item?.offer_value);
   }, []);
 
   const [showQtyModal, setShowQtyModal] = useState(false);
@@ -150,9 +155,7 @@ const OfferDetails = ({navigation, route}) => {
                       fontFamily: 'Montserrat-Regular',
                       color: COLORS.colorAccent,
                     }}>
-                    {receivedData?.currency?.symbol +
-                      '' +
-                      receivedData?.offer_value}
+                    {receivedData?.currency?.symbol + '' + price}
                     .0
                   </Text>
                   <View
@@ -172,6 +175,8 @@ const OfferDetails = ({navigation, route}) => {
                       onPress={() => {
                         if (count > 1) {
                           setCount(prev => prev - 1);
+                          let p1 = parseInt(price) - parseInt(originalPrice);
+                          setPrice(p1);
                         }
                       }}
                     />
@@ -194,6 +199,8 @@ const OfferDetails = ({navigation, route}) => {
                       }}
                       onPress={() => {
                         setCount(prev => prev + 1);
+                        let p1 = parseInt(price) + parseInt(originalPrice);
+                        setPrice(p1);
                       }}
                     />
                   </View>
@@ -230,6 +237,7 @@ const OfferDetails = ({navigation, route}) => {
                       item: receivedData,
                       count: count,
                     });
+                    ShowToastMessage('Work in progress');
                   }}
                   style={{
                     fontSize: 16,
@@ -381,7 +389,10 @@ const OfferDetails = ({navigation, route}) => {
               Store Detail
             </Text>
             <TouchableOpacity
-              onPress={() => {}}
+              onPress={() => {
+                console.log(JSON.stringify(receivedData));
+                navigation.navigate('StoreDetails', {item: receivedData});
+              }}
               activeOpacity={0.8}
               style={{flexDirection: 'row', alignItems: 'center'}}>
               <Ionicons

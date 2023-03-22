@@ -6,6 +6,9 @@ import {
   ScrollView,
   Text,
   View,
+  TouchableOpacity,
+  Linking,
+  Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
@@ -23,6 +26,10 @@ import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {images} from '../../constants';
 import TopTabBar from './top_tab_nav';
+import {requestContactPermission} from '../../utils/RequestUserPermission';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import ApiCall from '../../network/ApiCall';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
@@ -35,14 +42,73 @@ const StoreDetails = ({navigation, route}) => {
     'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600',
   );
   const [receivedData, setReceivedData] = useState({});
+  const [haveContactPermission, setHaveContactPermission] = useState({});
+
+  const triggerCall = () => {
+    let m = receivedData?.telephone + '';
+    // if (m.includes('+91')) {
+    //   m.replace('+91');
+    // } else {
+    //   m.replace('+91');
+    // }
+
+    try {
+      Linking.openURL(`tel:${m}`);
+    } catch (error) {}
+  };
+
+  const getStoreList = val => {
+    let body = {
+      limit: '1',
+      store_id: val,
+    };
+
+    ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          ShowConsoleLogMessage(JSON.stringify(response?.data));
+          let result = Object.values(response.data?.result);
+          setReceivedData(result[0]);
+        } else {
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
 
   useEffect(() => {
     let {item} = route.params;
-    console.log(JSON.stringify(item));
+    // console.log(JSON.stringify(item));
     setImageUrl(item?.images['0']['560_560'].url);
     setCatImageUrl(item?.images['0']['200_200'].url);
-    setReceivedData(item);
+    if (item?.id_store == undefined || null) {
+      getStoreList(item?.store_id);
+    } else {
+      setReceivedData(item);
+    }
   }, []);
+
+  const openMap = () => {
+    const scheme = Platform.select({ios: 'maps:0,0?q=', android: 'geo:0,0?q='});
+    const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
+    const label = receivedData?.name;
+    // const label = 'Open Google Map';
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`,
+    });
+    Linking.openURL(url);
+  };
 
   return (
     <SafeAreaView
@@ -118,231 +184,128 @@ const StoreDetails = ({navigation, route}) => {
               marginHorizontal: 8,
               backgroundColor: COLORS.white,
               paddingVertical: 5,
+              marginTop: 12,
+              minHeight: 350,
             }}>
             <TopTabBar items={receivedData} />
           </View>
-          {/* <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              marginHorizontal: 10,
-              marginTop: 10,
-              width: '94%',
-            }}>
-            <View
-              style={[
-                GlobalStyle1.OfferBOX,
-                {
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 15,
-                  justifyContent: 'center',
-                  backgroundColor: COLORS.white,
-                },
-              ]}>
-              <AntDesign
-                name="tags"
-                size={18}
-                color={COLORS.colorAccent}
-                style={{}}
-              />
-              <View
-                style={{
-                  marginHorizontal: 5,
-                }}
-              />
-              <Text style={[FONTS.body5, GlobalStyle1.Offertext]}>OFFERS</Text>
-            </View>
-            <View
-              style={[
-                GlobalStyle1.OfferBOX,
-                {
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 15,
-                  justifyContent: 'center',
-                  backgroundColor: COLORS.colorAccent,
-                },
-              ]}>
-              <Feather
-                name="message-square"
-                size={18}
-                color={COLORS.white}
-                style={{}}
-              />
-              <View
-                style={{
-                  marginHorizontal: 5,
-                }}
-              />
-              <Text
-                style={[
-                  FONTS.body5,
-                  GlobalStyle1.Offertext,
-                  {
-                    color: COLORS.white,
-                  },
-                ]}>
-                REVIEWS
-              </Text>
-            </View>
-            <View
-              style={[
-                GlobalStyle1.OfferBOX,
-                {
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingHorizontal: 15,
-                  justifyContent: 'center',
-                  backgroundColor: COLORS.colorAccent,
-                },
-              ]}>
-              <MaterialCommunityIcons
-                name="view-gallery-outline"
-                size={18}
-                color={COLORS.white}
-                style={{}}
-              />
-              <View
-                style={{
-                  marginHorizontal: 5,
-                }}
-              />
-              <Text
-                style={[
-                  FONTS.body5,
-                  GlobalStyle1.Offertext,
-                  {
-                    color: COLORS.white,
-                  },
-                ]}>
-                GALLERY
-              </Text>
-            </View>
-          </View> */}
-          {/* <View style={[GlobalStyle1.StoreBOX]}>
-            <Image
-              source={{
-                uri: 'https://thumbs.dreamstime.com/b/nail-salon-interior-as-creative-abstract-blur-background-pedicure-armchairs-modern-inside-beauty-studio-white-blue-140835941.jpg',
-              }}
-              style={GlobalStyle1.Storeimages}
-            />
-            <Text
-              style={[
-                FONTS.body4,
-                {
-                  marginStart: 85,
-                  color: COLORS.black,
-                  marginTop: -55,
-                },
-              ]}>
-              MENS's HAIR CUT - $15
-            </Text>
-            <Text
-              style={[
-                FONTS.body5,
-                {
-                  marginStart: 85,
-                  color: COLORS.darkgray,
-                  maxWidth: 255,
-                },
-              ]}>
-              THIS IS A DUMMY DEALmen's hair cut..
-            </Text>
-            <View
-              style={[
-                GlobalStyle1.price_BOX,
-                {
-                  marginTop: 10,
-                  marginRight: 10,
-                },
-              ]}>
-              <Text style={[FONTS.body5, GlobalStyle1.priceText]}>AU$15.0</Text>
-            </View>
-          </View> */}
-
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
               marginTop: 15,
-              marginHorizontal: 15,
+              marginHorizontal: 10,
               marginBottom: 15,
               backgroundColor: COLORS.white,
             }}>
-            <View style={[GlobalStyle1.iconBOX, {}]}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                // let res = requestContactPermission();
+                // ShowConsoleLogMessage(
+                //   JSON.stringify(res) + ' Permission granted',
+                // );
+                // setHaveContactPermission(res);
+                // if (haveContactPermission) {
+                // }
+                triggerCall();
+              }}
+              style={[GlobalStyle1.iconBOX, {}]}>
               <FontAwesome
                 name="phone"
-                size={18}
+                size={20}
                 color={COLORS.white}
                 style={{
-                  marginVertical: 12,
+                  marginVertical: 10,
                   alignSelf: 'center',
                 }}
               />
-            </View>
-            <View style={[GlobalStyle1.iconBOX, {}]}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                openMap();
+              }}
+              style={[GlobalStyle1.iconBOX, {}]}>
               <MaterialCommunityIcons
                 name="directions"
-                size={18}
+                size={20}
                 color={COLORS.white}
                 style={{
                   marginVertical: 10,
                   alignSelf: 'center',
                 }}
               />
-            </View>
-            <View style={[GlobalStyle1.iconBOX, {}]}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                ShowToastMessage('Api required');
+              }}
+              style={[GlobalStyle1.iconBOX, {}]}>
               <FontAwesome
                 name="heart-o"
-                size={18}
+                size={20}
                 color={COLORS.white}
                 style={{
                   marginVertical: 10,
                   alignSelf: 'center',
                 }}
               />
-            </View>
+            </TouchableOpacity>
           </View>
-          <View style={[GlobalStyle1.StoreBOX1]}>
+
+          <View
+            style={[
+              GlobalStyle1.StoreBOX1,
+              {
+                paddingBottom: 10,
+                paddingHorizontal: 15,
+              },
+            ]}>
             <Text
               style={[
-                FONTS.h5,
                 {
-                  marginStart: 20,
                   color: COLORS.black,
                   marginTop: 10,
+                  fontFamily: 'Montserrat-SemiBold',
+                  fontSize: 16,
                 },
               ]}>
-              HAIRSMITH UNISEX SALON
+              {receivedData?.name}
             </Text>
             <Text
               style={[
                 FONTS.body5,
                 {
-                  marginStart: 20,
                   color: COLORS.darkgray,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 13,
                 },
               ]}>
-              HAIR SMITH HAIR AND BEAUTY SALON UNISEX SALON
+              {receivedData?.detail}
+              {/* n publishing and graphic design,
+              Lorem ipsum is a placeholder text commonly used to demonstrate the
+              visual form of a document or a typeface */}
             </Text>
           </View>
+
           <View
             style={[
               GlobalStyle1.StoreBOX2,
               {
                 flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 10,
+                marginBottom: 15,
               },
             ]}>
             <Ionicons
               name="md-location-sharp"
               size={18}
               color={COLORS.colorAccent}
-              style={{
-                marginTop: 20,
-                marginStart: 22,
-              }}
+              style={{}}
             />
             <Text
               style={[
@@ -350,18 +313,12 @@ const StoreDetails = ({navigation, route}) => {
                 {
                   marginStart: 10,
                   color: COLORS.darkgray,
-                  marginTop: 15,
-                  maxWidth: 270,
+                  flex: 1,
                 },
               ]}>
-              11 Ascot Vale Rd, Flegmington VIC 3031, Australia
+              {receivedData?.address}
             </Text>
           </View>
-          <ImageBackground
-            source={{
-              uri: 'https://png.pngtree.com/background/20221109/original/pngtree-city-map-gps-navigation-with-location-pin-markers-picture-image_1953527.jpg',
-            }}
-            style={GlobalStyle1.Locationimage}></ImageBackground>
         </SafeAreaView>
       </ScrollView>
 

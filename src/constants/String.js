@@ -36,6 +36,7 @@ export const STRING = {
   register_now: 'Register Now',
   skip: 'SKIP',
   next: 'Next',
+  add_review: 'Add Review',
 
   fine_print_1:
     'Voucher Cannot be combined or used with any other offers or promotions',
