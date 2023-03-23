@@ -21,6 +21,9 @@ export const COLORS = {
 
   colorCountdownView: '#F4B400',
   colorPromo: '#E53935',
+  lightGreen: '#8BC34A',
+
+  grey_20: '#cccccc',
 
   // dots inactive colors
   dot_dark_screen1: '#d1395c',

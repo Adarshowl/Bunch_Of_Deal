@@ -107,4 +107,5 @@ export const STRING = {
 
   CAN_ACCESS_LOCATION: false,
   IS_LOGGED_IN: false,
+  SEARCH_LOCATION: 'Current Location',
 };

@@ -3,6 +3,7 @@ export const ic_storefront = require('../assets/icons/ic_storefront.png');
 export const ic_calendar = require('../assets/icons/ic_calendar.png');
 export const no_internet_found = require('../assets/icons/no_internet_found.png');
 export const ic_lnr_pushpin = require('../assets/icons/ic_lnr_pushpin.png');
+export const small_notification_icon = require('../assets/icons/small_notification_icon.png');
 
 export default {
   ic_percent,
@@ -10,4 +11,5 @@ export default {
   ic_calendar,
   no_internet_found,
   ic_lnr_pushpin,
+  small_notification_icon,
 };

@@ -17,30 +17,91 @@ import moment from 'moment';
 import OfferCardView from './OfferCardView';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
+import NoResult from '../../utils/NoResult';
 
-const Offer = ({navigation}) => {
+const Offer = ({
+  navigation,
+  searchText,
+  catId,
+  radius,
+  location,
+  dataChange,
+}) => {
   const [percent, setPercent] = useState(true);
   const [storeFront, setStoreFront] = useState(false);
-
   const [timeZone, setTimezone] = useState('');
   const [latitude, setLatitude] = useState(0.0);
   const [longitude, setLongitude] = useState(0.0);
   const [haveLocationPermission, setHaveLocationPermission] = useState(false);
-
   const [recentData, setRecentData] = useState([]);
   const [nearByData, setNearByData] = useState([]);
-
   const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     const permission = requestLocationPermission();
     setHaveLocationPermission(permission);
     Timezone.getTimeZone().then(result => {
-      // console.log(result);
       setTimezone(result);
     });
     getOfferList('recent');
   }, []);
+
+  useEffect(() => {
+    if (dataChange) {
+      getSearchOfferList(searchText, catId, radius, location);
+    }
+  }, [dataChange]);
+
+  const getSearchOfferList = (search, catId, radius, location) => {
+    let body = {
+      latitude: STRING.CURRENT_LAT + '',
+      longitude: STRING.CURRENT_LONG + '',
+      order_by: 'recent',
+      offer_ids: '0',
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
+      limit: '30',
+      page: '1',
+      search: search,
+      category_id: catId,
+      radius: radius,
+      date: moment().format('yyyy-MM-dd H:m:s'),
+      timezone: timeZone,
+    };
+
+    ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setShowError(result.length <= 0);
+          setRecentData(result);
+        } else {
+          setRecentData([]);
+          setShowError(true);
+        }
+      })
+      .catch(err => {
+        // console.log('eorir < ', err);
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
+
+  const onReloadBtn = () => {
+    getOfferList('rest');
+  };
 
   const getOfferList = val => {
     let body = {
@@ -57,7 +118,7 @@ const Offer = ({navigation}) => {
       timezone: timeZone,
     };
 
-    ShowConsoleLogMessage(JSON.stringify(body));
+    // ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -66,7 +127,6 @@ const Offer = ({navigation}) => {
     })
       .then(response => {
         // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
-
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
@@ -79,7 +139,7 @@ const Offer = ({navigation}) => {
         }
       })
       .catch(err => {
-        // console.log('eorir < ', err);
+        // console.log('error < ', err);
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -197,16 +257,20 @@ const Offer = ({navigation}) => {
           style={{
             flex: 1,
           }}>
-          <FlatList
-            data={recentData}
-            style={{
-              backgroundColor: COLORS.lightGrey,
-              marginBottom: 15,
-            }}
-            renderItem={({item}) => {
-              return <OfferCardView item={item} />;
-            }}
-          />
+          {!showError ? (
+            <FlatList
+              data={recentData}
+              style={{
+                backgroundColor: COLORS.lightGrey,
+                marginBottom: 15,
+              }}
+              renderItem={({item}) => {
+                return <OfferCardView item={item} />;
+              }}
+            />
+          ) : (
+            <NoResult onReloadBtn={onReloadBtn} />
+          )}
         </View>
       ) : null}
 
@@ -215,16 +279,20 @@ const Offer = ({navigation}) => {
           style={{
             flex: 1,
           }}>
-          <FlatList
-            data={nearByData}
-            style={{
-              backgroundColor: COLORS.lightGrey,
-              paddingBottom: 5,
-            }}
-            renderItem={({item}) => {
-              return <OfferCardView item={item} />;
-            }}
-          />
+          {!showError ? (
+            <FlatList
+              data={nearByData}
+              style={{
+                backgroundColor: COLORS.lightGrey,
+                paddingBottom: 5,
+              }}
+              renderItem={({item}) => {
+                return <OfferCardView item={item} />;
+              }}
+            />
+          ) : (
+            <NoResult onReloadBtn={onReloadBtn} />
+          )}
         </View>
       ) : null}
     </View>

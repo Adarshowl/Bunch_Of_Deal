@@ -106,7 +106,8 @@ export const API_END_POINTS = {
   API_USER_UPLOAD64: CLONE_BASE_URL + API + 'uploader/uploadImage64',
 
   //user API's
-
+  signUp: `${CLONE_BASE_URL}${API}user/signUp`,
+  signin: `${CLONE_BASE_URL}${API}user/signIn`,
   API_VERIFY_OTP: CLONE_BASE_URL + API + 'user/verifyOTP',
   API_RESEND_OTP: CLONE_BASE_URL + API + 'user/resendOTP',
   API_FACEBOOK_SIGNUP: CLONE_BASE_URL + API + 'user/verifyfacebook',

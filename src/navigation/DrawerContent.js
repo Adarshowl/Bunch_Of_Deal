@@ -1,25 +1,51 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {
+  ImageBackground,
+  SafeAreaView,
   StyleSheet,
   Text,
-  SafeAreaView,
-  ImageBackground,
-  View,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import React from 'react';
-import {COLORS} from '../constants/Colors';
-import {images, STRING} from '../constants';
 import {Image} from 'react-native-elements';
-import {FONTS} from '../constants/themes';
-import BunchDealVectorIcon from '../utils/BunchDealVectorIcon';
 import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {images, STRING} from '../constants';
+import {COLORS} from '../constants/Colors';
+import {FONTS} from '../constants/themes';
 import GlobalStyle from '../styles/GlobalStyle';
-import {useNavigation} from '@react-navigation/native';
-import {ShowToastMessage} from '../utils/Utility';
+import BunchDealImageLoader from '../utils/BunchDealImageLoader';
+import BunchDealVectorIcon from '../utils/BunchDealVectorIcon';
+import {ShowConsoleLogMessage} from '../utils/Utility';
 const DrawerContent = props => {
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    // ShowConsoleLogMessage(item);
+    setTimeout(async () => {
+      await getUserFromStorage();
+    }, 0);
+  }, []);
+
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setUserData(JSON.parse(value));
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
   return (
     <SafeAreaView
       style={{
@@ -40,17 +66,25 @@ const DrawerContent = props => {
           style={{
             padding: 25,
           }}>
-          <Image
+          {/* <Image
             source={{
               uri: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
             }}
             style={styles.profileImage}
+          /> */}
+
+          <BunchDealImageLoader
+            defaultImg={images.profile_placeholder}
+            styles={styles.profileImage}
+            source={
+              'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
+            }
           />
           <Text style={styles.name} onPress={() => {}}>
-            {STRING.login_create_account}
+            {userData?.name}
           </Text>
           <Text style={styles.email} onPress={() => {}}>
-            email address
+            {userData?.email}
           </Text>
         </View>
       </ImageBackground>
@@ -129,6 +163,7 @@ const DrawerContent = props => {
         title={Feather}
         iconName="log-in"
         onPress={() => {
+          AsyncStorage.clear();
           props?.navigation?.replace('Auth');
         }}
       />

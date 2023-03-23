@@ -48,6 +48,8 @@ const OfferDetails = ({navigation, route}) => {
     } else {
       navigation.navigate('Order', {
         item: receivedData,
+        count: count,
+        price: price,
       });
       ShowToastMessage('Work in progress!');
     }
@@ -64,7 +66,7 @@ const OfferDetails = ({navigation, route}) => {
     // console.log(JSON.stringify(item));
     setImageUrl(item?.images['0']['560_560'].url);
     setReceivedData(item);
-    setPrice(item?.offer_value);
+    setPrice(item?.offer_value + '');
     setOriginalPrice(item?.offer_value);
   }, []);
 
@@ -236,8 +238,9 @@ const OfferDetails = ({navigation, route}) => {
                     navigation.navigate('Order', {
                       item: receivedData,
                       count: count,
+                      price: price,
                     });
-                    ShowToastMessage('Work in progress');
+                    // ShowToastMessage('Work in progress');
                   }}
                   style={{
                     fontSize: 16,

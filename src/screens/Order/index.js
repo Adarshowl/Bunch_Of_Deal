@@ -1,20 +1,185 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Image,
+  FlatList,
 } from 'react-native';
-import React, {useState} from 'react';
-import GlobalStyle from '../../styles/GlobalStyle';
-import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import {STRING} from '../../constants';
-import {FONTS} from '../../constants/themes';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {icons, images, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
-const Order = ({navigation}) => {
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import GlobalStyle from '../../styles/GlobalStyle';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+const Order = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(false);
+  const [userData, setUserData] = useState({});
+
+  const [receivedData, setReceivedData] = useState();
+  const [count, setCount] = useState('');
+  const [price, setPrice] = useState('');
+
+  useEffect(() => {
+    let {item} = route.params;
+    let {count} = route.params;
+    let {price} = route.params;
+    getPaymentGatewayList();
+    setReceivedData(item);
+    // ShowConsoleLogMessage(JSON.stringify(item));
+    setCount(count + '');
+    setPrice(price + '');
+    setTimeout(async () => {
+      await getUserFromStorage();
+    }, 0);
+  }, []);
+
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            // ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+
+  const [paymentList, setPaymentList] = useState([]);
+
+  const getPaymentGatewayList = () => {
+    // ShowConsoleLogMessage(API_END_POINTS.API_PAYMENT_GATEWAY);
+    ApiCall('get', null, API_END_POINTS.API_PAYMENT_GATEWAY, {
+      Accept: 'application/json',
+      // 'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setPaymentList(result);
+        } else {
+          setPaymentList([]);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
+
+  const onItemClick = idx => {
+    let a = paymentList.map((data, index) => {
+      let temp = Object.assign(data, {});
+      if (index == idx) {
+        temp.selected = !temp.selected;
+      } else {
+        temp.selected = false;
+      }
+      return temp;
+    });
+    setPaymentList(a);
+  };
+
+  const renderItem = ({item, index}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          onItemClick(index);
+        }}
+        activeOpacity={0.8}
+        style={{
+          flexDirection: 'row',
+          padding: 15,
+          margin: 15,
+          borderRadius: 6,
+          borderWidth: 1,
+          borderColor: item?.selected ? COLORS.lightGreen : COLORS.grey_20,
+        }}>
+        <BunchDealImageLoader
+          defaultImg={images.def_logo}
+          source={item?.image}
+          styles={{
+            height: 60,
+            width: 60,
+            backgroundColor: COLORS.backgroundColor,
+          }}
+        />
+
+        <View
+          style={{
+            width: 10,
+            height: 0,
+          }}></View>
+
+        <View
+          style={{
+            padding: 3,
+            flex: 1,
+            marginTop: 5,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: 'Montserrat-Medium',
+                color: COLORS.black,
+                flex: 1,
+              }}
+              numberOfLines={2}>
+              {item?.payment}
+            </Text>
+          </View>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: 'Montserrat-Regular',
+              color: COLORS.black,
+              marginTop: 2,
+            }}>
+            {item?.description}
+          </Text>
+        </View>
+        {item?.selected ? (
+          <Ionicons
+            name="checkmark-circle"
+            size={25}
+            color={COLORS.lightGreen}
+          />
+        ) : null}
+      </TouchableOpacity>
+    );
+  };
+
+  const submitOrderApi = () => {
+    let body = {
+      user_id: userData?.id_user,
+      seller_id: receivedData?.id_offer,
+      module: 'store',
+      module_id: receivedData?.store_id,
+      fcm_id: 'fcm_token',
+    };
+  };
 
   return (
     <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
@@ -188,37 +353,38 @@ const Order = ({navigation}) => {
                   marginStart: 10,
                   fontSize: 13,
                 }}>
-                Full Name:
+                {userData?.name}
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingVertical: 5,
-              }}>
-              <Text
+            {userData?.telephone ? (
+              <View
                 style={{
-                  fontFamily: 'Montserrat-SemiBold',
-
-                  marginTop: 5,
-                  color: COLORS.black,
-                  marginStart: 5,
-                  fontSize: 13,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 5,
                 }}>
-                Phone Number:
-              </Text>
-              <Text
-                style={{
-                  fontFamily: 'Montserrat-Regular',
-                  marginTop: 5,
-                  color: COLORS.shimmer_loading_color_darker,
-                  marginStart: 10,
-                  fontSize: 13,
-                }}>
-                012325656
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    fontFamily: 'Montserrat-SemiBold',
+                    marginTop: 5,
+                    color: COLORS.black,
+                    marginStart: 5,
+                    fontSize: 13,
+                  }}>
+                  Phone Number:
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: 'Montserrat-Regular',
+                    marginTop: 5,
+                    color: COLORS.shimmer_loading_color_darker,
+                    marginStart: 10,
+                    fontSize: 13,
+                  }}>
+                  {userData?.telephone ? userData?.telephone : '-'}
+                </Text>
+              </View>
+            ) : null}
           </View>
           <View
             style={{
@@ -243,16 +409,66 @@ const Order = ({navigation}) => {
               PRODUCT ORDER:
             </Text>
 
-            <Text
+            <View
               style={{
-                fontFamily: 'Montserrat-Regular',
-                marginTop: 5,
-                color: COLORS.shimmer_loading_color_darker,
-                marginStart: 10,
-                fontSize: 13,
+                flexDirection: 'row',
+                // alignItems: 'center',
+                margin: 10,
               }}>
-              list of products
-            </Text>
+              <Image
+                source={icons.small_notification_icon}
+                style={{
+                  width: 60,
+                  height: 60,
+                }}
+              />
+              <View
+                style={{
+                  padding: 3,
+                  flex: 1,
+                  marginTop: 5,
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: 'Montserrat-Regular',
+                      color: COLORS.black,
+                      marginStart: 5,
+                      flex: 1,
+                    }}
+                    numberOfLines={2}>
+                    {receivedData?.name}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontFamily: 'Montserrat-SemiBold',
+                      color: COLORS.black,
+                      marginStart: 5,
+                    }}>
+                    {receivedData?.currency?.symbol +
+                      '' +
+                      receivedData?.offer_value}
+                    .0
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: 'Montserrat-Regular',
+                    color: COLORS.black,
+                    marginStart: 10,
+                    marginTop: 2,
+                  }}>
+                  Qty: {count}
+                </Text>
+              </View>
+            </View>
           </View>
 
           <View
@@ -288,29 +504,26 @@ const Order = ({navigation}) => {
                 marginEnd: 5,
                 fontSize: 14,
               }}>
-              AU$45.0
+              {receivedData?.currency?.symbol + '' + price}.0
             </Text>
           </View>
         </>
       ) : (
-        <Text
+        <FlatList
           style={{
-            fontFamily: 'Montserrat-Regular',
-            marginTop: 15,
-            color: COLORS.black,
-            marginStart: 10,
-            fontSize: 16,
-            textAlign: 'center',
-          }}>
-          list of payment methods available
-        </Text>
+            marginTop: 10,
+          }}
+          data={paymentList}
+          renderItem={renderItem}
+        />
       )}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
           if (changeOne) {
-            navigation.replace('MainContainer');
-            alert('order placed successfully');
+            // navigation.replace('MainContainer');
+            // alert('order placed successfully');
+            submitOrderApi();
           } else {
             setChangeOne(!changeOne);
           }

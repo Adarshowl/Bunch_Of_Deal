@@ -15,6 +15,7 @@ import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import Offer from '../Offer';
 import SearchDialog from '../Search';
+import PlacePickerLocation from '../Search/PlacePickerLocation';
 import Store from '../Store';
 
 const Home = ({navigation}) => {
@@ -26,11 +27,30 @@ const Home = ({navigation}) => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showPlacePickModal, setShowPlacePickModal] = useState(false);
 
   const [searchText, setSearchText] = useState('');
-
+  const [categoryId, setCategoryId] = useState('');
+  const [radius, setRadius] = useState('');
   const closeSearchModal = () => {
+    setUpdate(false);
+    setStoreUpdate(false);
     setShowSearchModal(!showSearchModal);
+  };
+  const closePlacePickModal = () => {
+    setShowPlacePickModal(!showPlacePickModal);
+  };
+
+  const [update, setUpdate] = useState(false);
+  const [storeUpdate, setStoreUpdate] = useState(false);
+  const handleSearchButtonClick = () => {
+    closeSearchModal();
+    setUpdate(true);
+  };
+
+  const handleStoreSearchButtonClick = () => {
+    closeSearchModal();
+    setStoreUpdate(true);
   };
 
   useEffect(() => {
@@ -150,6 +170,8 @@ const Home = ({navigation}) => {
             setPercent(true);
             setStoreFront(false);
             setToolbarTitle('Offers');
+            setUpdate(false);
+            setStoreUpdate(false);
           }}>
           Offers
         </Text>
@@ -167,6 +189,8 @@ const Home = ({navigation}) => {
             setPercent(false);
             setStoreFront(true);
             setToolbarTitle('Store');
+            setStoreUpdate(false);
+            setUpdate(false);
           }}>
           Store
         </Text>
@@ -178,18 +202,50 @@ const Home = ({navigation}) => {
           width: '100%',
         }}
       />
-      {percent ? <Offer /> : null}
-      {storeFront ? <Store /> : null}
+      {percent ? (
+        <Offer
+          searchText={searchText}
+          location={STRING.SEARCH_LOCATION}
+          radius={radius}
+          catId={categoryId}
+          dataChange={update}
+        />
+      ) : null}
+      {storeFront ? (
+        <Store
+          searchText={searchText}
+          location={STRING.SEARCH_LOCATION}
+          radius={radius}
+          catId={categoryId}
+          dataChange={storeUpdate}
+        />
+      ) : null}
       <SearchDialog
         show={showSearchModal}
-        onPress={closeSearchModal}
+        onPress={
+          percent ? handleSearchButtonClick : handleStoreSearchButtonClick
+        }
         title={percent ? 'offers' : 'stores'}
         onRequestClose={closeSearchModal}
         searchText={searchText}
         onChangeText={val => {
-          ShowConsoleLogMessage(val);
           setSearchText(val);
         }}
+        onCurrentLocationPress={() => {
+          // closeSearchModal();
+          closePlacePickModal();
+        }}
+        onChangeRadius={val => {
+          setRadius(val);
+        }}
+        onChangeCategoryId={val => {
+          setCategoryId(val);
+        }}
+      />
+      <PlacePickerLocation
+        navigation={navigation}
+        onRequestClose={closePlacePickModal}
+        show={showPlacePickModal}
       />
     </View>
   );

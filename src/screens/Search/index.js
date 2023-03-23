@@ -17,7 +17,7 @@ import {API_END_POINTS} from '../../network/ApiEndPoints';
 import ApiCall from '../../network/ApiCall';
 import LinearGradient from 'react-native-linear-gradient';
 import {Slider} from 'react-native-elements';
-
+import {useNavigation} from '@react-navigation/native';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 const SearchDialog = ({
@@ -27,10 +27,15 @@ const SearchDialog = ({
   onRequestClose,
   searchText,
   onChangeText,
+  onChangeRadius,
+  onChangeCategoryId,
+  onCurrentLocationPress,
 }) => {
   //   const [password, setPassword] = useState('');
   const [categoryData, setCategoryData] = useState([]);
-  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValue, setSliderValue] = useState(100);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     getCategoryList('rest');
@@ -64,6 +69,8 @@ const SearchDialog = ({
       let temp = Object.assign(data, {});
       if (index == idx) {
         temp.selected = true;
+        // console.log(temp);
+        onChangeCategoryId(temp?.id_category);
       } else {
         temp.selected = false;
       }
@@ -173,12 +180,17 @@ const SearchDialog = ({
                 Location:{' '}
               </Text>
               <Text
+                onPress={onCurrentLocationPress}
                 style={{
                   fontSize: 14,
                   fontFamily: 'Montserrat-Medium',
                   marginTop: 5,
                   color: COLORS.colorAccent,
-                }}>
+                  flex: 1,
+                  height: 36,
+                  textAlignVertical: 'center',
+                }}
+                numberOfLines={2}>
                 <FontAwesome
                   name="dot-circle-o"
                   size={13}
@@ -187,7 +199,7 @@ const SearchDialog = ({
                   }}
                   color={COLORS.colorAccent}
                 />{' '}
-                Current location
+                {STRING.SEARCH_LOCATION}
               </Text>
             </View>
 
@@ -195,14 +207,14 @@ const SearchDialog = ({
               style={{
                 fontSize: 18,
                 fontFamily: 'Montserrat-Bold',
-                marginTop: 25,
+                marginTop: 20,
                 color: COLORS.editTextBorder,
               }}>
               Category:
             </Text>
             <FlatList
               style={{
-                marginTop: 10,
+                marginTop: 3,
                 marginStart: 5,
               }}
               data={categoryData}
@@ -234,7 +246,7 @@ const SearchDialog = ({
               style={{
                 fontSize: 19,
                 fontFamily: 'Montserrat-SemiBold',
-                marginTop: 25,
+                marginTop: 20,
                 color: COLORS.black,
               }}>
               {sliderValue >= 100 ? '+' : ''}
@@ -263,7 +275,10 @@ const SearchDialog = ({
                 value={sliderValue}
                 maximumValue={100}
                 minimumValue={0}
-                onValueChange={value => setSliderValue(parseInt(value))}
+                onValueChange={value => {
+                  setSliderValue(parseInt(value));
+                  onChangeRadius(parseInt(value));
+                }}
               />
             </View>
           </View>

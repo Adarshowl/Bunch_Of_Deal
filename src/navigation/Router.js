@@ -15,6 +15,7 @@ import Order from '../screens/Order';
 import FavStore from '../screens/Favorite/FavStore';
 import FavOffer from '../screens/Favorite/FavOffer';
 import Account from '../screens/Account';
+import PlacePickerLocation from '../screens/Search/PlacePickerLocation';
 const Stack = createNativeStackNavigator();
 const Router = () => {
   return (
