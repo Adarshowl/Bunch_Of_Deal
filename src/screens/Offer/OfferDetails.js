@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Share,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -23,12 +25,15 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-// import CountDown from 'react-native-countdown-component';
+import CountDown from 'react-native-countdown-component';
 import {images} from '../../constants';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowToastMessage} from '../../utils/Utility';
-
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import moment from 'moment';
+import {useIsFocused} from '@react-navigation/native';
 const OfferDetails = ({navigation, route}) => {
+  const isFocused = useIsFocused();
+
   const [intentCause, setIntentCause] = useState(false);
   const [fav, setFav] = useState(false);
 
@@ -39,28 +44,27 @@ const OfferDetails = ({navigation, route}) => {
   const [originalPrice, setOriginalPrice] = useState(0);
 
   const onOrderClick = () => {
-    // navigation.navigate('Order');
-    // if (STRING.IS_LOGGED_IN == true) {
-
     if (parseInt(receivedData?.qty_enabled) > 0) {
       closeQtyModal();
-      // console.log('show dialog with');
     } else {
       navigation.navigate('Order', {
         item: receivedData,
         count: count,
         price: price,
       });
-      ShowToastMessage('Work in progress!');
     }
-
-    // } else {
-    //   navigation.replace('Auth');
-    // }
   };
+
+  useEffect(() => {
+    setCount(1);
+    setOriginalPrice(receivedData?.offer_value || 0);
+    setPrice(receivedData?.offer_value || 0);
+  }, [isFocused]);
 
   const [imageUrl, setImageUrl] = useState('');
 
+  const [counterTime, setCounterTime] = useState(0);
+  let t = 0;
   useEffect(() => {
     let {item} = route.params;
     // console.log(JSON.stringify(item));
@@ -68,7 +72,21 @@ const OfferDetails = ({navigation, route}) => {
     setReceivedData(item);
     setPrice(item?.offer_value + '');
     setOriginalPrice(item?.offer_value);
+
+    let date_start = item?.date_start;
+    let newData = moment(date_start).format('yyyy-MM-DD HH:mm:ss');
+    let cData = moment().format('yyyy-MM-DD HH:mm:ss');
+    let d1 = new Date(newData).getTime();
+    let d2 = new Date(cData).getTime();
+    let d3 = d2 - d1;
+    let seconds = d3 / 1000;
+    t = seconds;
+    setCounterTime(seconds);
   }, []);
+
+  useEffect(() => {
+    setCounterTime(t);
+  }, [counterTime]);
 
   const [showQtyModal, setShowQtyModal] = useState(false);
 
@@ -261,6 +279,27 @@ const OfferDetails = ({navigation, route}) => {
     );
   };
 
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message:
+          receivedData?.name +
+          ' - Only on Bunch of Deals \n https://play.google.com/store/apps/details?id=com.bunch.of.deals',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
   return (
     <SafeAreaView
       style={GlobalStyle1.mainContainerBgColor}
@@ -322,7 +361,7 @@ const OfferDetails = ({navigation, route}) => {
             ]}>
             DEAL ENDS ON
           </Text>
-          <View
+          {/* <View
             style={[
               GlobalStyle1.minute,
               {
@@ -342,22 +381,35 @@ const OfferDetails = ({navigation, route}) => {
               ]}>
               105 : 12 : 10 : 10
             </Text>
-          </View>
+          </View> */}
 
-          {/* <CountDown
-            digitStyle={{
-              backgroundColor: COLORS.colorCountdownView,
-            }}
-            until={10 * 60 * 60 * 60}
-            onFinish={() => alert('finished')}
-            onPress={() => alert('hello')}
-            size={20}
-          /> */}
+          <View
+            style={{
+              backgroundColor: '#F4B400',
+              marginHorizontal: 30,
+              marginTop: 15,
+              borderRadius: 3,
+            }}>
+            <CountDown
+              digitStyle={{
+                backgroundColor: COLORS.colorCountdownView,
+              }}
+              until={counterTime}
+              // onFinish={() => alert('finished')}
+              // onPress={() => alert('hello')}
+              size={20}
+              showSeparator={true}
+              digitTxtStyle={{
+                color: 'white',
+                fontFamily: 'Montserrat-Medium',
+              }}
+            />
+          </View>
           <View
             style={{
               marginHorizontal: 10,
               paddingBottom: 15,
-              marginTop: 45,
+              marginTop: 25,
             }}>
             <Text
               style={[
@@ -747,6 +799,9 @@ const OfferDetails = ({navigation, route}) => {
             color={COLORS.colorAccent}
             style={{
               marginHorizontal: 15,
+            }}
+            onPress={() => {
+              onShare();
             }}
           />
           <FontAwesome

@@ -10,10 +10,67 @@ import GlobalStyle2 from '../../styles/GlobalStyle2';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {requestExternalWritePermission} from '../../utils/RequestUserPermission';
-import {ShowToastMessage} from '../../utils/Utility';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ImgToBase64 from 'react-native-image-base64';
 
 const Account = ({navigation}) => {
+  const [userData, setUserData] = useState({});
+  useEffect(() => {
+    // ShowConsoleLogMessage(item);
+    setTimeout(async () => {
+      await getUserFromStorage();
+    }, 0);
+  }, []);
+
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            ShowConsoleLogMessage(JSON.parse(value));
+            setUserData(JSON.parse(value));
+          } else {
+          }
+        }
+      });
+
+      await AsyncStorage.getItem('userImage', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setImage(value);
+          } else {
+          }
+        }
+      });
+      await AsyncStorage.getItem('userPseudo', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setPseudo(value);
+          } else {
+            setPseudo('');
+          }
+        }
+      });
+      await AsyncStorage.getItem('userPassword', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setPassword(value);
+          } else {
+            setPassword('');
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+
   const [pseudo, setPseudo] = useState('');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
@@ -26,7 +83,9 @@ const Account = ({navigation}) => {
   }, []);
 
   const onLoginClick = () => {
-    ShowToastMessage('login success');
+    // ShowToastMessage('login success');
+    AsyncStorage.setItem('userImage', 'data:image/jpeg;base64,' + imageBase64);
+    navigation.replace('MainContainer');
   };
 
   const onPickPhotoClick = () => {
@@ -36,6 +95,7 @@ const Account = ({navigation}) => {
       ShowToastMessage('Please allow photos & media permission');
     }
   };
+  const [imageBase64, setImageBase64] = useState('');
 
   const [image, setImage] = useState();
 
@@ -45,6 +105,12 @@ const Account = ({navigation}) => {
       cropping: true,
     }).then(images => {
       setImage(images.path);
+      ImgToBase64.getBase64String(images.path)
+        .then(base64String => {
+          // console.log(base64String);
+          setImageBase64(base64String);
+        })
+        .catch(err => {});
     });
   };
 
@@ -144,10 +210,11 @@ const Account = ({navigation}) => {
           borderBottomWidth={1}
           placeholder={STRING.email}
           style={FONTS.body3}
-          value={email}
+          value={userData?.email}
           onChangeText={val => {
             setEmail(val);
           }}
+          editable={false}
           backgroundColor={COLORS.backgroundColor}
         />
         <BunchDealEditText
@@ -158,15 +225,17 @@ const Account = ({navigation}) => {
           onChangeText={val => {
             setPseudo(val);
           }}
+          editable={false}
         />
         <BunchDealEditText
           borderBottomWidth={1}
           placeholder={STRING.fullName}
           style={FONTS.body3}
-          value={fullName}
+          value={userData?.name}
           onChangeText={val => {
             setFullName(val);
           }}
+          editable={false}
         />
         <BunchDealEditText
           borderBottomWidth={1}
@@ -181,7 +250,7 @@ const Account = ({navigation}) => {
           height={40}
           backgroundColor={COLORS.colorAccent}
           marginHorizontal={5}
-          text={'Update'}
+          text={'Save'}
           textStyle={FONTS.body3}
           textColor={COLORS.white}
           onPress={onLoginClick}

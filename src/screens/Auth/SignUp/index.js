@@ -154,8 +154,9 @@
 // export default SignUp;
 // code merge
 
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, SafeAreaView, View} from 'react-native';
+import ImgToBase64 from 'react-native-image-base64';
 import ImagePicker from 'react-native-image-crop-picker';
 import {COLORS} from '../../../constants/Colors';
 import images from '../../../constants/images';
@@ -163,14 +164,15 @@ import {STRING} from '../../../constants/String';
 import {FONTS} from '../../../constants/themes';
 import GlobalStyle from '../../../styles/GlobalStyle';
 import BunchDealCommonBtn from '../../../utils/BunchDealCommonBtn';
-import BunchDealEditText from '../../../utils/EditText/BunchDealEditText';
 import BunchDealProgressBar from '../../../utils/BunchDealProgressBar';
+import BunchDealEditText from '../../../utils/EditText/BunchDealEditText';
 import {requestExternalWritePermission} from '../../../utils/RequestUserPermission';
 import {
   ShowConsoleLogMessage,
   ShowToastMessage,
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
+
 import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
 
@@ -193,6 +195,7 @@ const SignUp = ({navigation}) => {
     handleLogin();
     // navigation.navigate('OtpVerification');
   };
+  const [imageBase64, setImageBase64] = useState('');
 
   const handleLogin = () => {
     if (validateFieldNotEmpty(email)) {
@@ -210,23 +213,24 @@ const SignUp = ({navigation}) => {
         email: email,
         password: password,
         social_type: 'Normal',
-        image: image,
+        image: imageBase64,
         phone: mobile,
       };
 
-      console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(data));
 
       ApiCall('post', data, API_END_POINTS.signUp, {
         Accept: 'application/json',
         'Content-Type': 'multipart/form-data',
       })
         .then(response => {
-          ShowConsoleLogMessage(JSON.stringify(response));
+          // ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.status == true) {
             ShowToastMessage('SignUp Successfully');
-            console.log(response);
+            // console.log(response);
             navigation.navigate('OtpVerification', {
               data,
+              imageBase64: imageBase64,
             });
           } else {
             ShowToastMessage('SignUp Failed');
@@ -255,6 +259,12 @@ const SignUp = ({navigation}) => {
       cropping: true,
     }).then(images => {
       setImage(images.path);
+      ImgToBase64.getBase64String(images.path)
+        .then(base64String => {
+          // console.log(base64String);
+          setImageBase64(base64String);
+        })
+        .catch(err => {});
     });
   };
 

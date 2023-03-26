@@ -368,7 +368,7 @@ const Login = ({navigation}) => {
               height: 30,
               width: 90,
               top: 5,
-              backgroundColor: COLORS.red,
+              backgroundColor: 'royalblue',
               justifyContent: 'center',
               alignItems: 'center',
             }}

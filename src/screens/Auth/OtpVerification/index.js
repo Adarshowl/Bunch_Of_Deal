@@ -230,7 +230,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useRef, useState} from 'react';
 import {Image, SafeAreaView, Text, View} from 'react-native';
-import CountDown from 'react-native-countdown-component';
 import OtpInputs from 'react-native-otp-inputs';
 import {COLORS} from '../../../constants/Colors';
 import images from '../../../constants/images';
@@ -268,12 +267,13 @@ const OtpVerification = ({navigation, route}) => {
 
   useEffect(() => {
     let {data} = route.params;
-    ShowConsoleLogMessage(data);
+    let {imageBase64} = route.params;
+    // ShowConsoleLogMessage(data);
     setPseudo(data.pseudo);
     setEmail(data.email);
     setFullName(data.name);
     setPassword(data.password);
-    setImage(data.image);
+    setImage(imageBase64);
   }, []);
 
   const handleOTPpassword = () => {
@@ -297,13 +297,13 @@ const OtpVerification = ({navigation, route}) => {
         auth_type: '',
         guest_id: '1',
       };
-      ShowConsoleLogMessage(JSON.stringify(body));
+      // ShowConsoleLogMessage(JSON.stringify(body));
       ApiCall('post', body, API_END_POINTS.API_VERIFY_OTP, {
         Accept: 'application/json',
         'Content-Type': 'multipart/form-data',
       })
         .then(response => {
-          console.log(response, '$$$$$');
+          // console.log(response, '$$$$$');
 
           if (response?.data?.status == true) {
             ShowToastMessage('OTP verify successfully');
@@ -311,7 +311,18 @@ const OtpVerification = ({navigation, route}) => {
               'userData',
               JSON.stringify(response?.data?.data),
             );
+            AsyncStorage.setItem('userPseudo', pseudo);
+            AsyncStorage.setItem('userPassword', password);
+            if (image != '') {
+              AsyncStorage.setItem(
+                'userImage',
+                'data:image/jpeg;base64,' + image,
+              );
+            } else {
+              AsyncStorage.setItem('userImage', '');
+            }
             AsyncStorage.setItem(STRING.userEmail, email);
+            uploadImage(response?.data?.data?.id_user);
             navigation.navigate('MainContainer');
           } else {
             ShowToastMessage('Otp Verification Failed');
@@ -324,6 +335,34 @@ const OtpVerification = ({navigation, route}) => {
           setLoading(false);
         });
     }
+  };
+
+  const uploadImage = val => {
+    setLoading(true);
+    let body = {
+      image: image,
+      int_id: val,
+      module_id: val,
+      type: 'user',
+      module: 'user',
+    };
+    // ShowConsoleLogMessage(JSON.stringify(body));
+    ApiCall('post', body, API_END_POINTS.API_USER_UPLOAD64, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage(response);
+        if (response?.data?.status == true) {
+        } else {
+        }
+      })
+      .catch(error => {
+        console.log(error, 'eroor------------>');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const ResendOTPpassword = () => {

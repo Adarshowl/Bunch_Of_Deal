@@ -417,4 +417,12 @@ export default StyleSheet.create({
     borderBottomColor: COLORS.lightGrey,
     borderBottomWidth: 1,
   },
+  content2: {
+    marginHorizontal: 10,
+    marginVertical: 5,
+    borderBottomColor: COLORS.grey,
+    borderBottomWidth: 0.5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });

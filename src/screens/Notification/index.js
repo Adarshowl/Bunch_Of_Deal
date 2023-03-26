@@ -1,82 +1,96 @@
-import React, {useState} from 'react';
-import {FlatList, Image, SafeAreaView, Text, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  FlatList,
+  Image,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
+import GlobalStyle from '../../styles/GlobalStyle';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import ApiCall from '../../network/ApiCall';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import images from '../../constants/images';
+import {NotificationSkeleton} from '../../utils/Skeleton';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import {ShowToastMessage} from '../../utils/Utility';
 
 const Notification = ({navigation}) => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      name: 'Kid&039;s HAIR CUT - $10',
-      description:
-        'DUMMY DEALKids hair cut - CLIPPER ONLY for $10Stylist hair cut starting from $15No ORDER REQU',
-      uri: 'https://c4.wallpaperflare.com/wallpaper/92/475/600/coffee-sandwich-breakfast-food-wallpaper-preview.jpg',
-    },
-    {
-      id: 2,
-      name: 'TEST DEAL $1',
-      description: 'TEST ORDER$1',
-      uri: 'https://cdn.pixabay.com/photo/2016/12/26/17/28/spaghetti-1932466__340.jpg',
-    },
-    {
-      id: 3,
-      name: 'Buy 2 Traditional Pizza for $20',
-      description: '2 Traditional Pizza $20',
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLyE86C-kl1M-kwQ__rq73rNj4klm0TdDO600MD8Q-hNW4t1bvoBY3Aa5IwEBa_xupJAQ&usqp=CAU',
-    },
-    {
-      id: 4,
-      name: 'New Test',
-      description: 'Testing',
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRLH-3g_ZE2QLVwDeBzPXYiuQo4gP00S0IZ45tTh2fyDYSwPAyfSZcy7lntstOCjClUx8&usqp=CAU',
-    },
-    {
-      id: 5,
-      name: 'New Test 11 jan',
-      description: 'Testing',
-      uri: 'https://c4.wallpaperflare.com/wallpaper/92/475/600/coffee-sandwich-breakfast-food-wallpaper-preview.jpg',
-    },
-    {
-      id: 6,
-      name: 'Madina Halal Meat, Coburg',
-      description:
-        'Madina Halal Meats, CoburgHalal meat, Hand slaughter chicken',
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb-J46RTxChrwlxg2Y_icIAPtajU779z9aD3TgLkeZnuBBREp3eQkYlEGwqLD4-uCgVEo&usqp=CAU',
-    },
-    {
-      id: 7,
-      name: 'Minor Car Service for $50',
-      description:
-        'Minor Car Service for $50Oil chnageOil Filter ChangeGneneral safety check.Diesel cars $15 Extra',
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4ptqcWtbHe62ZM9z9Y9sFcGo3-MAAN2HbvQ&usqp=CAU',
-    },
-    {
-      id: 8,
-      name: 'Id',
-      description: 'Not Id',
-      uri: 'https://c4.wallpaperflare.com/wallpaper/92/475/600/coffee-sandwich-breakfast-food-wallpaper-preview.jpg',
-    },
-    {
-      id: 9,
-      name: 'AJ',
-      description: 'Check Aj',
-      uri: 'https://c4.wallpaperflare.com/wallpaper/92/475/600/coffee-sandwich-breakfast-food-wallpaper-preview.jpg',
-    },
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [listData, setListData] = useState([]);
+
+  useEffect(() => {
+    getNotification();
+  }, []);
+
+  const getNotification = () => {
+    let body = {user_id: '578', page: 1, limit: 30};
+
+    ApiCall(
+      'post',
+      body,
+      'https://bunchofdeals.com.au/APP/index.php/api/nshistoric/getNotifications_new',
+      {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    )
+      .then(response => {
+        console.log(
+          'ERROR IN GET Notification List => ',
+          JSON.stringify(response),
+        );
+
+        if (response?.data?.status == 1) {
+          let result = Object.values(response.data?.result);
+          // console.log(JSON.stringify(result));
+
+          setListData(result);
+        } else if (response.data?.success == 0) {
+          console.log('error');
+        }
+      })
+      .catch(error => {
+        console.log('ERROR IN GET Notification List => ', error);
+      })
+      .finally(() => {});
+  };
 
   const renderItem = ({item, index}) => {
     return (
-      <View activeOpacity={0.9} style={[GlobalStyle1.content]}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          // navigation.navigate('StoreDetails')
+          ShowToastMessage('Work in progress!');
+        }}
+        style={{
+          backgroundColor: item?.status == 1 ? COLORS.white : '#AAE4FA',
+        }}>
         <View
+          activeOpacity={0.9}
           style={{
             flexDirection: 'row',
-            flex: 1,
-            paddingStart: 10,
+            alignItems: 'center',
+            paddingHorizontal: 10,
+            marginVertical: 5,
           }}>
-          <Image source={{uri: item.uri}} style={[GlobalStyle1.images]} />
+          {/* {item?.image ? (
+            <Image source={{uri: item?.image}} style={[GlobalStyle1.images]} />
+          ) : (
+            <Image style={[GlobalStyle1.images]} source={images.def_logo} />
+          )} */}
+          <BunchDealImageLoader
+            defaultImg={images.def_logo}
+            source={item?.image}
+            styles={GlobalStyle1.images}
+          />
 
           <View
             style={{
@@ -91,34 +105,34 @@ const Notification = ({navigation}) => {
                   marginHorizontal: 5,
                 },
               ]}>
-              {item.name}
+              {item.label_description}
             </Text>
             <Text
               style={[
-                FONTS.body5,
                 {
-                  fontFamily: 'Quicksand-Medium',
-                  color: COLORS.dimgray,
+                  fontFamily: 'Montserrat-Regular',
+                  color: 'grey',
                   marginHorizontal: 5,
                   fontSize: 13,
                   maxWidth: 230,
                 },
               ]}>
-              {item.description}
+              {item.label}
             </Text>
           </View>
+
+          <Entypo
+            color={COLORS.black}
+            name="dots-three-vertical"
+            size={15}
+            style={{
+              alignSelf: 'flex-start',
+              marginStart: 'auto',
+              marginEnd: 0,
+            }}
+          />
         </View>
-        <Entypo
-          color={COLORS.black}
-          name="dots-three-vertical"
-          size={15}
-          style={{
-            marginTop: 10,
-            marginEnd: 10,
-            alignItems: 'flex-end',
-          }}
-        />
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -133,25 +147,26 @@ const Notification = ({navigation}) => {
           name="ios-arrow-back-sharp"
           size={25}
           style={{
-            marginStart: 10,
+            marginStart: 15,
           }}
         />
         <Text
           style={[
-            FONTS.body2,
             {
               color: COLORS.colorPrimary,
-              marginHorizontal: 10,
+              marginHorizontal: 15,
+              fontFamily: 'Montserrat-Regular',
+              fontSize: 18,
             },
           ]}>
-          Notification
+          Notifications
         </Text>
       </View>
       <FlatList
-        data={data}
-        extraData={data}
+        data={listData}
+        extraData={listData}
         keyExtractor={item => {
-          return item.id;
+          return item.item;
         }}
         renderItem={renderItem}
       />

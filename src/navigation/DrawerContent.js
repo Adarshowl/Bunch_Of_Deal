@@ -23,7 +23,7 @@ import BunchDealVectorIcon from '../utils/BunchDealVectorIcon';
 import {ShowConsoleLogMessage} from '../utils/Utility';
 const DrawerContent = props => {
   const [userData, setUserData] = useState({});
-
+  const [image, setImage] = useState('');
   useEffect(() => {
     // ShowConsoleLogMessage(item);
     setTimeout(async () => {
@@ -38,6 +38,16 @@ const DrawerContent = props => {
         } else {
           if (value !== null) {
             setUserData(JSON.parse(value));
+          } else {
+          }
+        }
+      });
+
+      await AsyncStorage.getItem('userImage', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setImage(value);
           } else {
           }
         }
@@ -62,22 +72,20 @@ const DrawerContent = props => {
           tintColor: COLORS.lightGrey,
           backgroundColor: COLORS.colorPrimary,
         }}>
-        <View
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            props?.navigation?.navigate('Account');
+          }}
           style={{
             padding: 25,
           }}>
-          {/* <Image
-            source={{
-              uri: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
-            }}
-            style={styles.profileImage}
-          /> */}
-
           <BunchDealImageLoader
             defaultImg={images.profile_placeholder}
             styles={styles.profileImage}
             source={
-              'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
+              // 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
+              '' + image
             }
           />
           <Text style={styles.name} onPress={() => {}}>
@@ -86,7 +94,7 @@ const DrawerContent = props => {
           <Text style={styles.email} onPress={() => {}}>
             {userData?.email}
           </Text>
-        </View>
+        </TouchableOpacity>
       </ImageBackground>
       <View
         style={{

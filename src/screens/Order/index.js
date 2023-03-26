@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
@@ -11,16 +12,19 @@ import {
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {icons, images, STRING} from '../../constants';
+import {icons, images, SIZES, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 const Order = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(false);
+  const [showDone, setShowDone] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({});
 
   const [receivedData, setReceivedData] = useState();
@@ -59,6 +63,9 @@ const Order = ({navigation, route}) => {
   };
 
   const [paymentList, setPaymentList] = useState([]);
+  const [masterPaymentList, setMasterPaymentList] = useState([]);
+
+  const [selectedPayment, setSelectedPayment] = useState(null);
 
   const getPaymentGatewayList = () => {
     // ShowConsoleLogMessage(API_END_POINTS.API_PAYMENT_GATEWAY);
@@ -72,6 +79,7 @@ const Order = ({navigation, route}) => {
           let result = Object.values(response.data?.result);
           // ShowConsoleLogMessage(JSON.stringify(result));
           setPaymentList(result);
+          setMasterPaymentList(result);
         } else {
           setPaymentList([]);
         }
@@ -89,6 +97,11 @@ const Order = ({navigation, route}) => {
       let temp = Object.assign(data, {});
       if (index == idx) {
         temp.selected = !temp.selected;
+        if (temp?.selected) {
+          setSelectedPayment(temp);
+        } else {
+          setSelectedPayment(null);
+        }
       } else {
         temp.selected = false;
       }
@@ -172,17 +185,91 @@ const Order = ({navigation, route}) => {
   };
 
   const submitOrderApi = () => {
+    setLoading(true);
+    let c = [];
+    c.push();
     let body = {
       user_id: userData?.id_user,
       seller_id: receivedData?.id_offer,
       module: 'store',
       module_id: receivedData?.store_id,
       fcm_id: 'fcm_token',
+      req_cf_data: JSON.stringify({
+        'Full Name': userData?.name,
+        'Phone Number': userData?.telephone,
+      }),
+      payment_method: selectedPayment?.id,
+      user_token: userData?.token,
+      cart: [
+        {
+          module: 'offer',
+          module_id: parseInt(receivedData?.id_offer),
+          qty: parseInt(count),
+          amount: price + '.0',
+        },
+      ],
     };
+    // {module_id=8, req_cf_data={"Full Name":"g ","Phone Number":"0293393839","Notes":"yv"},
+    //  user_id=565, module=store, user_token=76558d292d03a265e91054a2cb33b0d3, seller_id=98,
+    // fcm_id=fG, cart=[{"module":"offer","module_id":98,"qty":1,"amount":"15.0"}], payment_method=3}
+
+    ShowConsoleLogMessage(body);
+
+    ApiCall('post', body, API_END_POINTS.API_ORDERS_CREATE_COD, {
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        let da = response?.data?.split(':')[1];
+
+        ShowConsoleLogMessage('response -> ' + response?.data?.split(':')[1]);
+        ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
+        if (da.split(',')[0] == 1) {
+          setShowDone(true);
+        } else {
+          ShowToastMessage('Something went wrong');
+          setSelectedPayment(null);
+          getPaymentGatewayList();
+        }
+      })
+      .catch(error => {
+        ShowToastMessage('Something went wrong');
+        setSelectedPayment(null);
+        getPaymentGatewayList();
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+    // fetch(API_END_POINTS.API_ORDERS_CREATE_COD, {
+    //   method: 'POST',
+    //   body: body,
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data',
+    //     // 'Content-Type': 'application/json',
+    //   },
+    // })
+    //   .then(response => {
+    //     ShowConsoleLogMessage('response -> ' + JSON.stringify(response));
+    //     if (response?.data?.success == 1) {
+    //       setShowDone(true);
+    //     } else {
+    //       ShowToastMessage('Something went wrong');
+    //       setSelectedPayment(null);
+    //       getPaymentGatewayList();
+    //     }
+    //   })
+    //   .catch(error => {
+    //     ShowToastMessage('Something went wrong');
+    //     setSelectedPayment(null);
+    //     getPaymentGatewayList();
+    //   })
+    //   .finally(() => {
+    //     setLoading(false);
+    //   });
   };
 
   return (
     <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+      <BunchDealProgressBar loading={loading} />
       <View>
         <View
           style={{
@@ -313,7 +400,34 @@ const Order = ({navigation, route}) => {
           </View>
         </View>
       </View>
-      {!changeOne ? (
+      {showDone ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: SIZES.width / 2,
+          }}>
+          <Ionicons
+            name="checkmark-circle"
+            size={120}
+            color={COLORS.holoGreen}
+            style={{
+              marginTop: 'auto',
+            }}
+          />
+          <Text
+            style={{
+              fontFamily: 'Montserrat-Medium',
+              marginTop: 5,
+              color: COLORS.shimmer_loading_color_darker,
+              textAlign: 'center',
+              flex: 1,
+            }}>
+            Your order has been sent successfully!
+          </Text>
+        </View>
+      ) : !changeOne ? (
         <>
           <View
             style={{
@@ -517,42 +631,123 @@ const Order = ({navigation, route}) => {
           renderItem={renderItem}
         />
       )}
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => {
-          if (changeOne) {
-            // navigation.replace('MainContainer');
-            // alert('order placed successfully');
-            submitOrderApi();
-          } else {
-            setChangeOne(!changeOne);
-          }
-        }}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          left: 0,
-          height: 56,
-          width: '100%',
-          backgroundColor: COLORS.colorAccent,
-          justifyContent: 'center',
-          alignItems: 'center',
-          alignContent: 'center',
-          flexDirection: 'row',
-        }}>
-        <Text
+      {showDone ? (
+        <View
           style={{
-            fontFamily: 'Montserrat-SemiBold',
-            color: COLORS.white,
-            marginEnd: 5,
-            fontSize: 16,
-            letterSpacing: 0.5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            left: 0,
           }}>
-          {STRING.next}
-        </Text>
-        <AntDesign name="arrowright" size={15} color={COLORS.white} />
-      </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{
+              height: 56,
+              width: '100%',
+              backgroundColor: COLORS.done_green,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignContent: 'center',
+              flexDirection: 'row',
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Montserrat-SemiBold',
+                color: COLORS.white,
+                marginEnd: 5,
+                fontSize: 16,
+                letterSpacing: 0.5,
+              }}>
+              DONE
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            left: 0,
+          }}>
+          {changeOne ? (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                setChangeOne(!changeOne);
+              }}
+              style={{
+                height: 56,
+                width: '12%',
+                backgroundColor: COLORS.colorPrimary,
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignContent: 'center',
+                flexDirection: 'row',
+              }}>
+              <AntDesign name="arrowleft" size={20} color={COLORS.white} />
+            </TouchableOpacity>
+          ) : null}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              if (changeOne) {
+                if (selectedPayment != null) {
+                  submitOrderApi();
+                } else {
+                  ShowToastMessage('Please choose your payment gateway!');
+                }
+                // navigation.replace('MainContainer');
+                // alert('order placed successfully');
+              } else {
+                setChangeOne(!changeOne);
+              }
+            }}
+            style={{
+              height: 56,
+              width: changeOne ? '88%' : '100%',
+              backgroundColor: COLORS.colorAccent,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignContent: 'center',
+              flexDirection: 'row',
+            }}>
+            {changeOne ? (
+              <Text
+                style={{
+                  fontFamily: 'Montserrat-SemiBold',
+                  color: COLORS.white,
+                  marginEnd: 5,
+                  fontSize: 16,
+                  letterSpacing: 0.5,
+                }}>
+                Confirm Payment
+              </Text>
+            ) : (
+              <>
+                <Text
+                  style={{
+                    fontFamily: 'Montserrat-SemiBold',
+                    color: COLORS.white,
+                    marginEnd: 5,
+                    fontSize: 16,
+                    letterSpacing: 0.5,
+                  }}>
+                  {STRING.next}
+                </Text>
+                <AntDesign name="arrowright" size={15} color={COLORS.white} />
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

@@ -24,6 +24,8 @@ export const COLORS = {
   lightGreen: '#8BC34A',
 
   grey_20: '#cccccc',
+  holoGreen: '#669900',
+  done_green: '#157f1f',
 
   // dots inactive colors
   dot_dark_screen1: '#d1395c',
