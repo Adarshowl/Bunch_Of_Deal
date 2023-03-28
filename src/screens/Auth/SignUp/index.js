@@ -193,7 +193,10 @@ const SignUp = ({navigation}) => {
 
   const onLoginClick = () => {
     handleLogin();
-    // navigation.navigate('OtpVerification');
+    // navigation.navigate('OtpVerification', {
+    //   data: {},
+    //   imageBase64: '',
+    // });
   };
   const [imageBase64, setImageBase64] = useState('');
 
@@ -215,6 +218,9 @@ const SignUp = ({navigation}) => {
         social_type: 'Normal',
         image: imageBase64,
         phone: mobile,
+        telephone: mobile,
+        username: pseudo,
+        pseudo: pseudo,
       };
 
       // console.log(JSON.stringify(data));
@@ -227,7 +233,7 @@ const SignUp = ({navigation}) => {
           // ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.status == true) {
             ShowToastMessage('SignUp Successfully');
-            // console.log(response);
+            console.log(response);
             navigation.navigate('OtpVerification', {
               data,
               imageBase64: imageBase64,
@@ -318,6 +324,7 @@ const SignUp = ({navigation}) => {
           placeholder={STRING.email}
           style={FONTS.body3}
           value={email}
+          keyBoardType="email-address"
           onChangeText={val => {
             setEmail(val);
           }}
@@ -355,6 +362,7 @@ const SignUp = ({navigation}) => {
           borderBottomWidth={1}
           placeholder={STRING.password}
           keyBoardType="default"
+          secureTextEntry={true}
           style={FONTS.body3}
           value={password}
           onChangeText={val => {

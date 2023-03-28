@@ -9,9 +9,11 @@ import {
   TouchableOpacity,
   Linking,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
+import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypofrom from 'react-native-vector-icons/Entypo';
@@ -20,7 +22,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../../constants/Colors';
-import {FONTS} from '../../constants/themes';
+import {FONTS, SIZES} from '../../constants/themes';
 import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
@@ -319,6 +321,35 @@ const StoreDetails = ({navigation, route}) => {
               {receivedData?.address}
             </Text>
           </View>
+          {receivedData?.latitude ? (
+            <View style={styles.container}>
+              <MapView
+                style={styles.mapcontainer}
+                showsUserLocation={true}
+                showsMyLocationButton={false}
+                zoomEnabled={true}
+                region={{
+                  latitude: parseFloat(receivedData?.latitude) || 0.0,
+                  longitude: parseFloat(receivedData?.longitude) || 0.0,
+                  latitudeDelta: 0,
+                  longitudeDelta: 0,
+                }}>
+                <Marker.Animated
+                  coordinate={{
+                    latitude: parseFloat(receivedData?.latitude) || 0.0,
+                    longitude: parseFloat(receivedData?.longitude) || 0.0,
+                    latitudeDelta: 0,
+                    longitudeDelta: 0,
+                  }}
+                  title={receivedData?.name}
+                />
+              </MapView>
+            </View>
+          ) : null}
+          <View
+            style={{
+              padding: 10,
+            }}></View>
         </SafeAreaView>
       </ScrollView>
 
@@ -366,3 +397,14 @@ const StoreDetails = ({navigation, route}) => {
 };
 
 export default StoreDetails;
+const styles = StyleSheet.create({
+  container: {
+    height: SIZES.width,
+    flex: 1,
+  },
+  mapcontainer: {
+    flex: 1,
+    width: SIZES.width,
+    height: SIZES.height,
+  },
+});

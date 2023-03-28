@@ -14,6 +14,9 @@ import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImgToBase64 from 'react-native-image-base64';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import ApiCall from '../../network/ApiCall';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 
 const Account = ({navigation}) => {
   const [userData, setUserData] = useState({});
@@ -30,7 +33,6 @@ const Account = ({navigation}) => {
         if (error) {
         } else {
           if (value !== null) {
-            ShowConsoleLogMessage(JSON.parse(value));
             setUserData(JSON.parse(value));
           } else {
           }
@@ -42,20 +44,12 @@ const Account = ({navigation}) => {
         } else {
           if (value !== null) {
             setImage(value);
+            setImageBase64(value.replace('data:image/jpeg;base64,', ''));
           } else {
           }
         }
       });
-      await AsyncStorage.getItem('userPseudo', (error, value) => {
-        if (error) {
-        } else {
-          if (value !== null) {
-            setPseudo(value);
-          } else {
-            setPseudo('');
-          }
-        }
-      });
+
       await AsyncStorage.getItem('userPassword', (error, value) => {
         if (error) {
         } else {
@@ -77,6 +71,10 @@ const Account = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [havePermission, setHavePermission] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
+  const [update, setUpdate] = useState(false);
+
   useEffect(() => {
     let permission = requestExternalWritePermission();
     setHavePermission(permission);
@@ -84,8 +82,17 @@ const Account = ({navigation}) => {
 
   const onLoginClick = () => {
     // ShowToastMessage('login success');
-    AsyncStorage.setItem('userImage', 'data:image/jpeg;base64,' + imageBase64);
-    navigation.replace('MainContainer');
+    if (update) {
+      AsyncStorage.setItem(
+        'userImage',
+        'data:image/jpeg;base64,' +
+          imageBase64.replace('data:image/jpeg;base64,', ''),
+      );
+      uploadImage('uId');
+      navigation.replace('MainContainer');
+    } else {
+      navigation.replace('MainContainer');
+    }
   };
 
   const onPickPhotoClick = () => {
@@ -111,11 +118,42 @@ const Account = ({navigation}) => {
           setImageBase64(base64String);
         })
         .catch(err => {});
+
+      setUpdate(true);
     });
+  };
+
+  const uploadImage = val => {
+    setLoading(true);
+    let body = {
+      image: imageBase64,
+      int_id: userData?.id_user,
+      module_id: userData?.id_user,
+      type: 'user',
+      module: 'user',
+    };
+    // ShowConsoleLogMessage(JSON.stringify(body));
+    ApiCall('post', body, API_END_POINTS.API_USER_UPLOAD64, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        ShowConsoleLogMessage(response);
+        if (response?.data?.status == true) {
+        } else {
+        }
+      })
+      .catch(error => {
+        console.log(error, 'eroor------------>');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
     <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+      <BunchDealProgressBar loading={loading} />
       <View
         style={{
           height: 56,
@@ -164,7 +202,7 @@ const Account = ({navigation}) => {
             // bottom: -150,
             borderRadius: 6,
             backgroundColor: COLORS.white,
-            marginTop: 150,
+            marginTop: 100,
           },
         ]}>
         <View
@@ -221,7 +259,7 @@ const Account = ({navigation}) => {
           borderBottomWidth={1}
           placeholder={STRING.pseudo}
           style={FONTS.body3}
-          value={pseudo}
+          value={userData?.username}
           onChangeText={val => {
             setPseudo(val);
           }}
@@ -237,6 +275,17 @@ const Account = ({navigation}) => {
           }}
           editable={false}
         />
+
+        <BunchDealEditText
+          borderBottomWidth={1}
+          placeholder={STRING.phoneHint}
+          style={FONTS.body3}
+          value={userData?.telephone}
+          onChangeText={val => {
+            setFullName(val);
+          }}
+          editable={false}
+        />
         <BunchDealEditText
           borderBottomWidth={1}
           placeholder={STRING.password}
@@ -244,6 +293,7 @@ const Account = ({navigation}) => {
           value={password}
           onChangeText={val => {
             setPassword(val);
+            setUpdate(true);
           }}
         />
         <BunchDealCommonBtn

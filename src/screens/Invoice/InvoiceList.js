@@ -350,6 +350,7 @@ const InvoiceList = ({navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
+    ShowConsoleLogMessage(item?.owner_name);
     let order_status =
       item?.status?.split(';')[0].substring(0, 1).toUpperCase() +
       item?.status?.split(';')[0].substring(1);
@@ -427,7 +428,8 @@ const InvoiceList = ({navigation}) => {
                 fontFamily: 'Montserrat-SemiBold',
                 color: COLORS.black,
               }}>
-              {item?.owner_name}
+              {/* {item?.owner_name?.replace(/<\/?[^>]+(>|$)/g, '')} */}
+              {item?.owner_name?.replace(/<[^>]*>/g, '')}
             </Text>
           </View>
           <Feather
@@ -496,7 +498,7 @@ const InvoiceList = ({navigation}) => {
 
         <Text
           style={[
-            FONTS.h4,
+            FONTS.body2,
             {color: COLORS.colorPrimary, marginHorizontal: 10},
           ]}>
           Orders

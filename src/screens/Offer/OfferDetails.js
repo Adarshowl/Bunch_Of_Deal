@@ -816,17 +816,19 @@ const OfferDetails = ({navigation, route}) => {
         {/* </View> */}
       </LinearGradient>
 
-      <BunchDealCommonBtn
-        height={50}
-        backgroundColor={COLORS.colorAccent}
-        marginHorizontal={0}
-        text={receivedData?.order_button?.toUpperCase()}
-        textStyle={FONTS.body4}
-        onPress={onOrderClick}
-        textColor={COLORS.white}
-        borderRadius={1}
-        textSize={16}
-      />
+      {receivedData?.order_button != null || '' ? (
+        <BunchDealCommonBtn
+          height={50}
+          backgroundColor={COLORS.colorAccent}
+          marginHorizontal={0}
+          text={receivedData?.order_button?.toUpperCase()}
+          textStyle={FONTS.body4}
+          onPress={onOrderClick}
+          textColor={COLORS.white}
+          borderRadius={1}
+          textSize={16}
+        />
+      ) : null}
       {renderQtyModal()}
     </SafeAreaView>
   );

@@ -70,7 +70,7 @@ const SearchDialog = ({
       if (index == idx) {
         temp.selected = true;
         // console.log(temp);
-        onChangeCategoryId(temp?.id_category);
+        onChangeCategoryId(temp?.id_category, temp?.name);
       } else {
         temp.selected = false;
       }

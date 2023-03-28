@@ -6,6 +6,7 @@ import {LogBox, StyleSheet} from 'react-native';
 import {COLORS} from './src/constants/Colors';
 import {requestUserPermission} from './src/firebase/notificationService';
 import DrawerNav from './src/navigation/DrawerNav';
+import ForgotPassword from './src/screens/Auth/ForgotPassword';
 import Login from './src/screens/Auth/Login';
 import OnBoarding from './src/screens/Auth/OnBoarding';
 import OtpVerification from './src/screens/Auth/OtpVerification';
@@ -27,6 +28,7 @@ const Auth = () => {
       <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="OnBoarding" component={OnBoarding} />
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="OtpVerification" component={OtpVerification} />
     </Stack.Navigator>

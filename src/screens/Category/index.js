@@ -1,120 +1,138 @@
-import {StyleSheet, Text, View, FlatList, ImageBackground} from 'react-native';
-import React, {useState} from 'react';
-import GlobalStyle2 from '../../styles/GlobalStyle2';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import ApiCall from '../../network/ApiCall';
+import {images} from '../../constants';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 
 const Category = ({navigation}) => {
-  const data = [
-    {
-      id: 3,
-      order: 'Order #320',
-      text: 'Upload',
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 2,
-      order: 'Order #319',
-      text: 'Upload',
+  const [listData, setListData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    getCategoryList();
+  }, []);
 
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 4,
-      order: 'Order #318',
-      text: 'Upload',
+  const getCategoryList = () => {
+    setLoading(true);
 
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 5,
-      order: 'Order #317',
-      text: 'Upload',
+    ApiCall('get', null, API_END_POINTS.API_USER_GET_CATEGORY, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          let result = Object.values(response.data?.result);
 
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 1,
-      order: 'Order #316',
-      text: 'Upload',
+          setListData(result);
+        } else if (response.data?.success == 0) {
+          console.log('error');
+        }
+      })
+      .catch(error => {
+        console.log('ERROR IN GET USer PROFILE => ', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 6,
-      order: 'Order #315',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-    {
-      id: 7,
-      order: 'Order #314',
-      text: 'Upload',
-
-      des: 'TURKISH KEBAB AND PIDES',
-      status: 'Pending',
-    },
-  ];
+  const renderItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('CategoryList', {
+            item: item,
+          });
+        }}
+        activeOpacity={0.8}
+        style={{
+          width: '100%',
+          height: 150,
+          marginVertical: 3,
+        }}>
+        <BunchDealImageLoader
+          defaultImg={images.def_logo}
+          source={item?.image['560_560'].url + ''}
+          styles={{
+            // flex: 1,
+            width: '100%',
+            height: 150,
+          }}
+          // blurRadius={1.5}
+        />
+        <View
+          style={{
+            position: 'absolute',
+            right: 0,
+            left: 0,
+            bottom: 0,
+            top: 0,
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text
+            style={styles.name}
+            onPress={() => {
+              navigation.navigate('CategoryList', {
+                item: item,
+              });
+            }}>
+            {item?.name}
+          </Text>
+          <View
+            style={{
+              borderWidth: 2,
+              borderColor: COLORS.white,
+              borderRadius: 50,
+              paddingHorizontal: 5,
+              marginTop: 5,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Ionicons
+              name="location-sharp"
+              color={COLORS.white}
+              style={{
+                marginHorizontal: 5,
+              }}
+              onPress={() => {
+                navigation.navigate('CategoryList', {
+                  item: item,
+                });
+              }}
+            />
+            <Text
+              style={styles.email}
+              onPress={() => {
+                navigation.navigate('CategoryList', {
+                  item: item,
+                });
+              }}>
+              {item?.nbr_stores} {item?.nbr_stores > 1 ? 'Stores' : 'Store'}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <View style={{backgroundColor: COLORS.white}}>
-      <View style={GlobalStyle2.headerFooterStyle}>
+    <View style={{flex: 1, backgroundColor: COLORS.white}}>
+      <View
+        style={[
+          {
+            height: 56,
+            width: '100%',
+            alignItems: 'center',
+            flexDirection: 'row',
+            backgroundColor: COLORS.white,
+            elevation: 10,
+          },
+        ]}>
         <Ionicons
           onPress={() => {
             navigation.goBack();
@@ -136,49 +154,17 @@ const Category = ({navigation}) => {
           Category
         </Text>
       </View>
-
-      <FlatList
-        data={data}
-        renderItem={item => {
-          return (
-            <ImageBackground
-              style={{
-                width: '100%',
-                height: 150,
-                marginTop: 5,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              source={{
-                uri: 'https://images.pexels.com/photos/2641886/pexels-photo-2641886.jpeg',
-              }}>
-              <Text
-                style={styles.name}
-                onPress={() => {
-                  props?.navigation.navigate('Category');
-                }}>
-                Automatic store
-              </Text>
-              <View
-                style={{
-                  borderWidth: 2,
-                  borderColor: COLORS.white,
-                  borderRadius: 50,
-                  paddingHorizontal: 15,
-                  marginTop: 5,
-                }}>
-                <Text
-                  style={styles.email}
-                  onPress={() => {
-                    props?.navigation.navigate('Setting');
-                  }}>
-                  1 Store
-                </Text>
-              </View>
-            </ImageBackground>
-          );
-        }}
-      />
+      <View
+        style={{
+          flexGrow: 1,
+          height: '90%',
+        }}>
+        <FlatList
+          data={listData}
+          extraData={listData}
+          renderItem={renderItem}
+        />
+      </View>
     </View>
   );
 };

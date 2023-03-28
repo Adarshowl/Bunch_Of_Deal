@@ -298,7 +298,7 @@ const InvoiceDetail = ({navigation, route}) => {
 
         <Text
           style={[
-            FONTS.h4,
+            FONTS.body2,
             {color: COLORS.colorPrimary, marginHorizontal: 10},
           ]}>
           Bunch of Deals

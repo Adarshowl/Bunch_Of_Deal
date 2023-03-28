@@ -223,11 +223,16 @@ const Login = ({navigation}) => {
 
             let arr = [];
             arr.push(response?.data?.result);
-            console.log(JSON.stringify(arr));
             for (let i = 0; i < arr.length; i++) {
-              // console.log(arr[i]['0']);
+              // console.log(arr[i]['0']?.images['0']['560_560']?.url);
               AsyncStorage.setItem('userData', JSON.stringify(arr[i]['0']));
+              AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
+
               AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email);
+              AsyncStorage.setItem(
+                'userImage',
+                arr[i]['0']?.images['0']['560_560']?.url || '',
+              );
             }
             console.log(arr.length);
             console.log(JSON.stringify(response));
@@ -388,19 +393,19 @@ const Login = ({navigation}) => {
             onPress={() => {
               onGoogleButtonPress()
                 .then(response => {
-                  console.log('response -> ' + JSON.stringify(response));
-
                   let body = {
                     email: response?.additionalUserInfo?.profile?.email,
                     username: response?.additionalUserInfo?.profile?.name,
                     telephone: response?.additionalUserInfo?.providerData?.name,
-                    social_type: 'Normal',
+                    social_type: 'Google',
                     guest_id: '1',
                     lng: '1234',
                     lat: '123',
                     mac_adr: '02.00:00:00:00',
                     images: response?.additionalUserInfo?.profile?.picture,
                   };
+                  console.log('response -> ' + JSON.stringify(body));
+
                   ApiCall('post', body, API_END_POINTS.GOOGLE_LOGIN, {
                     Accept: 'application/json',
                     'Content-Type': 'multipart/form-data',

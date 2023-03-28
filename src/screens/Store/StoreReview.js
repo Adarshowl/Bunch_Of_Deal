@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -32,6 +33,30 @@ const StoreReview = props => {
   }, [isFocused]);
 
   useEffect(() => {
+    // ShowConsoleLogMessage(item);
+    setTimeout(async () => {
+      await getUserFromStorage();
+    }, 0);
+  }, []);
+
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setUserData(JSON.parse(value));
+          } else {
+            setUserData({});
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+
+  useEffect(() => {
     Timezone.getTimeZone().then(result => {
       setTimezone(result);
     });
@@ -39,6 +64,7 @@ const StoreReview = props => {
   }, [props?.item?.id_store]);
 
   const isFocused = useIsFocused();
+  const [userData, setUserData] = useState({});
 
   const [timeZone, setTimezone] = useState('');
 
@@ -87,7 +113,7 @@ const StoreReview = props => {
         review: password,
         guest_id: '',
         user_id: '12',
-        pseudo: 'test pseudo',
+        pseudo: userData?.username,
         token: 'fjksdjfksdfkdsjflsdjflsdkj',
         mac_adr: '02:00:00:00:00:00',
       };
@@ -165,10 +191,8 @@ const StoreReview = props => {
                 borderBottomWidth={1}
                 placeholder={'Pseudo'}
                 style={FONTS.body3}
-                value={fullName}
-                onChangeText={val => {
-                  setFullName(val);
-                }}
+                value={userData?.username}
+                onChangeText={val => {}}
                 editable={false}
               />
               <BunchDealEditText

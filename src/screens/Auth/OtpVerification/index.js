@@ -245,6 +245,7 @@ import {
   ShowToastMessage,
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
+import CountDown from 'react-native-countdown-component';
 
 const OtpVerification = ({navigation, route}) => {
   const [loading, setLoading] = useState(false);
@@ -252,6 +253,10 @@ const OtpVerification = ({navigation, route}) => {
   const [code, setCode] = useState('');
   const [focused, setFocused] = React.useState(false);
 
+  const [secondLeft, setSecondLeft] = useState(300);
+  const [enable, setEnable] = useState(false);
+
+  const [mobile, setMobile] = useState('');
   const [pseudo, setPseudo] = useState('');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
@@ -271,6 +276,7 @@ const OtpVerification = ({navigation, route}) => {
     // ShowConsoleLogMessage(data);
     setPseudo(data.pseudo);
     setEmail(data.email);
+    setMobile(data.phone);
     setFullName(data.name);
     setPassword(data.password);
     setImage(imageBase64);
@@ -285,11 +291,12 @@ const OtpVerification = ({navigation, route}) => {
         otp: code,
         name: fullName,
         email: email,
-        image: image,
+        username: pseudo,
         pseudo: pseudo,
         password: password,
         social_type: '',
-        phone: '',
+        phone: mobile,
+        telephone: mobile,
         lat: '',
         lng: '',
         token: '',
@@ -311,7 +318,6 @@ const OtpVerification = ({navigation, route}) => {
               'userData',
               JSON.stringify(response?.data?.data),
             );
-            AsyncStorage.setItem('userPseudo', pseudo);
             AsyncStorage.setItem('userPassword', password);
             if (image != '') {
               AsyncStorage.setItem(
@@ -377,6 +383,8 @@ const OtpVerification = ({navigation, route}) => {
         console.log(response, '$$$$$');
         if (response?.data?.status === true) {
           ShowToastMessage('Successfully resend OTP to your mail');
+          // setSecondLeft(300);
+          // setEnable(false);
         } else {
           ShowToastMessage('Failed');
         }
@@ -461,6 +469,7 @@ const OtpVerification = ({navigation, route}) => {
             flexDirection: 'row',
             marginTop: 20,
             justifyContent: 'center',
+            alignItems: 'center',
           }}>
           <Text
             style={[
@@ -473,22 +482,36 @@ const OtpVerification = ({navigation, route}) => {
           </Text>
           <Text
             onPress={() => {
-              ResendOTPpassword();
+              if (enable) {
+                ResendOTPpassword();
+              }
             }}
             style={[FONTS.h6, {color: COLORS.black, marginLeft: 5}]}>
             Resend OTP
           </Text>
-          {/* <View style={{marginTop: -4}}>
+
+          <View style={{}}>
             <CountDown
-              until={60 * 4 + 30}
-              size={12}
-              digitStyle={{}}
+              until={secondLeft}
+              size={10}
+              digitStyle={
+                {
+                  // backgroundColor: 'white',
+                }
+              }
+              onFinish={() => {
+                setEnable(true);
+              }}
+              separatorStyle={{
+                color: 'black',
+                marginHorizontal: -10,
+              }}
               digitTxtStyle={[FONTS.h6, {color: COLORS.black}]}
               timeToShow={['M', 'S']}
               timeLabels={{m: null, s: null}}
               showSeparator
             />
-          </View> */}
+          </View>
         </View>
       </View>
     </SafeAreaView>

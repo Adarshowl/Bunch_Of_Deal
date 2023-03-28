@@ -16,6 +16,7 @@ import FavStore from '../screens/Favorite/FavStore';
 import FavOffer from '../screens/Favorite/FavOffer';
 import Account from '../screens/Account';
 import PlacePickerLocation from '../screens/Search/PlacePickerLocation';
+import CategoryList from '../screens/Category/CategoryList';
 const Stack = createNativeStackNavigator();
 const Router = () => {
   return (
@@ -40,6 +41,7 @@ const Router = () => {
       <Stack.Screen name="FavStore" component={FavStore} />
       <Stack.Screen name="FavOffer" component={FavOffer} />
       <Stack.Screen name="Account" component={Account} />
+      <Stack.Screen name="CategoryList" component={CategoryList} />
     </Stack.Navigator>
   );
 };

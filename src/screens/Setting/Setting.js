@@ -50,7 +50,8 @@ const Setting = ({navigation}) => {
 
         <Text
           style={[
-            FONTS.h5,
+            FONTS.body2,
+
             {color: COLORS.colorPrimary, marginHorizontal: 10},
           ]}>
           Settings
