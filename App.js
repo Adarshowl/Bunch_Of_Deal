@@ -13,6 +13,11 @@ import OtpVerification from './src/screens/Auth/OtpVerification';
 import SignUp from './src/screens/Auth/SignUp';
 import Splash from './src/screens/Auth/Splash';
 import NoInternetConnection from './src/utils/NoInternetConnection';
+import notifee, {AndroidImportance} from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
+import {ShowConsoleLogMessage} from './src/utils/Utility';
+import {images} from './src/constants';
+
 LogBox.ignoreAllLogs();
 const Stack = createNativeStackNavigator();
 
@@ -45,8 +50,43 @@ const App = () => {
       setOfflineStatus(offline);
     });
 
-    return () => removeNetInfoSubscription();
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // ShowConsoleLogMessage(
+      //   'Remote message arrived: App screen' + JSON.stringify(remoteMessage),
+      // );
+      // DisplayNotification(remoteMessage);
+    });
+
+    return () => {
+      removeNetInfoSubscription();
+      unsubscribe();
+    };
   }, []);
+
+  const DisplayNotification = async remoteMessage => {
+    const channelId = await notifee.createChannel({
+      id: 'BUNCH_OF_DEALS',
+      name: 'BUNCH_OF_DEALS',
+      importance: AndroidImportance.HIGH,
+    });
+
+    await notifee.displayNotification({
+      title: remoteMessage.notification?.title,
+      body: remoteMessage?.data?.bodyText,
+
+      android: {
+        channelId: channelId,
+        loopSound: false,
+        sound: 'default',
+        smallIcon: 'ic_launcher_full_latest',
+      },
+    });
+
+    notifee.onBackgroundEvent(event => {
+      console.log('on background event notifee -=> ' + JSON.stringify(event));
+    });
+  };
+
   return isOffline ? (
     <NoInternetConnection show={isOffline} />
   ) : (

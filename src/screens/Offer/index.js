@@ -69,7 +69,7 @@ const Offer = ({
       timezone: timeZone,
     };
 
-    ShowConsoleLogMessage(JSON.stringify(body));
+    // ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -77,7 +77,7 @@ const Offer = ({
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
 
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));

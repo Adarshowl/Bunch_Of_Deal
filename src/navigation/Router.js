@@ -1,22 +1,23 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import About from '../screens/Content/About';
-import Home from '../screens/Home';
-import InvoiceList from '../screens/Invoice/InvoiceList';
-import OfferDetails from '../screens/Offer/OfferDetails';
-import StoreDetails from '../screens/Store/StoreDetails';
-import Notification from '../screens/Notification/index';
-import Setting from '../screens/Setting/Setting';
-import InvoiceDetail from '../screens/Invoice/InvoiceDetail';
-import Category from '../screens/Category';
-import GeoStore from '../screens/GeoStore';
-import Order from '../screens/Order';
-import FavStore from '../screens/Favorite/FavStore';
-import FavOffer from '../screens/Favorite/FavOffer';
 import Account from '../screens/Account';
-import PlacePickerLocation from '../screens/Search/PlacePickerLocation';
+import Category from '../screens/Category';
 import CategoryList from '../screens/Category/CategoryList';
+import About from '../screens/Content/About';
+import PrivacyPolicy from '../screens/Content/PrivacyPolicy';
+import TermsOfUse from '../screens/Content/TermsOfUse';
+import FavOffer from '../screens/Favorite/FavOffer';
+import FavStore from '../screens/Favorite/FavStore';
+import GeoStore from '../screens/GeoStore';
+import Home from '../screens/Home';
+import InvoiceDetail from '../screens/Invoice/InvoiceDetail';
+import InvoiceList from '../screens/Invoice/InvoiceList';
+import Notification from '../screens/Notification/index';
+import OfferDetails from '../screens/Offer/OfferDetails';
+import Order from '../screens/Order';
+import Setting from '../screens/Setting/Setting';
+import StoreDetails from '../screens/Store/StoreDetails';
 const Stack = createNativeStackNavigator();
 const Router = () => {
   return (
@@ -42,6 +43,8 @@ const Router = () => {
       <Stack.Screen name="FavOffer" component={FavOffer} />
       <Stack.Screen name="Account" component={Account} />
       <Stack.Screen name="CategoryList" component={CategoryList} />
+      <Stack.Screen name="TermsOfUse" component={TermsOfUse} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
     </Stack.Navigator>
   );
 };

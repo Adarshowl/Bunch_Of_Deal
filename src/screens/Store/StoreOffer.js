@@ -118,7 +118,7 @@ const StoreOffer = props => {
           <Text
             style={[
               {
-                color: COLORS.darkgray,
+                color: 'grey',
                 fontSize: 13,
                 fontFamily: 'Montserrat-Regular',
               },

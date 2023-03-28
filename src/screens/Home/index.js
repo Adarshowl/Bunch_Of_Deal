@@ -14,6 +14,7 @@ import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import Offer from '../Offer';
 import SearchDialog from '../Search';
+import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import Store from '../Store';
 
@@ -27,6 +28,7 @@ const Home = ({navigation}) => {
 
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showPlacePickModal, setShowPlacePickModal] = useState(false);
+  const [showPlaceChooseModal, setShowPlaceChooseModal] = useState(false);
 
   const [searchText, setSearchText] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -37,7 +39,13 @@ const Home = ({navigation}) => {
     setShowSearchModal(!showSearchModal);
   };
   const closePlacePickModal = () => {
+    if (showPlaceChooseModal) {
+      closePlaceChooseModal();
+    }
     setShowPlacePickModal(!showPlacePickModal);
+  };
+  const closePlaceChooseModal = () => {
+    setShowPlaceChooseModal(!showPlaceChooseModal);
   };
 
   const [update, setUpdate] = useState(false);
@@ -54,6 +62,7 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     getNotificationCount();
+    // console.log(STRING.FCM_TOKEN);
   }, []);
 
   const getNotificationCount = val => {
@@ -232,7 +241,8 @@ const Home = ({navigation}) => {
         }}
         onCurrentLocationPress={() => {
           // closeSearchModal();
-          closePlacePickModal();
+          // closePlacePickModal();
+          closePlaceChooseModal();
         }}
         onChangeRadius={val => {
           setRadius(val);
@@ -245,6 +255,13 @@ const Home = ({navigation}) => {
         navigation={navigation}
         onRequestClose={closePlacePickModal}
         show={showPlacePickModal}
+      />
+
+      <PlaceChooseLocation
+        navigation={navigation}
+        onRequestClose={closePlaceChooseModal}
+        onChangeLocation={closePlacePickModal}
+        show={showPlaceChooseModal}
       />
     </View>
   );

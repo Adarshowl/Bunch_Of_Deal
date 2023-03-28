@@ -14,6 +14,7 @@ import {ShowConsoleLogMessage, Timezone} from '../../utils/Utility';
 import StoreCardView from '../Store/StoreCardView';
 import SearchDialog from '../Search';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
+import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 
 const CategoryList = ({navigation, route}) => {
   const [listData, setListData] = useState([]);
@@ -26,7 +27,7 @@ const CategoryList = ({navigation, route}) => {
   const [radius, setRadius] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categoryName, setCategoryName] = useState('');
-
+  const [showPlaceChooseModal, setShowPlaceChooseModal] = useState(false);
   const [timeZone, setTimezone] = useState('');
 
   useEffect(() => {
@@ -99,7 +100,13 @@ const CategoryList = ({navigation, route}) => {
     getSearchStoreList(searchText, categoryId, radius);
   };
   const closePlacePickModal = () => {
+    if (showPlaceChooseModal) {
+      closePlaceChooseModal();
+    }
     setShowPlacePickModal(!showPlacePickModal);
+  };
+  const closePlaceChooseModal = () => {
+    setShowPlaceChooseModal(!showPlaceChooseModal);
   };
 
   const getSearchStoreList = (search, catId, radius, location) => {
@@ -208,7 +215,8 @@ const CategoryList = ({navigation, route}) => {
         }}
         onCurrentLocationPress={() => {
           // closeSearchModal();
-          closePlacePickModal();
+          // closePlacePickModal();
+          closePlaceChooseModal();
         }}
         onChangeRadius={val => {
           setRadius(val);
@@ -222,6 +230,12 @@ const CategoryList = ({navigation, route}) => {
         navigation={navigation}
         onRequestClose={closePlacePickModal}
         show={showPlacePickModal}
+      />
+      <PlaceChooseLocation
+        navigation={navigation}
+        onRequestClose={closePlaceChooseModal}
+        onChangeLocation={closePlacePickModal}
+        show={showPlaceChooseModal}
       />
     </View>
   );

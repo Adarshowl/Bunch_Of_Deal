@@ -32,110 +32,292 @@ const Setting = ({navigation}) => {
     }
 
     return temp;
-
     setSelect(a);
   };
   return (
-    <SafeAreaView style={{backgroundColor: COLORS.white}}>
-      <View style={GlobalStyle2.headerFooterStyle}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+      <View
+        style={{
+          height: 56,
+          alignItems: 'center',
+          flexDirection: 'row',
+          backgroundColor: COLORS.white,
+          elevation: 10,
+        }}>
         <Ionicons
           onPress={() => {
             navigation.goBack();
           }}
-          marginStart={10}
+          marginStart={15}
           color={COLORS.colorPrimary}
-          name="ios-arrow-back-sharp"
+          name="close"
           size={25}
         />
 
         <Text
           style={[
             FONTS.body2,
-
             {color: COLORS.colorPrimary, marginHorizontal: 10},
           ]}>
           Settings
         </Text>
       </View>
-      <View activeOpacity={0.9} style={GlobalStyle2.SettingView}>
-        <View style={{flexDirection: 'column'}}>
-          <Text
-            style={[
-              FONTS.body5,
-              {color: COLORS.colorPrimary, marginBottom: 10},
-            ]}>
-            NOTIFICATIONS
-          </Text>
-          <Text style={[FONTS.body4, {color: COLORS.black}]}>
-            Offers notifications
-          </Text>
-          <Text style={[FONTS.body5]}>
-            Receive a special offers notification
-          </Text>
-        </View>
 
-        <MaterialIcons
-          onPress={() => {
-            onItemSelected(item, index);
-          }}
-          name={'check-box-outline-blank'}
-          size={20}
-          color={COLORS.black}
-        />
-      </View>
       <View activeOpacity={0.9} style={GlobalStyle2.SettingView}>
-        <View style={{flexDirection: 'column'}}>
-          <Text
-            onPress={() => {
-              navigation.navigate('About');
-            }}
-            style={[FONTS.body4, {color: COLORS.black}]}>
-            Nearby stores notifications
-          </Text>
-          <Text style={[FONTS.body5]}>
-            Receive notification when there is a store {'\n'}
-            near you
-          </Text>
+        <Text
+          style={[
+            {
+              color: COLORS.colorAccent,
+
+              fontFamily: 'Montserrat-Regular',
+              fontSize: 14,
+              marginStart: 5,
+            },
+          ]}>
+          NOTIFICATIONS
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={{
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomColor: COLORS.lightGrey,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <View>
+            <Text
+              style={[
+                {
+                  color: COLORS.black,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 15,
+                },
+              ]}>
+              Offers notifications
+            </Text>
+            <Text
+              style={[
+                {
+                  color: 'grey',
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 13,
+                  marginTop: 3,
+                },
+              ]}>
+              Receive a special offers notification
+            </Text>
+          </View>
         </View>
         <MaterialIcons
           name={'check-box-outline-blank'}
           size={20}
-          color={COLORS.black}
+          color={COLORS.white}
+          marginEnd={5}
         />
-      </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={{
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomColor: COLORS.lightGrey,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+          marginTop: 15,
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <View>
+            <Text
+              style={[
+                {
+                  color: COLORS.black,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 15,
+                },
+              ]}>
+              Nearby stores notifications
+            </Text>
+            <Text
+              style={[
+                {
+                  color: 'grey',
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 13,
+                  marginTop: 3,
+                },
+              ]}>
+              Receive notification when there is a store {'\n'}near you
+            </Text>
+          </View>
+        </View>
+        <MaterialIcons
+          name={'check-box-outline-blank'}
+          size={20}
+          color={COLORS.white}
+          marginEnd={5}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={{
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingBottom: 15,
+          marginTop: 15,
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <View>
+            <Text
+              style={[
+                {
+                  color: COLORS.black,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 15,
+                },
+              ]}>
+              Messenger notifications
+            </Text>
+            <Text
+              style={[
+                {
+                  color: 'grey',
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 13,
+                  marginTop: 3,
+                },
+              ]}>
+              Receive notification when there is new{'\n'}messages
+            </Text>
+          </View>
+        </View>
+        <MaterialIcons
+          name={'check-box-outline-blank'}
+          size={20}
+          color={COLORS.white}
+          marginEnd={5}
+        />
+      </TouchableOpacity>
+
       <View activeOpacity={0.9} style={GlobalStyle2.SettingView}>
-        <View style={{flexDirection: 'column'}}>
-          <Text style={[FONTS.body4, {color: COLORS.black}]}>
-            Messenger notifications
-          </Text>
-          <Text style={[FONTS.body5]}>
-            Receive notification when there is new {'\n'}
-            messages
-          </Text>
+        <Text
+          style={[
+            {
+              color: COLORS.colorAccent,
+              fontFamily: 'Montserrat-Regular',
+              fontSize: 14,
+              marginStart: 5,
+            },
+          ]}>
+          APPLICATION
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('TermsOfUse');
+        }}
+        activeOpacity={0.8}
+        style={{
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomColor: COLORS.lightGrey,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
           <Text
             style={[
-              FONTS.body5,
-              {color: COLORS.colorPrimary, marginVertical: 20},
+              {
+                color: COLORS.black,
+                fontFamily: 'Montserrat-Regular',
+                fontSize: 15,
+              },
             ]}>
-            APPLICATION
+            Terms of use
           </Text>
-          <Text style={[FONTS.body4, {color: COLORS.black}]}>Terms of use</Text>
         </View>
-        <MaterialIcons
-          name={'check-box-outline-blank'}
-          size={20}
-          color={COLORS.black}
-        />
-      </View>
-      <View activeOpacity={0.9} style={GlobalStyle2.settingbox}>
-        <Text style={[FONTS.body4, {color: COLORS.black}]}>Privacy Policy</Text>
-      </View>
-      <View activeOpacity={0.9} style={GlobalStyle2.settingbox}>
-        <Text style={[FONTS.body4, {color: COLORS.black}]}>
-          Version of application
-        </Text>
-        <Text style={[FONTS.body5]}>2.0.2</Text>
-      </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('PrivacyPolicy');
+        }}
+        activeOpacity={0.8}
+        style={{
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomColor: COLORS.lightGrey,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+          marginTop: 15,
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <Text
+            style={[
+              {
+                color: COLORS.black,
+                fontFamily: 'Montserrat-Regular',
+                fontSize: 15,
+              },
+            ]}>
+            Privacy Policy
+          </Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={{
+          paddingVertical: 5,
+          paddingHorizontal: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomColor: COLORS.lightGrey,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+          marginTop: 15,
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+          <View>
+            <Text
+              style={[
+                {
+                  color: COLORS.black,
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 15,
+                },
+              ]}>
+              Version of application
+            </Text>
+            <Text
+              style={[
+                {
+                  color: 'grey',
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 13,
+                  marginTop: 3,
+                },
+              ]}>
+              1.0.0
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

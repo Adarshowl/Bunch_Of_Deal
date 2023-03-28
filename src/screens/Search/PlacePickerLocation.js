@@ -41,7 +41,15 @@ const PlacePickerLocation = ({navigation, show, onRequestClose}) => {
             fontSize: 16,
             fontFamily: 'Montserrat-Regular',
             paddingHorizontal: 15,
+            color: 'black',
           }}
+          userProps={{
+            placeholderTextColor: '#000',
+          }}
+          styles={{
+            color: COLORS.black,
+          }}
+          textInputHide={false}
           query={{
             key: api_key,
             language: 'en',
@@ -55,3 +63,9 @@ const PlacePickerLocation = ({navigation, show, onRequestClose}) => {
 export default PlacePickerLocation;
 
 const styles = StyleSheet.create({});
+//* NOTE
+/**
+Google auto complete package me 2 change
+1. text color black of flat list 
+2. place holder color change
+ */

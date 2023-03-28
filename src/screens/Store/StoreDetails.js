@@ -10,6 +10,8 @@ import {
   Linking,
   Platform,
   StyleSheet,
+  Share,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
@@ -37,11 +39,11 @@ import ApiCall from '../../network/ApiCall';
 
 const StoreDetails = ({navigation, route}) => {
   const [imageUrl, setImageUrl] = useState(
-    'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://cdn.corporatefinanceinstitute.com/assets/products-and-services-1024x1024.jpeg',
   );
 
   const [catImageUrl, setCatImageUrl] = useState(
-    'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://cdn.corporatefinanceinstitute.com/assets/products-and-services-1024x1024.jpeg',
   );
   const [receivedData, setReceivedData] = useState({});
   const [haveContactPermission, setHaveContactPermission] = useState({});
@@ -57,6 +59,27 @@ const StoreDetails = ({navigation, route}) => {
     try {
       Linking.openURL(`tel:${m}`);
     } catch (error) {}
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message:
+          receivedData?.name +
+          ' - Only on Bunch of Deals \n https://play.google.com/store/apps/details?id=com.bunch.of.deals',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   };
 
   const getStoreList = val => {
@@ -77,6 +100,8 @@ const StoreDetails = ({navigation, route}) => {
           ShowConsoleLogMessage(JSON.stringify(response?.data));
           let result = Object.values(response.data?.result);
           setReceivedData(result[0]);
+          setImageUrl(result[0]?.images['0']['560_560'].url);
+          setCatImageUrl(result[0]?.images['0']['560_560'].url);
         } else {
         }
       })
@@ -90,13 +115,20 @@ const StoreDetails = ({navigation, route}) => {
 
   useEffect(() => {
     let {item} = route.params;
-    // console.log(JSON.stringify(item));
-    setImageUrl(item?.images['0']['560_560'].url);
-    setCatImageUrl(item?.images['0']['200_200'].url);
+    console.log(JSON.stringify(item));
+
     if (item?.id_store == undefined || null) {
       getStoreList(item?.store_id);
     } else {
-      setReceivedData(item);
+      if (item?.id_store != undefined || null) {
+        if (item?.intentFromNotification) {
+          getStoreList(item?.store_id);
+        }
+      } else {
+        setReceivedData(item);
+        setImageUrl(item?.images['0']['560_560'].url);
+        setCatImageUrl(item?.images['0']['200_200'].url);
+      }
     }
   }, []);
 
@@ -281,7 +313,8 @@ const StoreDetails = ({navigation, route}) => {
               style={[
                 FONTS.body5,
                 {
-                  color: COLORS.darkgray,
+                  color: 'grey',
+
                   fontFamily: 'Montserrat-Regular',
                   fontSize: 13,
                 },
@@ -314,7 +347,7 @@ const StoreDetails = ({navigation, route}) => {
                 FONTS.body4,
                 {
                   marginStart: 10,
-                  color: COLORS.darkgray,
+                  color: 'grey',
                   flex: 1,
                 },
               ]}>
@@ -379,6 +412,9 @@ const StoreDetails = ({navigation, route}) => {
             color={COLORS.colorAccent}
             style={{
               marginHorizontal: 15,
+            }}
+            onPress={() => {
+              onShare();
             }}
           />
           <FontAwesome

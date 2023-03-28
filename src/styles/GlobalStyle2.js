@@ -405,13 +405,12 @@ export default StyleSheet.create({
     padding: 10,
     flexDirection: 'row',
     paddingVertical: 15,
-    justifyContent: 'space-between',
-    borderBottomColor: COLORS.lightGrey,
-    borderBottomWidth: 1,
+    // justifyContent: 'space-between',
+    // borderBottomColor: COLORS.lightGrey,
+    // borderBottomWidth: 1,
   },
   settingbox: {
     padding: 10,
-
     flexDirection: 'column',
     paddingVertical: 15,
     borderBottomColor: COLORS.lightGrey,

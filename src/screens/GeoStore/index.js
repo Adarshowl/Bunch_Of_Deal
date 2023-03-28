@@ -27,6 +27,7 @@ import {ShowConsoleLogMessage, Timezone} from '../../utils/Utility';
 import {FlatList} from 'react-native';
 import SearchDialog from '../Search';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
+import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 var {width, height} = Dimensions.get('window');
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -42,6 +43,7 @@ const GeoStore = ({navigation}) => {
   const [radius, setRadius] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  const [showPlaceChooseModal, setShowPlaceChooseModal] = useState(false);
 
   const closeSearchModal = () => {
     setShowSearchModal(!showSearchModal);
@@ -52,7 +54,13 @@ const GeoStore = ({navigation}) => {
     getSearchStoreList(searchText, categoryId, radius);
   };
   const closePlacePickModal = () => {
+    if (showPlaceChooseModal) {
+      closePlaceChooseModal();
+    }
     setShowPlacePickModal(!showPlacePickModal);
+  };
+  const closePlaceChooseModal = () => {
+    setShowPlaceChooseModal(!showPlaceChooseModal);
   };
 
   const getSearchStoreList = (search, catId, radius, location) => {
@@ -628,7 +636,8 @@ const GeoStore = ({navigation}) => {
         }}
         onCurrentLocationPress={() => {
           // closeSearchModal();
-          closePlacePickModal();
+          // closePlacePickModal();
+          closePlaceChooseModal();
         }}
         onChangeRadius={val => {
           setRadius(val);
@@ -642,6 +651,12 @@ const GeoStore = ({navigation}) => {
         navigation={navigation}
         onRequestClose={closePlacePickModal}
         show={showPlacePickModal}
+      />
+      <PlaceChooseLocation
+        navigation={navigation}
+        onRequestClose={closePlaceChooseModal}
+        onChangeLocation={closePlacePickModal}
+        show={showPlaceChooseModal}
       />
     </View>
   );

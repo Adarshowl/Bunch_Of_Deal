@@ -31,6 +31,8 @@ import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import moment from 'moment';
 import {useIsFocused} from '@react-navigation/native';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import ApiCall from '../../network/ApiCall';
 const OfferDetails = ({navigation, route}) => {
   const isFocused = useIsFocused();
 
@@ -68,21 +70,90 @@ const OfferDetails = ({navigation, route}) => {
   useEffect(() => {
     let {item} = route.params;
     // console.log(JSON.stringify(item));
-    setImageUrl(item?.images['0']['560_560'].url);
-    setReceivedData(item);
-    setPrice(item?.offer_value + '');
-    setOriginalPrice(item?.offer_value);
 
-    let date_start = item?.date_start;
-    let newData = moment(date_start).format('yyyy-MM-DD HH:mm:ss');
-    let cData = moment().format('yyyy-MM-DD HH:mm:ss');
-    let d1 = new Date(newData).getTime();
-    let d2 = new Date(cData).getTime();
-    let d3 = d2 - d1;
-    let seconds = d3 / 1000;
-    t = seconds;
-    setCounterTime(seconds);
+    if (item?.id_offer == undefined || null) {
+      getSearchOfferList(item?.id_offer);
+    } else {
+      if (item?.id_offer != undefined || null) {
+        if (item?.intentFromNotification) {
+          getSearchOfferList(item?.id_offer);
+        }
+      } else {
+        setImageUrl(item?.images['0']['560_560'].url);
+        setReceivedData(item);
+        setPrice(item?.offer_value + '');
+        setOriginalPrice(item?.offer_value);
+
+        let date_start = item?.date_start;
+        let newData = moment(date_start).format('yyyy-MM-DD HH:mm:ss');
+        let cData = moment().format('yyyy-MM-DD HH:mm:ss');
+        let d1 = new Date(newData).getTime();
+        let d2 = new Date(cData).getTime();
+        let d3 = d2 - d1;
+        let seconds = d3 / 1000;
+        t = seconds;
+        setCounterTime(seconds);
+      }
+    }
   }, []);
+
+  const getSearchOfferList = offer_ids => {
+    let body = {
+      latitude: STRING.CURRENT_LAT + '',
+      longitude: STRING.CURRENT_LONG + '',
+      order_by: 'recent',
+      offer_ids: offer_ids,
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
+      limit: '30',
+      page: '1',
+      search: '',
+      category_id: '',
+      radius: '',
+      date: moment().format('yyyy-MM-dd H:m:s'),
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setReceivedData(result[0]);
+          setImageUrl(result[0]?.images['0']['560_560'].url);
+
+          setPrice(result[0]?.offer_value + '');
+          setOriginalPrice(result[0]?.offer_value);
+
+          let date_start = result[0]?.date_start;
+          let newData = moment(date_start).format('yyyy-MM-DD HH:mm:ss');
+          let cData = moment().format('yyyy-MM-DD HH:mm:ss');
+          let d1 = new Date(newData).getTime();
+          let d2 = new Date(cData).getTime();
+          let d3 = d2 - d1;
+          let seconds = d3 / 1000;
+          t = seconds;
+          setCounterTime(seconds);
+        } else {
+          setReceivedData({});
+        }
+      })
+      .catch(err => {
+        // console.log('eorir < ', err);
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
 
   useEffect(() => {
     setCounterTime(t);
@@ -426,7 +497,7 @@ const OfferDetails = ({navigation, route}) => {
               style={[
                 FONTS.body4,
                 {
-                  color: COLORS.darkgray,
+                  color: 'grey',
                   marginHorizontal: 15,
                 },
               ]}>

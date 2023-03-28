@@ -1,51 +1,68 @@
-import React, {useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 import {
   FlatList,
-  Image,
   SafeAreaView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {COLORS} from '../../constants/Colors';
-import {FONTS} from '../../constants/themes';
-import GlobalStyle from '../../styles/GlobalStyle';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
-import ApiCall from '../../network/ApiCall';
-import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import {COLORS} from '../../constants/Colors';
 import images from '../../constants/images';
-import {NotificationSkeleton} from '../../utils/Skeleton';
+import {FONTS} from '../../constants/themes';
+import ApiCall from '../../network/ApiCall';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowToastMessage} from '../../utils/Utility';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 
 const Notification = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [listData, setListData] = useState([]);
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
-    getNotification();
+    getUserFromStorage();
   }, []);
 
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            // ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+            getNotification(); // for now using static
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+
   const getNotification = () => {
+    setLoading(true);
     let body = {user_id: '578', page: 1, limit: 30};
 
     ApiCall(
       'post',
       body,
-      'https://bunchofdeals.com.au/APP/index.php/api/nshistoric/getNotifications_new',
+      'https://bunchofdeals.com.au/APP/index.php/api/nshistoric/getNotifications_new', // old url
       {
         Accept: 'application/json',
         'Content-Type': 'multipart/form-data',
       },
     )
       .then(response => {
-        console.log(
-          'ERROR IN GET Notification List => ',
-          JSON.stringify(response),
-        );
+        // console.log(
+        //   'ERROR IN GET Notification List => ',
+        //   JSON.stringify(response),
+        // );
 
         if (response?.data?.status == 1) {
           let result = Object.values(response.data?.result);
@@ -59,7 +76,9 @@ const Notification = ({navigation}) => {
       .catch(error => {
         console.log('ERROR IN GET Notification List => ', error);
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const renderItem = ({item, index}) => {
@@ -68,7 +87,18 @@ const Notification = ({navigation}) => {
         activeOpacity={0.8}
         onPress={() => {
           // navigation.navigate('StoreDetails')
-          ShowToastMessage('Work in progress!');
+          ShowToastMessage('Work in progress');
+          // if (item?.module == 'store') {
+          //   navigation.navigate('StoreDetails', {
+          //     item: {id_store: item?.module_id, intentFromNotification: true},
+          //   });
+          // }
+          // if (item?.module == 'offer') {
+          //   ShowConsoleLogMessage(item);
+          //   navigation.navigate('OfferDetails', {
+          //     item: {id_offer: item?.module_id, intentFromNotification: true},
+          //   });
+          // }
         }}
         style={{
           backgroundColor: item?.status == 1 ? COLORS.white : '#AAE4FA',
@@ -138,6 +168,7 @@ const Notification = ({navigation}) => {
 
   return (
     <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
+      <BunchDealProgressBar loading={loading} />
       <View style={GlobalStyle1.Header}>
         <Ionicons
           onPress={() => {

@@ -25,6 +25,7 @@ const BunchDealProgressBar = ({loading}) => {
               {
                 flex: 1,
                 marginStart: 20,
+                color: COLORS.shimmer_loading_color_darker,
               },
             ]}>
             {STRING.loading}

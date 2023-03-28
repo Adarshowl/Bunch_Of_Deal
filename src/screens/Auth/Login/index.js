@@ -218,15 +218,13 @@ const Login = ({navigation}) => {
 
           if (response?.data?.success == 1) {
             ShowToastMessage('Login successful');
-
             setLoading(false);
-
             let arr = [];
             arr.push(response?.data?.result);
             for (let i = 0; i < arr.length; i++) {
               // console.log(arr[i]['0']?.images['0']['560_560']?.url);
               AsyncStorage.setItem('userData', JSON.stringify(arr[i]['0']));
-              AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
+              // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
 
               AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email);
               AsyncStorage.setItem(
@@ -243,8 +241,9 @@ const Login = ({navigation}) => {
             setLoading(false);
           }
         })
-        .catch(() => {
-          ShowToastMessage('Something went wrong.');
+        .catch(error => {
+          ShowConsoleLogMessage('Something went wrong.' + error);
+          ShowToastMessage('Something went wrong.' + error);
           setLoading(false);
         })
         .finally(() => {
