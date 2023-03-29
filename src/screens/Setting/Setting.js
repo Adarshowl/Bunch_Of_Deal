@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,33 +7,62 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import GlobalStyle2 from '../../styles/GlobalStyle2';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
 
 const Setting = ({navigation}) => {
-  const [isItemSelected, setIsItemSelected] = useState(false);
-  const [data, setData] = useState({});
-  const [select, setSelect] = useState();
-
-  const onItemSelected = (item, index) => {
-    let temp = Object.assign({}, item);
-
-    temp.selected = !temp.selected;
-    if (temp.selected) {
-      setData(temp);
-      setIsItemSelected(true);
-    } else {
-      setIsItemSelected(false);
-      setData({});
+  const [offerNotification, setOfferNotification] = useState(false);
+  const [storeNotification, setStoreNotification] = useState(false);
+  const [messengerNotification, setMessengerNotification] = useState(false);
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem(
+        STRING.userNotificationPref,
+        (error, value) => {
+          if (error) {
+          } else {
+            if (value != null) {
+              // ShowConsoleLogMessage(value);
+              setOfferNotification(JSON.parse(value)?.offerNotification);
+              setStoreNotification(JSON.parse(value)?.storeNotification);
+              setMessengerNotification(
+                JSON.parse(value)?.messengerNotification,
+              );
+            }
+          }
+        },
+      );
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
     }
-
-    return temp;
-    setSelect(a);
   };
+
+  useEffect(() => {
+    getUserFromStorage();
+  }, []);
+
+  useEffect(() => {
+    updateStoredValue();
+  }, [offerNotification, storeNotification, messengerNotification]);
+
+  const updateStoredValue = async () => {
+    let data = {
+      offerNotification: offerNotification,
+      storeNotification: storeNotification,
+      messengerNotification: messengerNotification,
+    };
+    // ShowConsoleLogMessage(JSON.stringify(data));
+    await AsyncStorage.setItem(
+      STRING.userNotificationPref,
+      JSON.stringify(data),
+    );
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       <View
@@ -80,6 +109,9 @@ const Setting = ({navigation}) => {
 
       <TouchableOpacity
         activeOpacity={0.8}
+        onPress={() => {
+          setOfferNotification(!offerNotification);
+        }}
         style={{
           paddingVertical: 5,
           paddingHorizontal: 15,
@@ -115,13 +147,16 @@ const Setting = ({navigation}) => {
           </View>
         </View>
         <MaterialIcons
-          name={'check-box-outline-blank'}
+          name={offerNotification ? 'check-box' : 'check-box-outline-blank'}
           size={20}
-          color={COLORS.white}
+          color={offerNotification ? COLORS.colorPrimary : COLORS.white}
           marginEnd={5}
         />
       </TouchableOpacity>
       <TouchableOpacity
+        onPress={() => {
+          setStoreNotification(!storeNotification);
+        }}
         activeOpacity={0.8}
         style={{
           paddingVertical: 5,
@@ -159,14 +194,17 @@ const Setting = ({navigation}) => {
           </View>
         </View>
         <MaterialIcons
-          name={'check-box-outline-blank'}
+          name={storeNotification ? 'check-box' : 'check-box-outline-blank'}
           size={20}
-          color={COLORS.white}
+          color={storeNotification ? COLORS.colorPrimary : COLORS.white}
           marginEnd={5}
         />
       </TouchableOpacity>
 
       <TouchableOpacity
+        onPress={() => {
+          setMessengerNotification(!messengerNotification);
+        }}
         activeOpacity={0.8}
         style={{
           paddingVertical: 5,
@@ -202,9 +240,9 @@ const Setting = ({navigation}) => {
           </View>
         </View>
         <MaterialIcons
-          name={'check-box-outline-blank'}
+          name={messengerNotification ? 'check-box' : 'check-box-outline-blank'}
           size={20}
-          color={COLORS.white}
+          color={messengerNotification ? COLORS.colorPrimary : COLORS.white}
           marginEnd={5}
         />
       </TouchableOpacity>

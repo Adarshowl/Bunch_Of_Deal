@@ -69,15 +69,11 @@ const OfferDetails = ({navigation, route}) => {
   let t = 0;
   useEffect(() => {
     let {item} = route.params;
-    // console.log(JSON.stringify(item));
-
-    if (item?.id_offer == undefined || null) {
+    if (item?.intentFromNotification) {
       getSearchOfferList(item?.id_offer);
     } else {
-      if (item?.id_offer != undefined || null) {
-        if (item?.intentFromNotification) {
-          getSearchOfferList(item?.id_offer);
-        }
+      if (item?.id_offer == undefined || null) {
+        getSearchOfferList(item?.id_offer);
       } else {
         setImageUrl(item?.images['0']['560_560'].url);
         setReceivedData(item);

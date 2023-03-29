@@ -84,9 +84,7 @@ const StoreOffer = props => {
         activeOpacity={0.8}
         style={[GlobalStyle1.StoreBOX]}
         onPress={() => {
-          navigation.navigate('OfferDetails', {
-            item: item,
-          });
+          navigation.navigate('OfferDetails', {item: item});
         }}>
         {/* <Image
           source={{

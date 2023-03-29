@@ -73,6 +73,7 @@ export const STRING = {
   // internal fields / variables name
   onBoardComplete: 'ON_BOARD_COMPLETE',
   userEmail: 'USER_EMAIL',
+  userNotificationPref: 'USER_NOTIFICATION_PREF',
 
   // order by filter
   ORDER_RECENT: 'recent',

@@ -45,6 +45,25 @@ const Splash = ({navigation}) => {
           }
         }
       });
+      await AsyncStorage.getItem(
+        STRING.userNotificationPref,
+        async (error, value) => {
+          if (error) {
+          } else {
+            if (value == null) {
+              let data = {
+                offerNotification: true,
+                storeNotification: true,
+                messengerNotification: true,
+              };
+              await AsyncStorage.setItem(
+                STRING.userNotificationPref,
+                JSON.stringify(data),
+              );
+            }
+          }
+        },
+      );
     } catch (err) {
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }

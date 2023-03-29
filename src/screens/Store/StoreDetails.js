@@ -38,13 +38,9 @@ import ApiCall from '../../network/ApiCall';
 // import {ShowToastMessage} from '../../../utils/Utility';
 
 const StoreDetails = ({navigation, route}) => {
-  const [imageUrl, setImageUrl] = useState(
-    'https://cdn.corporatefinanceinstitute.com/assets/products-and-services-1024x1024.jpeg',
-  );
+  const [imageUrl, setImageUrl] = useState('');
 
-  const [catImageUrl, setCatImageUrl] = useState(
-    'https://cdn.corporatefinanceinstitute.com/assets/products-and-services-1024x1024.jpeg',
-  );
+  const [catImageUrl, setCatImageUrl] = useState('');
   const [receivedData, setReceivedData] = useState({});
   const [haveContactPermission, setHaveContactPermission] = useState({});
 
@@ -55,7 +51,7 @@ const StoreDetails = ({navigation, route}) => {
     // } else {
     //   m.replace('+91');
     // }
-
+    // ShowConsoleLogMessage(m);
     try {
       Linking.openURL(`tel:${m}`);
     } catch (error) {}
@@ -115,15 +111,12 @@ const StoreDetails = ({navigation, route}) => {
 
   useEffect(() => {
     let {item} = route.params;
-    console.log(JSON.stringify(item));
-
-    if (item?.id_store == undefined || null) {
+    ShowConsoleLogMessage(item);
+    if (item?.intentFromNotification) {
       getStoreList(item?.store_id);
     } else {
-      if (item?.id_store != undefined || null) {
-        if (item?.intentFromNotification) {
-          getStoreList(item?.store_id);
-        }
+      if (item?.store_id != undefined || null) {
+        getStoreList(item?.store_id);
       } else {
         setReceivedData(item);
         setImageUrl(item?.images['0']['560_560'].url);

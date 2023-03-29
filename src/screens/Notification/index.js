@@ -87,18 +87,29 @@ const Notification = ({navigation}) => {
         activeOpacity={0.8}
         onPress={() => {
           // navigation.navigate('StoreDetails')
-          ShowToastMessage('Work in progress');
-          // if (item?.module == 'store') {
-          //   navigation.navigate('StoreDetails', {
-          //     item: {id_store: item?.module_id, intentFromNotification: true},
-          //   });
-          // }
-          // if (item?.module == 'offer') {
-          //   ShowConsoleLogMessage(item);
-          //   navigation.navigate('OfferDetails', {
-          //     item: {id_offer: item?.module_id, intentFromNotification: true},
-          //   });
-          // }
+          ShowConsoleLogMessage(item);
+
+          if (item?.module == 'store') {
+            navigation.navigate('StoreDetails', {
+              item: {store_id: item?.module_id, intentFromNotification: true},
+            });
+          } else if (item?.module == 'offer') {
+            navigation.navigate('OfferDetails', {
+              item: {id_offer: item?.module_id, intentFromNotification: true},
+            });
+          } else if (item?.module == 'nsorder') {
+            ShowConsoleLogMessage(item);
+            navigation.navigate('InvoiceList', {
+              item: {id: item?.module_id, intentFromNotification: true},
+            });
+          } else if (item?.module == 'event') {
+            ShowToastMessage('Work in progress');
+
+            // ShowConsoleLogMessage(item);
+            // navigation.navigate('InvoiceList', {
+            //   item: {id: item?.module_id, intentFromNotification: true},
+            // });
+          }
         }}
         style={{
           backgroundColor: item?.status == 1 ? COLORS.white : '#AAE4FA',

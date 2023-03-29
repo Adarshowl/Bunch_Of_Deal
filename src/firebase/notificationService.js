@@ -2,7 +2,10 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PushNotification from 'react-native-push-notification';
 import {STRING} from '../constants';
-
+import {ShowConsoleLogMessage} from '../utils/Utility';
+import ApiCall from '../network/ApiCall';
+import {Platform} from 'react-native';
+import {API_END_POINTS} from '../network/ApiEndPoints';
 export async function requestUserPermission() {
   const authStatus = await messaging().requestPermission();
   const enabled =
@@ -25,6 +28,7 @@ const getFcmToken = async () => {
         console.log(fcmToken, 'the new genrated token');
         STRING.FCM_TOKEN = fcmToken;
         await AsyncStorage.setItem('fcmToken', fcmToken);
+        updateTokenToDatabase(fcmToken);
       }
     } catch (error) {
       console.log(error, 'error raised in fcmToken');
@@ -32,6 +36,7 @@ const getFcmToken = async () => {
     }
   } else {
     STRING.FCM_TOKEN = fcmToken;
+    updateTokenToDatabase(fcmToken);
   }
 };
 
@@ -78,4 +83,44 @@ export const notificationListener = async () => {
         );
       }
     });
+};
+
+const updateTokenToDatabase = async fcmToken => {
+  let id = '';
+  try {
+    await AsyncStorage.getItem('userData', (error, value) => {
+      if (error) {
+      } else {
+        if (value !== null) {
+          ShowConsoleLogMessage(value);
+          id = JSON.parse(value)?.id_user;
+        } else {
+        }
+      }
+    });
+  } catch (err) {
+    console.log('ERROR IN GETTING USER FROM STORAGE');
+  }
+  if (id != '') {
+    let body = {
+      user_id: id,
+      fcm_id: fcmToken,
+      sender_id: '',
+      platform: Platform.OS,
+      lat: STRING.CURRENT_LAT,
+      lng: STRING.CURRENT_LONG,
+    };
+    // ShowConsoleLogMessage(JSON.stringify(body) + ' --> update token');
+    ApiCall('post', body, API_END_POINTS.API_USER_REGISTER_TOKEN, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage(response);
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(err);
+      })
+      .finally(() => {});
+  }
 };

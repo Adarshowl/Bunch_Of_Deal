@@ -227,10 +227,12 @@ const Login = ({navigation}) => {
               // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
 
               AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email);
-              AsyncStorage.setItem(
-                'userImage',
-                arr[i]['0']?.images['0']['560_560']?.url || '',
-              );
+              if (arr[i]['0']?.images != null || undefined) {
+                AsyncStorage.setItem(
+                  'userImage',
+                  arr[i]['0']?.images['0']['560_560']?.url || '',
+                );
+              }
             }
             console.log(arr.length);
             console.log(JSON.stringify(response));
