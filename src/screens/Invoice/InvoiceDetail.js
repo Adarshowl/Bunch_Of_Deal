@@ -255,20 +255,109 @@
 // new merge code - 25 mar 2023
 
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {WebView} from 'react-native-webview';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
+import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
-
+import RNFetchBlob from 'rn-fetch-blob';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 const InvoiceDetail = ({navigation, route}) => {
   const [webViewLoading, setWebViewLoading] = useState(true);
+  const [downloaded, setisdownloaded] = useState(true);
   const showSpinner = () => setWebViewLoading(true);
   const hideSpinner = () => setWebViewLoading(false);
 
+  // const permissionFunc = async () => {
+  //   if (Platform.OS == 'ios') {
+  //     actualDownload();
+  //   } else {
+  //     if (downloaded) {
+  //       try {
+  //         const granted = await PermissionsAndroid.request(
+  //           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+  //         );
+  //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //           actualDownload();
+  //         } else {
+  //           ShowToastMessage(
+  //             'You need to give storage permission to download the file',
+  //           );
+  //         }
+  //       } catch (err) {
+  //         console.warn(err);
+  //       }
+  //     } else {
+  //       ShowToastMessage('File is already downloaded.');
+  //     }
+  //   }
+  // };
+
+  // const actualDownload = () => {
+  //   const {dirs} = RNFetchBlob.fs;
+  //   const dirToSave =
+  //     Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
+  //   const configfb = {
+  //     useDownloadManager: true,
+  //     notification: true,
+  //     mediaScannable: true,
+  //     title: 'BOD_OrderID_' + order_id + '.pdf',
+  //     path: `${dirToSave}/BOD_OrderID_${order_id}.pdf`,
+  //     mime: 'application/pdf',
+  //   };
+  //   const configOptions = Platform.select({
+  //     ios: {
+  //       title: configfb.title,
+  //       path: configfb.path,
+  //       appendExt: 'pdf',
+  //     },
+  //     android: configfb,
+  //   });
+
+  //   ShowConsoleLogMessage(
+  //     'The file saved to 23233 -> ' +
+  //       JSON.stringify(configfb) +
+  //       ' ' +
+  //       JSON.stringify(dirs),
+  //   );
+
+  //   RNFetchBlob.config(configOptions)
+  //     .fetch('GET', `${url}`, {})
+  //     .then(res => {
+  //       if (Platform.OS === 'ios') {
+  //         RNFetchBlob.ios.previewDocument(configfb.path);
+  //       }
+  //       if (Platform.OS === 'android') {
+  //         RNFetchBlob.android.actionViewIntent(
+  //           res.path(),
+  //           configOptions.mime || 'application/pdf',
+  //         );
+  //       }
+
+  //       setisdownloaded(false);
+  //       if (Platform.OS == 'android') {
+  //         ShowToastMessage('File downloaded');
+  //       }
+  //       ShowConsoleLogMessage('The file saved to ' + JSON.stringify(res));
+  //     })
+  //     .catch(e => {
+  //       setisdownloaded(true);
+  //       ShowToastMessage(e.message);
+  //       ShowConsoleLogMessage('The file saved to ERROR ' + e.message);
+  //     });
+  // };
+
   let {url} = route?.params;
-  console.log(url);
+  let {order_id} = route?.params;
+  // console.log(url);
   return (
     <View
       style={{
@@ -320,6 +409,20 @@ const InvoiceDetail = ({navigation, route}) => {
         startInLoadingState={false}
         scalesPageToFit={true}
         style={{marginTop: 0, flex: 1}}
+      />
+
+      <BunchDealCommonBtn
+        height={50}
+        width={'100%'}
+        backgroundColor={COLORS.colorAccent}
+        text={'Download Invoice'}
+        textStyle={FONTS.body3}
+        textColor={COLORS.white}
+        onPress={() => {
+          // permissionFunc();
+        }}
+        borderRadius={1}
+        textSize={16}
       />
     </View>
   );

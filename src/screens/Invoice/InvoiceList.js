@@ -276,7 +276,7 @@ const InvoiceList = ({navigation}) => {
   const onEyeItemClick = item => {
     let a = base64.encode(item?.id);
     let url = CLONE_BASE_URL + '/user/Data_Order?Id=' + a;
-    ShowConsoleLogMessage(url);
+    // ShowConsoleLogMessage(url);
     navigation.navigate('InvoiceDetail', {
       url: url + '',
       order_id: item?.id + '',
@@ -351,7 +351,7 @@ const InvoiceList = ({navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    ShowConsoleLogMessage(item?.owner_name);
+    // ShowConsoleLogMessage(item?.owner_name);
     let order_status =
       item?.status?.split(';')[0].substring(0, 1).toUpperCase() +
       item?.status?.split(';')[0].substring(1);

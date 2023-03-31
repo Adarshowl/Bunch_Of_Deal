@@ -209,8 +209,8 @@ const DrawerItem = ({name, title, iconName, iconSize, onPress}) => {
       <Text
         style={{
           fontSize: 16,
-          fontFamily: 'Montserrat-SemiBold',
-          color: COLORS.editTextBorder,
+          fontFamily: 'Montserrat-Regular',
+          color: COLORS.shimmer_loading_color_darker,
         }}>
         {name}
       </Text>
