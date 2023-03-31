@@ -92,7 +92,7 @@ const updateTokenToDatabase = async fcmToken => {
       if (error) {
       } else {
         if (value !== null) {
-          ShowConsoleLogMessage(value);
+          // ShowConsoleLogMessage(value);
           id = JSON.parse(value)?.id_user;
         } else {
         }

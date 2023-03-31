@@ -37,6 +37,8 @@ export const STRING = {
   skip: 'SKIP',
   next: 'Next',
   add_review: 'Add Review',
+  logoutMessage:
+    'Your account is logged out, that because your account is blocked or deleted\nMore information contact the admin',
 
   fine_print_1:
     'Voucher Cannot be combined or used with any other offers or promotions',
@@ -73,6 +75,7 @@ export const STRING = {
   // internal fields / variables name
   onBoardComplete: 'ON_BOARD_COMPLETE',
   userEmail: 'USER_EMAIL',
+  initConfig: 'INIT_CONFIG',
   userNotificationPref: 'USER_NOTIFICATION_PREF',
 
   // order by filter
@@ -109,4 +112,7 @@ export const STRING = {
   CAN_ACCESS_LOCATION: false,
   IS_LOGGED_IN: false,
   SEARCH_LOCATION: 'Current Location',
+
+  /// constant -
+  ANDROID_APP_ID: '477b00c095ab859fff3e010d1ce96e4d',
 };

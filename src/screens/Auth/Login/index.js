@@ -214,7 +214,7 @@ const Login = ({navigation}) => {
         'Content-Type': 'multipart/form-data',
       })
         .then(response => {
-          console.log(JSON.stringify(response));
+          console.log(JSON.stringify(body));
 
           if (response?.data?.success == 1) {
             ShowToastMessage('Login successful');

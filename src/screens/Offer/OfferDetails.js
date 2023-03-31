@@ -33,6 +33,8 @@ import moment from 'moment';
 import {useIsFocused} from '@react-navigation/native';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import ApiCall from '../../network/ApiCall';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {markAsRead} from '../CampaignController';
 const OfferDetails = ({navigation, route}) => {
   const isFocused = useIsFocused();
 
@@ -54,6 +56,35 @@ const OfferDetails = ({navigation, route}) => {
         count: count,
         price: price,
       });
+    }
+  };
+
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    let {item} = route?.params;
+
+    getUserFromStorage(item);
+  }, []);
+
+  const getUserFromStorage = async item => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            // ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+            ShowConsoleLogMessage(item);
+            if (item?.cid != undefined || null) {
+              markAsRead(item?.cid, JSON.parse(value)?.id_user);
+            }
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
 
@@ -365,6 +396,66 @@ const OfferDetails = ({navigation, route}) => {
     } catch (error) {
       Alert.alert(error.message);
     }
+  };
+  const [favorite, setFavorite] = useState(false);
+
+  const doSaveOnline = () => {
+    let body = {
+      user_id: userData?.id_user + '',
+      offer_id: receivedData?.id_offer + '',
+    };
+
+    ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_SAVE_OFFER, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        ShowConsoleLogMessage(response);
+        if (response?.data?.success == 1) {
+          setFavorite(!favorite);
+          ShowToastMessage('Saved');
+        } else {
+          setFavorite(false);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
+  const unSaveOnline = () => {
+    let body = {
+      user_id: userData?.id_user + '',
+      offer_id: receivedData?.id_offer + '',
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_REMOVE_OFFER, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage(response);
+        if (response?.data?.success == 1) {
+          setFavorite(!favorite);
+          ShowToastMessage('Unsaved');
+        } else {
+          setFavorite(false);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
   };
 
   return (
@@ -872,11 +963,18 @@ const OfferDetails = ({navigation, route}) => {
             }}
           />
           <FontAwesome
-            name="heart-o"
+            name={favorite ? 'heart' : 'heart-o'}
             size={22}
             color={COLORS.colorAccent}
             style={{
               marginHorizontal: 5,
+            }}
+            onPress={() => {
+              if (favorite) {
+                unSaveOnline();
+              } else {
+                doSaveOnline();
+              }
             }}
           />
         </View>

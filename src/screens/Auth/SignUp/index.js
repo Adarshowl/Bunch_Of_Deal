@@ -232,7 +232,7 @@ const SignUp = ({navigation}) => {
         .then(response => {
           // ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.status == true) {
-            ShowToastMessage('SignUp Successfully');
+            ShowToastMessage('OTP sent Successfully');
             console.log(response);
             navigation.navigate('OtpVerification', {
               data,

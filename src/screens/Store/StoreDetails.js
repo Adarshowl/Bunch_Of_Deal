@@ -34,6 +34,7 @@ import {requestContactPermission} from '../../utils/RequestUserPermission';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import ApiCall from '../../network/ApiCall';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
@@ -43,6 +44,29 @@ const StoreDetails = ({navigation, route}) => {
   const [catImageUrl, setCatImageUrl] = useState('');
   const [receivedData, setReceivedData] = useState({});
   const [haveContactPermission, setHaveContactPermission] = useState({});
+
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    getUserFromStorage();
+  }, []);
+
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            // ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
 
   const triggerCall = () => {
     let m = receivedData?.telephone + '';
@@ -108,10 +132,70 @@ const StoreDetails = ({navigation, route}) => {
       })
       .finally(() => {});
   };
+  const [favorite, setFavorite] = useState(false);
+
+  const doSaveOnline = val => {
+    let body = {
+      user_id: userData?.id_user,
+      store_id: receivedData?.id_store,
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_SAVE_STORE, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage(response);
+        if (response?.data?.success == 1) {
+          setFavorite(!favorite);
+          ShowToastMessage('Saved');
+        } else {
+          setFavorite(false);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
+  const unSaveOnline = val => {
+    let body = {
+      user_id: userData?.id_user + '',
+      store_id: receivedData?.id_store + '',
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_REMOVE_STORE, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage(response);
+        if (response?.data?.success == 1) {
+          setFavorite(!favorite);
+          ShowToastMessage('Unsaved');
+        } else {
+          setFavorite(false);
+        }
+      })
+      .catch(err => {
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
 
   useEffect(() => {
     let {item} = route.params;
-    ShowConsoleLogMessage(item);
+    // ShowConsoleLogMessage(item);
     if (item?.intentFromNotification) {
       getStoreList(item?.store_id);
     } else {
@@ -268,11 +352,15 @@ const StoreDetails = ({navigation, route}) => {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                ShowToastMessage('Api required');
+                if (favorite) {
+                  unSaveOnline();
+                } else {
+                  doSaveOnline();
+                }
               }}
               style={[GlobalStyle1.iconBOX, {}]}>
               <FontAwesome
-                name="heart-o"
+                name={favorite ? 'heart' : 'heart-o'}
                 size={20}
                 color={COLORS.white}
                 style={{
@@ -404,20 +492,24 @@ const StoreDetails = ({navigation, route}) => {
             size={22}
             color={COLORS.colorAccent}
             style={{
-              marginHorizontal: 15,
+              marginHorizontal: 5,
+              // marginHorizontal: 15,
             }}
             onPress={() => {
               onShare();
             }}
           />
-          <FontAwesome
+          {/* <FontAwesome
             name="heart-o"
             size={22}
             color={COLORS.colorAccent}
             style={{
               marginHorizontal: 5,
             }}
-          />
+            onPress={() => {
+              doSaveOnline();
+            }}
+          /> */}
         </View>
         {/* </View> */}
       </LinearGradient>

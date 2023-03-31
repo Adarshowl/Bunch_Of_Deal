@@ -1,5 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -59,15 +60,33 @@ const Home = ({navigation}) => {
     closeSearchModal();
     setStoreUpdate(true);
   };
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
-    getNotificationCount();
-    // console.log(STRING.FCM_TOKEN);
+    getUserFromStorage();
   }, []);
+
+  const getUserFromStorage = async () => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            // ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+            getNotificationCount(JSON.parse(value)?.id_user); // for now using static
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
 
   const getNotificationCount = val => {
     let body = {
-      user_id: '578',
+      user_id: val,
       guest_id: '0',
       // auth_type: '', // if login not sent
       // auth_id: '', // if login sent not
@@ -125,7 +144,11 @@ const Home = ({navigation}) => {
             closeSearchModal();
           }}
         />
-        <View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Notification');
+          }}
+          activeOpacity={0.9}>
           <BunchDealVectorIcon
             title={MaterialIcons}
             name={'notifications'}
@@ -153,7 +176,7 @@ const Home = ({navigation}) => {
               {notificationCount}
             </Text>
           ) : null}
-        </View>
+        </TouchableOpacity>
       </View>
 
       <View

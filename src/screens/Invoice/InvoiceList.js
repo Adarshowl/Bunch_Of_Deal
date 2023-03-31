@@ -202,6 +202,7 @@ import GlobalStyle2 from '../../styles/GlobalStyle2';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import base64 from 'react-native-base64';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 const InvoiceList = ({navigation}) => {
   const [listData, setListData] = useState([]);
   const [apiToken, setApiToken] = useState('');
@@ -478,7 +479,8 @@ const InvoiceList = ({navigation}) => {
   };
 
   return (
-    <View style={{backgroundColor: COLORS.white}}>
+    <View style={{backgroundColor: COLORS.white, flex: 1}}>
+      <BunchDealProgressBar loading={loading} />
       <View
         style={[
           GlobalStyle2.headerFooterStyle,
