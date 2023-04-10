@@ -18,6 +18,7 @@ const StoreCardView = ({item}) => {
       activeOpacity={0.9}
       onPress={() => {
         navigation.navigate('StoreDetails', {item: item});
+        // navigation.navigate('TestStoreDetail', {item: item});
       }}>
       <View>
         <BunchDealImageLoader
@@ -70,17 +71,19 @@ const StoreCardView = ({item}) => {
               {' (' + item?.nbr_votes + ')'}
             </Text>
           </View>
-          <Text
-            style={{
-              backgroundColor: COLORS.colorAccent,
-              paddingHorizontal: 15,
-              fontFamily: 'Montserrat-Medium',
-              paddingVertical: 6,
-              color: COLORS.white,
-              fontSize: 11,
-            }}>
-            {item?.nbrOffers} {item?.nbrOffers > 1 ? 'offers' : 'offer'}
-          </Text>
+          {item?.nbrOffers != null && item?.nbrOffers >= 1 ? (
+            <Text
+              style={{
+                backgroundColor: COLORS.colorAccent,
+                paddingHorizontal: 15,
+                fontFamily: 'Montserrat-Medium',
+                paddingVertical: 6,
+                color: COLORS.white,
+                fontSize: 11,
+              }}>
+              {item?.nbrOffers} {item?.nbrOffers > 1 ? 'offers' : 'offer'}
+            </Text>
+          ) : null}
           {item?.distance != null ? (
             item?.distance >= 100 ? (
               <Text

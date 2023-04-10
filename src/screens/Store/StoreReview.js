@@ -46,6 +46,7 @@ const StoreReview = props => {
         } else {
           if (value !== null) {
             setUserData(JSON.parse(value));
+            ShowConsoleLogMessage(JSON.parse(value));
           } else {
             setUserData({});
           }
@@ -90,6 +91,7 @@ const StoreReview = props => {
       .then(response => {
         if (response?.data?.success == 1) {
           let result = Object.values(response.data?.result);
+
           setShowError(result.length <= 0);
           setRecentData(result);
         } else {
@@ -111,8 +113,8 @@ const StoreReview = props => {
         store_id: props?.item?.id_store,
         rate: rate.toString(),
         review: password,
-        guest_id: '',
-        user_id: '12',
+        guest_id: '1',
+        user_id: userData?.id_user,
         pseudo: userData?.username,
         token: 'fjksdjfksdfkdsjflsdjflsdkj',
         mac_adr: '02:00:00:00:00:00',
@@ -126,7 +128,7 @@ const StoreReview = props => {
         'Content-Type': 'multipart/form-data',
       })
         .then(response => {
-          ShowConsoleLogMessage(JSON.stringify(response?.data));
+          ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.success == 1) {
             getReviewList('rtest');
           } else {
@@ -231,17 +233,16 @@ const StoreReview = props => {
   return (
     <View
       style={{
-        flex: 1,
         backgroundColor: COLORS.white,
       }}>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-        }}>
-        {recentData?.map(item => {
+      {/* {recentData?.map(item => {
           return renderItem(item);
-        })}
-      </ScrollView>
+        })} */}
+      <FlatList
+        data={recentData}
+        keyExtractor={item => item?.id_store}
+        renderItem={renderItem}
+      />
       <BunchDealCommonBtn
         height={40}
         backgroundColor={COLORS.colorPrimary}

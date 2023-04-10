@@ -37,6 +37,7 @@ export const STRING = {
   skip: 'SKIP',
   next: 'Next',
   add_review: 'Add Review',
+  download_invoice: 'Download Invoice',
   logoutMessage:
     'Your account is logged out, that because your account is blocked or deleted\nMore information contact the admin',
 
@@ -73,6 +74,7 @@ export const STRING = {
   network_not_available: "Couldn't load data from server",
   retry: 'Retry',
   // internal fields / variables name
+  isFirstTime: 'IS_FIRST_TIME',
   onBoardComplete: 'ON_BOARD_COMPLETE',
   userEmail: 'USER_EMAIL',
   initConfig: 'INIT_CONFIG',

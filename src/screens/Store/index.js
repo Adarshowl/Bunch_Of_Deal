@@ -18,6 +18,7 @@ import StoreCardView from './StoreCardView';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
+import {StoreSkeleton} from '../../utils/Skeleton';
 
 const Store = ({
   navigation,
@@ -38,6 +39,7 @@ const Store = ({
   const [recentData, setRecentData] = useState([]);
 
   const [showError, setShowError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const permission = requestLocationPermission();
@@ -56,6 +58,7 @@ const Store = ({
     }
   }, [dataChange]);
   const getSearchStoreList = (search, catId, radius, location) => {
+    setLoading(true);
     let body = {
       latitude: STRING.CURRENT_LAT + '',
       longitude: STRING.CURRENT_LONG + '',
@@ -93,7 +96,9 @@ const Store = ({
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const getStoreList = val => {
@@ -149,9 +154,22 @@ const Store = ({
         {!showError ? (
           <FlatList
             data={recentData}
-            style={{
-              backgroundColor: COLORS.lightGrey,
-              marginBottom: 15,
+            ListEmptyComponent={() => {
+              return loading ? (
+                <StoreSkeleton />
+              ) : (
+                <Text
+                  style={{
+                    flex: 1,
+                    alignSelf: 'center',
+                    textAlign: 'center',
+                    marginTop: 200,
+                    fontSize: 18,
+                    fontFamily: 'Quicksand-Medium',
+                  }}>
+                  No data Found
+                </Text>
+              );
             }}
             renderItem={({item}) => {
               return <StoreCardView item={item} />;

@@ -15,10 +15,11 @@ import StoreCardView from '../Store/StoreCardView';
 import SearchDialog from '../Search';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
+import {StoreSkeleton} from '../../utils/Skeleton';
 
 const CategoryList = ({navigation, route}) => {
   const [listData, setListData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [receivedData, setReceivedData] = useState(false);
   const [showError, setShowError] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -193,9 +194,22 @@ const CategoryList = ({navigation, route}) => {
       {!showError ? (
         <FlatList
           data={listData}
-          style={{
-            backgroundColor: 'lightgrey',
-            marginBottom: 15,
+          ListEmptyComponent={() => {
+            return loading ? (
+              <StoreSkeleton />
+            ) : (
+              <Text
+                style={{
+                  flex: 1,
+                  alignSelf: 'center',
+                  textAlign: 'center',
+                  marginTop: 200,
+                  fontSize: 18,
+                  fontFamily: 'Quicksand-Medium',
+                }}>
+                No data Found
+              </Text>
+            );
           }}
           renderItem={({item}) => {
             return <StoreCardView item={item} />;

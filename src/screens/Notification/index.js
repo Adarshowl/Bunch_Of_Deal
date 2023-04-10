@@ -19,16 +19,15 @@ import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import {useIsFocused} from '@react-navigation/native';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
+import {NotificationSkeleton} from '../../utils/Skeleton';
+
 const Notification = ({navigation}) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [listData, setListData] = useState([]);
   const [userData, setUserData] = useState({});
 
   const isFocused = useIsFocused();
 
-  // useEffect(() => {
-  //   getUserFromStorage();
-  // }, []);
   useEffect(() => {
     getUserFromStorage();
   }, [isFocused]);
@@ -60,7 +59,10 @@ const Notification = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // console.log('ERROR IN GET Notification List => ', JSON.stringify(response));
+        // console.log(
+        //   'ERROR IN GET Notification List => ',
+        //   JSON.stringify(response),
+        // );
 
         if (response?.data?.status == 1) {
           let result = Object.values(response.data?.result);
@@ -318,7 +320,7 @@ const Notification = ({navigation}) => {
 
   return (
     <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
-      <BunchDealProgressBar loading={loading} />
+      {/* <BunchDealProgressBar loading={loading} /> */}
       <View style={GlobalStyle1.Header}>
         <Ionicons
           onPress={() => {
@@ -345,6 +347,23 @@ const Notification = ({navigation}) => {
       </View>
       <FlatList
         data={listData}
+        ListEmptyComponent={() => {
+          return loading ? (
+            <NotificationSkeleton />
+          ) : (
+            <Text
+              style={{
+                flex: 1,
+                alignSelf: 'center',
+                textAlign: 'center',
+                marginTop: 200,
+                fontSize: 18,
+                fontFamily: 'Quicksand-Medium',
+              }}>
+              No data Found
+            </Text>
+          );
+        }}
         extraData={listData}
         keyExtractor={item => {
           return item.item;

@@ -1,6 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Modal,
+  BackHandler,
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -68,6 +76,20 @@ const Home = ({navigation}) => {
 
   const getUserFromStorage = async () => {
     try {
+      await AsyncStorage.getItem(STRING.isFirstTime, async (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            if (value == 'true') {
+              setShowFilterModal(true);
+            } else {
+              setShowFilterModal(false);
+              await AsyncStorage.setItem(STRING.isFirstTime, 'false');
+            }
+          } else {
+          }
+        }
+      });
       await AsyncStorage.getItem('userData', (error, value) => {
         if (error) {
         } else {
@@ -118,6 +140,114 @@ const Home = ({navigation}) => {
       })
       .finally(() => {});
   };
+
+  // code for privacy popup
+  const [showFilterModal, setShowFilterModal] = useState(false);
+
+  const closeFilterModal = () => {
+    setShowFilterModal(!showFilterModal);
+  };
+
+  const renderFilterModal = () => {
+    return (
+      <Modal
+        visible={showFilterModal}
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent
+        onRequestClose={() => closeFilterModal()}
+        style={{
+          justifyContent: 'center',
+          flex: 1,
+          alignItems: 'center',
+          // backgroundColor: 'rgba(0,0,0,0.5)',
+        }}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            flexDirection: 'column',
+            justifyContent: 'space-around',
+            // backgroundColor: '#00000040',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}>
+          <View
+            style={{
+              width: 340,
+              height: 170,
+              backgroundColor: COLORS.white,
+              elevation: 20,
+              alignSelf: 'center',
+              marginVertical: 320,
+            }}>
+            <View
+              style={{
+                height: 50,
+                backgroundColor: COLORS.colorPrimary,
+                // alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={[
+                  FONTS.body3,
+                  {
+                    color: COLORS.white,
+                    marginStart: 10,
+                  },
+                ]}>
+                Privacy & Policy
+              </Text>
+            </View>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text
+                style={[
+                  FONTS.body4,
+                  {
+                    color: COLORS.black,
+                    marginTop: 10,
+                    paddingHorizontal: 3,
+                  },
+                ]}>
+                By using this App you agree to be bound by the Terms_Conditions
+                and Privacy_Policy
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignSelf: 'flex-end',
+                marginTop: 30,
+                marginHorizontal: 20,
+              }}>
+              <Text
+                onPress={async () => {
+                  // await AsyncStorage.setItem(STRING.onBoardComplete, 'false');
+                  await AsyncStorage.clear();
+                  closeFilterModal();
+                  navigation.replace('Auth');
+                  BackHandler.exitApp();
+                }}
+                style={[
+                  FONTS.body4,
+                  {color: COLORS.colorPrimary, marginHorizontal: 20},
+                ]}>
+                DECLINE
+              </Text>
+              <Text
+                onPress={async () => {
+                  await AsyncStorage.setItem(STRING.isFirstTime, 'false');
+                  closeFilterModal();
+                }}
+                style={[FONTS.body4, {color: COLORS.colorPrimary}]}>
+                ACCEPT
+              </Text>
+            </View>
+          </View>
+        </SafeAreaView>
+      </Modal>
+    );
+  };
+  // code for privacy popup end
 
   return (
     <View style={GlobalStyle.mainContainerBgColor}>
@@ -286,6 +416,7 @@ const Home = ({navigation}) => {
         onChangeLocation={closePlacePickModal}
         show={showPlaceChooseModal}
       />
+      {renderFilterModal()}
     </View>
   );
 };

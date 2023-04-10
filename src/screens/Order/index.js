@@ -285,6 +285,7 @@ const Order = ({navigation, route}) => {
             onPress={() => {
               navigation.goBack();
             }}
+            color={COLORS.shimmer_loading_color_darker}
           />
           <Text
             style={[
@@ -760,5 +761,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Medium',
     fontSize: 18,
     textAlign: 'center',
+    color: 'grey',
   },
 });

@@ -1,15 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  Image,
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  FlatList,
   Modal,
   SafeAreaView,
   ScrollView,
+  Share,
   Text,
   TouchableOpacity,
   View,
-  Share,
-  Alert,
 } from 'react-native';
+import {Image} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {
@@ -17,24 +20,29 @@ import {
   default as Entypofrom,
 } from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused} from '@react-navigation/native';
+import moment from 'moment';
+import CountDown from 'react-native-countdown-component';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
 import {STRING} from '../../constants/String';
 import {FONTS, SIZES} from '../../constants/themes';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-import CountDown from 'react-native-countdown-component';
-import {images} from '../../constants';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
-import moment from 'moment';
-import {useIsFocused} from '@react-navigation/native';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
-import ApiCall from '../../network/ApiCall';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
+import {
+  ShowConsoleLogMessage,
+  ShowToastMessage,
+  getDateDiff,
+} from '../../utils/Utility';
 import {markAsRead} from '../CampaignController';
+
 const OfferDetails = ({navigation, route}) => {
   const isFocused = useIsFocused();
 
@@ -48,14 +56,23 @@ const OfferDetails = ({navigation, route}) => {
   const [originalPrice, setOriginalPrice] = useState(0);
 
   const onOrderClick = () => {
-    if (parseInt(receivedData?.qty_enabled) > 0) {
-      closeQtyModal();
-    } else {
-      navigation.navigate('Order', {
-        item: receivedData,
-        count: count,
-        price: price,
+    if (userData?.id_user == null) {
+      navigation.navigate('Auth', {
+        screen: 'Login',
+        params: {
+          screen: 'Login',
+        },
       });
+    } else {
+      if (parseInt(receivedData?.qty_enabled) > 0) {
+        closeQtyModal();
+      } else {
+        navigation.navigate('Order', {
+          item: receivedData,
+          count: count,
+          price: price,
+        });
+      }
     }
   };
 
@@ -75,7 +92,7 @@ const OfferDetails = ({navigation, route}) => {
           if (value !== null) {
             // ShowConsoleLogMessage(value);
             setUserData(JSON.parse(value));
-            ShowConsoleLogMessage(item);
+            // ShowConsoleLogMessage(item);
             if (item?.cid != undefined || null) {
               markAsRead(item?.cid, JSON.parse(value)?.id_user);
             }
@@ -95,31 +112,84 @@ const OfferDetails = ({navigation, route}) => {
   }, [isFocused]);
 
   const [imageUrl, setImageUrl] = useState('');
+  const [images, setImages] = useState([]);
+
+  const scrollToActiveIndex = index => {
+    // console.log('scrollToActiveIndex =>? ', index);
+    setActiveIndex(index);
+  };
+
+  // 1. Define a function outside the component:
+  const onViewableItemsChanged = info => {
+    // console.log('onViewableItemsChanged => ', info?.viewableItems[0]?.index);
+    setActiveIndex(info?.viewableItems[0]?.index + 1);
+  };
+
+  useEffect(() => {
+    // console.log('use effect active index -> ', activeIndex);
+  }, [activeIndex]);
+
+  // 2. create a reference to the function (above)
+  const viewabilityConfigCallbackPairs = useRef([{onViewableItemsChanged}]);
 
   const [counterTime, setCounterTime] = useState(0);
   let t = 0;
   useEffect(() => {
     let {item} = route.params;
+
     if (item?.intentFromNotification) {
       getSearchOfferList(item?.id_offer);
     } else {
       if (item?.id_offer == undefined || null) {
         getSearchOfferList(item?.id_offer);
       } else {
-        setImageUrl(item?.images['0']['560_560'].url);
         setReceivedData(item);
+
+        var res = [];
+
+        try {
+          Object.values(item?.images).forEach((key, index) => {
+            let temp = Object.keys(key);
+            // console.log('key -??? ?? >>> ', temp[index], index);
+            // console.log('key -??? ?? >>> ', key['560_560' || 'full']?.url);
+            res.push(key['560_560' || 'full']?.url + '');
+          });
+          // console.log('image -> > \n\n\n => ', res);
+        } catch (err) {}
+
+        setImages(res);
+        // img.map(x => {
+        //   console.log(x, 'xxx');
+        //   let url = x?.url;
+        //   setImages(...images, url);
+        // });
+        setImageUrl(item?.images['0']['560_560'].url);
         setPrice(item?.offer_value + '');
+
         setOriginalPrice(item?.offer_value);
 
-        let date_start = item?.date_start;
-        let newData = moment(date_start).format('yyyy-MM-DD HH:mm:ss');
-        let cData = moment().format('yyyy-MM-DD HH:mm:ss');
-        let d1 = new Date(newData).getTime();
-        let d2 = new Date(cData).getTime();
-        let d3 = d2 - d1;
-        let seconds = d3 / 1000;
-        t = seconds;
-        setCounterTime(seconds);
+        let start_date = item?.date_start;
+        let end_date = item?.date_end;
+
+        let diff_Will_Start = getDateDiff(start_date);
+
+        if (diff_Will_Start > 0) {
+          if (item?.is_deal == 1) {
+            t = diff_Will_Start;
+            setCounterTime(diff_Will_Start);
+            setDiffWillStart(diff_Will_Start);
+          }
+        }
+        let diff_will_end = getDateDiff(end_date);
+
+        if (diff_will_end > 0 && diff_Will_Start < 0) {
+          t = diff_will_end;
+          setCounterTime(diff_will_end);
+          setDiffWillEnd(diff_will_end);
+        }
+
+        if (diff_Will_Start < 0 && diff_will_end < 0) {
+        }
       }
     }
   }, []);
@@ -153,22 +223,47 @@ const OfferDetails = ({navigation, route}) => {
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
-          // ShowConsoleLogMessage(JSON.stringify(result));
+
           setReceivedData(result[0]);
           setImageUrl(result[0]?.images['0']['560_560'].url);
+          var res = [];
+
+          try {
+            Object.values(result[0]?.images).forEach((key, index) => {
+              let temp = Object.keys(key);
+              res.push(key['560_560' || 'full']?.url + '');
+            });
+            // console.log('image -> > \n\n\n => ', res);
+          } catch (err) {}
+
+          setImages(res);
+          // setImageUrl(result[0]?.images);
 
           setPrice(result[0]?.offer_value + '');
           setOriginalPrice(result[0]?.offer_value);
 
-          let date_start = result[0]?.date_start;
-          let newData = moment(date_start).format('yyyy-MM-DD HH:mm:ss');
-          let cData = moment().format('yyyy-MM-DD HH:mm:ss');
-          let d1 = new Date(newData).getTime();
-          let d2 = new Date(cData).getTime();
-          let d3 = d2 - d1;
-          let seconds = d3 / 1000;
-          t = seconds;
-          setCounterTime(seconds);
+          let start_date = result[0]?.date_start;
+          let end_date = result[0]?.date_end;
+
+          let diff_Will_Start = getDateDiff(start_date);
+
+          if (diff_Will_Start > 0) {
+            if (result[0]?.is_deal == 1) {
+              t = diff_Will_Start;
+              setCounterTime(diff_Will_Start);
+              setDiffWillStart(diff_Will_Start);
+            }
+          }
+          let diff_will_end = getDateDiff(end_date);
+
+          if (diff_will_end > 0 && diff_Will_Start < 0) {
+            t = diff_will_end;
+            setCounterTime(diff_will_end);
+            setDiffWillEnd(diff_will_end);
+          }
+
+          if (diff_Will_Start < 0 && diff_will_end < 0) {
+          }
         } else {
           setReceivedData({});
         }
@@ -182,6 +277,153 @@ const OfferDetails = ({navigation, route}) => {
       .finally(() => {});
   };
 
+  const bigPhotoRef = useRef();
+  const smallPhotoRef = useRef();
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [diffWillStart, setDiffWillStart] = useState(0);
+  const [diffWillEnd, setDiffWillEnd] = useState(0);
+  const [offerUpTo, setOfferUpTo] = useState('');
+
+  const renderBigPhotoItems = ({item, index}) => {
+    return (
+      <View
+        activeOpacity={1.0}
+        onPress={() => {}}
+        style={{
+          height: 300,
+          width: Dimensions.get('window').width,
+          alignItems: 'center',
+        }}>
+        <Image
+          style={{
+            height: 300,
+            width: Dimensions.get('window').width,
+            resizeMode: 'stretch',
+          }}
+          source={{uri: item}}
+          PlaceholderContent={
+            <ActivityIndicator color={COLORS.white} size="large" />
+          }
+        />
+      </View>
+    );
+  };
+
+  const [selectedImage, setSelectedImage] = useState('');
+  const [showImageModal, setShowImageModal] = useState('');
+
+  const closeImageModal = () => {
+    setShowImageModal(!showImageModal);
+    if (showImageModal) {
+      setActiveIndex(0);
+    }
+  };
+
+  const renderImageModal = () => {
+    return (
+      <Modal
+        visible={showImageModal}
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent
+        onRequestClose={() => closeImageModal()}
+        style={{flexGrow: 1}}>
+        <View
+          style={{
+            backgroundColor: COLORS.black,
+            flexGrow: 1,
+            // justifyContent: 'flex-end',
+          }}>
+          <View
+            style={[
+              {
+                height: SIZES.height,
+                backgroundColor: COLORS.black,
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                // closeImageModal();
+              }}
+              activeOpacity={0.8}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'flex-start',
+              }}>
+              <AntDesign
+                name="close"
+                size={25}
+                color={COLORS.white}
+                style={{
+                  marginHorizontal: 20,
+                  // marginTop: 60,
+                  opacity: 0.0,
+                }}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 18,
+                color: COLORS.white,
+                textAlign: 'center',
+                marginTop: 30,
+                fontFamily: 'Montserrat-Medium',
+              }}>
+              {images.length > 1 ? `${activeIndex}/${images.length}` : ''}
+            </Text>
+            <View
+              style={{
+                marginBottom: 'auto',
+                marginTop: 'auto',
+              }}>
+              <FlatList
+                data={images}
+                ref={bigPhotoRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                pagingEnabled
+                initialScrollIndex={activeIndex}
+                // onMomentumScrollBegin={ev => {
+                //   scrollToActiveIndex(
+                //     Math.floor(ev.nativeEvent.contentOffset.x / SIZES.width),
+                //   );
+                // }}
+                // onMomentumScrollEnd={ev => {
+                //   scrollToActiveIndex(
+                //     Math.floor(ev.nativeEvent.contentOffset.x / 2),
+                //   );
+                // }}
+                // onScrollEndDrag={ev => {
+                //   scrollToActiveIndex(
+                //     Math.floor(ev.nativeEvent.contentOffset.x / SIZES.width),
+                //   );
+                // }}
+                // remove the following statement
+                // onViewableItemsChanged={(info) =>console.log(info)}
+
+                // 3. add the following statement, instead of the one above
+                viewabilityConfigCallbackPairs={
+                  viewabilityConfigCallbackPairs.current
+                }
+                onScrollToIndexFailed={info => {
+                  const wait = new Promise(resolve => setTimeout(resolve, 500));
+                  wait.then(() => {
+                    bigPhotoRef.current?.scrollToIndex({
+                      index: info.index,
+                      animated: true,
+                    });
+                  });
+                }}
+                renderItem={renderBigPhotoItems}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
   useEffect(() => {
     setCounterTime(t);
   }, [counterTime]);
@@ -405,7 +647,7 @@ const OfferDetails = ({navigation, route}) => {
       offer_id: receivedData?.id_offer + '',
     };
 
-    ShowConsoleLogMessage(JSON.stringify(body));
+    // ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_SAVE_OFFER, {
@@ -413,7 +655,7 @@ const OfferDetails = ({navigation, route}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        ShowConsoleLogMessage(response);
+        // ShowConsoleLogMessage(response);
         if (response?.data?.success == 1) {
           setFavorite(!favorite);
           ShowToastMessage('Saved');
@@ -464,18 +706,23 @@ const OfferDetails = ({navigation, route}) => {
       showsVerticalScrollIndicator={false}>
       <ScrollView>
         <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
-          <View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              closeImageModal();
+            }}>
             <BunchDealImageLoader
-              defaultImg={images.def_logo}
+              // defaultImg={images.def_logo}
               source={imageUrl + ''}
               styles={GlobalStyle1.Product_image}
             />
-            <View
+
+            {/* <View
               style={[
                 GlobalStyle1.price,
                 {
                   alignSelf: 'flex-end',
-                  // backgroundColor: 'red',
+                  backgroundColor: 'red',
                   // flex: 1,
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -493,8 +740,51 @@ const OfferDetails = ({navigation, route}) => {
                 ]}>
                 +100 km
               </Text>
+            </View> */}
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                flexDirection: 'row',
+                height: 35,
+                alignItems: 'center',
+                backgroundColor: COLORS.colorAccent,
+              }}>
+              <View
+                style={{
+                  alignSelf: 'flex-start',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}></View>
+              {images.length > 1 ? (
+                <Text
+                  style={{
+                    backgroundColor: COLORS.colorAccent,
+                    paddingHorizontal: 15,
+                    fontFamily: 'Montserrat-Bold',
+                    paddingVertical: 6,
+                    color: COLORS.white,
+                    fontSize: 13,
+                  }}>
+                  <FontAwesome name="camera" color={COLORS.white} />
+                  {images.length > 1 ? `  ${images.length}` : ''}
+                </Text>
+              ) : null}
+              <Text
+                style={{
+                  paddingHorizontal: 15,
+                  fontFamily: 'Montserrat-Medium',
+                  paddingVertical: 6,
+                  color: COLORS.white,
+                  fontSize: 11,
+                  backgroundColor: COLORS.colorAccent,
+                }}>
+                +100km
+              </Text>
             </View>
-          </View>
+          </TouchableOpacity>
+
           <View
             style={[
               GlobalStyle1.product_amount,
@@ -517,6 +807,7 @@ const OfferDetails = ({navigation, route}) => {
                 fontFamily: 'Montserrat-SemiBold',
               },
             ]}>
+            {/* {offerUpTo} */}
             DEAL ENDS ON
           </Text>
           {/* <View
@@ -555,6 +846,11 @@ const OfferDetails = ({navigation, route}) => {
               until={counterTime}
               // onFinish={() => alert('finished')}
               // onPress={() => alert('hello')}
+
+              timeToShow={['D', 'H', 'M', 'S']}
+              // timeToShow={
+              //   diffWillEnd > 0 ? ['D', 'H', 'M', 'S'] : ['H', 'M', 'S']
+              // }
               size={20}
               showSeparator={true}
               digitTxtStyle={{
@@ -995,8 +1291,10 @@ const OfferDetails = ({navigation, route}) => {
         />
       ) : null}
       {renderQtyModal()}
+      {renderImageModal()}
     </SafeAreaView>
   );
 };
 
 export default OfferDetails;
+/** change in coutdown componet - react-na */

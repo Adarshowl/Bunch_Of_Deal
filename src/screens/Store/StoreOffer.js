@@ -155,8 +155,9 @@ const StoreOffer = props => {
   return (
     <View
       style={{
-        flex: 1,
-        backgroundColor: COLORS.white,
+        // flex: 1,
+        backgroundColor: COLORS.red,
+        // padding: 10,
       }}>
       <FlatList
         data={recentData}

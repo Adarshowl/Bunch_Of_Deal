@@ -152,7 +152,14 @@
 
 //// code merged
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, Text, View, TouchableOpacity} from 'react-native';
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  View,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import {COLORS} from '../../../constants/Colors';
 import images from '../../../constants/images';
 import {STRING} from '../../../constants/String';
@@ -169,11 +176,13 @@ import {
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+
 // import {LoginButton, AccessToken} from 'react-native-fbsdk';
 GoogleSignin.configure({
   webClientId:
@@ -186,6 +195,90 @@ const Login = ({navigation}) => {
   const [state, setState] = useState('');
 
   const [loading, setLoading] = useState(false);
+
+  const [showFilterModal, setShowFilterModal] = useState(false);
+
+  const closeFilterModal = () => {
+    setShowFilterModal(!showFilterModal);
+  };
+
+  const renderFilterModal = () => {
+    return (
+      <Modal
+        visible={showFilterModal}
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent
+        onRequestClose={() => closeFilterModal()}
+        style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
+        <View
+          style={{
+            width: 340,
+            height: 150,
+            backgroundColor: COLORS.white,
+            elevation: 20,
+
+            alignSelf: 'center',
+            marginTop: 150,
+          }}>
+          <View
+            style={{
+              height: 40,
+              backgroundColor: COLORS.colorPrimary,
+              // alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={[
+                FONTS.body3,
+                {
+                  color: COLORS.white,
+                  marginStart: 10,
+                },
+              ]}>
+              Privacy & Policy
+            </Text>
+          </View>
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <Text
+              style={[
+                FONTS.body4,
+                {
+                  color: COLORS.black,
+                  marginTop: 10,
+                  paddingHorizontal: 3,
+                },
+              ]}>
+              By using this App you agree to be bound by the Terms_Conditions
+              and Privacy_Policy
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignSelf: 'flex-end',
+              marginTop: 30,
+              marginHorizontal: 5,
+            }}>
+            <Text
+              style={[
+                FONTS.body4,
+                {color: COLORS.colorPrimary, marginHorizontal: 10},
+              ]}>
+              DECLINE
+            </Text>
+            <Text
+              onPress={() => {
+                closeFilterModal();
+              }}
+              style={[FONTS.body4, {color: COLORS.colorPrimary}]}>
+              ACCEPT
+            </Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
 
   const onPress = () => {
     onLoginClick();
@@ -237,9 +330,10 @@ const Login = ({navigation}) => {
             console.log(arr.length);
             console.log(JSON.stringify(response));
 
-            navigation.navigate('MainContainer');
+            // closeFilterModal();
+            navigation.replace('MainContainer');
           } else {
-            ShowToastMessage('Login failed');
+            ShowToastMessage(response?.data?.errors?.connect2);
             setLoading(false);
           }
         })
@@ -304,11 +398,42 @@ const Login = ({navigation}) => {
   async function onGoogleButtonPress() {
     const {idToken} = await GoogleSignin.signIn();
     console.log(JSON.stringify(idToken), ' <  id Token');
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
     console.log(JSON.stringify(googleCredential), ' <  google credential');
     return auth().signInWithCredential(googleCredential);
   }
+
+  const uploadImage = (val, image) => {
+    setLoading(true);
+    let body = {
+      image: image,
+      int_id: val,
+      module_id: val,
+      type: 'user',
+      module: 'user',
+    };
+    ShowConsoleLogMessage(
+      'upload image3 bidty requresr =-> logou karke run karo ' +
+        JSON.stringify(body),
+    );
+    ApiCall('post', body, API_END_POINTS.API_USER_UPLOAD64, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage(response);
+        if (response?.data?.status == true) {
+        } else {
+        }
+      })
+      .catch(error => {
+        console.log(error, 'eroor------------>');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
@@ -339,6 +464,7 @@ const Login = ({navigation}) => {
           keyBoardType="number-pad"
           style={FONTS.body3}
           value={password}
+          secureTextEntry={true}
           onChangeText={val => {
             setPassword(val);
           }}
@@ -394,8 +520,11 @@ const Login = ({navigation}) => {
             onPress={() => {
               onGoogleButtonPress()
                 .then(response => {
+                  let googleImage =
+                    response?.additionalUserInfo?.profile?.picture + '';
                   let body = {
                     email: response?.additionalUserInfo?.profile?.email,
+                    name: response?.additionalUserInfo?.profile?.name,
                     username: response?.additionalUserInfo?.profile?.name,
                     telephone: response?.additionalUserInfo?.providerData?.name,
                     social_type: 'Google',
@@ -405,41 +534,49 @@ const Login = ({navigation}) => {
                     mac_adr: '02.00:00:00:00',
                     images: response?.additionalUserInfo?.profile?.picture,
                   };
+
                   console.log('response -> ' + JSON.stringify(body));
 
-                  ApiCall('post', body, API_END_POINTS.GOOGLE_LOGIN, {
+                  ApiCall('post', body, API_END_POINTS.API_GOOGLE_SIGNUP, {
                     Accept: 'application/json',
                     'Content-Type': 'multipart/form-data',
                   })
                     .then(response => {
-                      console.log(JSON.stringify(response));
+                      console.log(JSON.stringify(response), 'google ');
 
-                      if (response?.data?.success == 1) {
+                      if (response?.data?.status == true) {
                         ShowToastMessage('Login successful');
-
                         setLoading(false);
-
                         let arr = [];
-                        arr.push(response?.data?.result);
-                        console.log(JSON.stringify(arr));
+                        arr.push(response?.data?.data);
                         for (let i = 0; i < arr.length; i++) {
-                          console.log(arr[i]['0']);
+                          // console.log(arr[i]['0']?.images['0']['560_560']?.url);
                           AsyncStorage.setItem(
                             'userData',
-                            JSON.stringify(arr[i]['0']),
+                            JSON.stringify(arr[i]),
                           );
-                        }
-                        console.log(arr.length);
-                        console.log(JSON.stringify(response));
+                          // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
 
-                        navigation.navigate('Profile');
+                          AsyncStorage.setItem(STRING.userEmail, arr[i]?.email);
+                          if (googleImage != null || '') {
+                            AsyncStorage.setItem(
+                              'userImage',
+                              googleImage || '',
+                            );
+                          }
+                          // console.log(googleImage + ' imatgwe profile  ');
+                          uploadImage(arr[i]?.id_user, googleImage);
+                        }
+                        // console.log(arr.length);
+                        // console.log(JSON.stringify(response));
+
+                        navigation.navigate('MainContainer');
                       } else {
                         ShowToastMessage('Login failed');
                         setLoading(false);
                       }
                     })
                     .catch(() => {
-                      ShowToastMessage('Something went wrong.');
                       setLoading(false);
                     })
                     .finally(() => {
@@ -502,6 +639,7 @@ const Login = ({navigation}) => {
           }}
         />
       </View>
+      {renderFilterModal()}
     </SafeAreaView>
   );
 };

@@ -1,4 +1,6 @@
+import notifee, {AndroidImportance} from '@notifee/react-native';
 import NetInfo from '@react-native-community/netinfo';
+import messaging from '@react-native-firebase/messaging';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
@@ -13,10 +15,6 @@ import OtpVerification from './src/screens/Auth/OtpVerification';
 import SignUp from './src/screens/Auth/SignUp';
 import Splash from './src/screens/Auth/Splash';
 import NoInternetConnection from './src/utils/NoInternetConnection';
-import notifee, {AndroidImportance} from '@notifee/react-native';
-import messaging from '@react-native-firebase/messaging';
-import {ShowConsoleLogMessage} from './src/utils/Utility';
-import {images} from './src/constants';
 
 LogBox.ignoreAllLogs();
 const Stack = createNativeStackNavigator();

@@ -203,11 +203,13 @@ import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import base64 from 'react-native-base64';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import {InvoiceListSkeleton} from '../../utils/Skeleton';
+
 const InvoiceList = ({navigation}) => {
   const [listData, setListData] = useState([]);
   const [apiToken, setApiToken] = useState('');
   const [userId, setUserId] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [show, setShow] = useState(false);
   const [userData, setUserData] = useState({});
 
@@ -242,7 +244,7 @@ const InvoiceList = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // console.log('ERROR IN GET USer PROFILE => ', JSON.stringify(response));
+        console.log('ERROR IN GET USer PROFILE => ', JSON.stringify(response));
 
         if (response?.data?.success == 1) {
           let result = Object.values(response.data?.result);
@@ -276,7 +278,7 @@ const InvoiceList = ({navigation}) => {
   const onEyeItemClick = item => {
     let a = base64.encode(item?.id);
     let url = CLONE_BASE_URL + '/user/Data_Order?Id=' + a;
-    // ShowConsoleLogMessage(url);
+    ShowConsoleLogMessage(url);
     navigation.navigate('InvoiceDetail', {
       url: url + '',
       order_id: item?.id + '',
@@ -351,7 +353,7 @@ const InvoiceList = ({navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    // ShowConsoleLogMessage(item?.owner_name);
+    ShowConsoleLogMessage(item?.owner_name);
     let order_status =
       item?.status?.split(';')[0].substring(0, 1).toUpperCase() +
       item?.status?.split(';')[0].substring(1);
@@ -480,7 +482,7 @@ const InvoiceList = ({navigation}) => {
 
   return (
     <View style={{backgroundColor: COLORS.white, flex: 1}}>
-      <BunchDealProgressBar loading={loading} />
+      {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
           GlobalStyle2.headerFooterStyle,
@@ -515,12 +517,30 @@ const InvoiceList = ({navigation}) => {
         }}>
         <FlatList
           data={listData}
+          ListEmptyComponent={() => {
+            return loading ? (
+              <InvoiceListSkeleton />
+            ) : (
+              <Text
+                style={{
+                  flex: 1,
+                  alignSelf: 'center',
+                  textAlign: 'center',
+                  marginTop: 200,
+                  fontSize: 18,
+                  fontFamily: 'Quicksand-Medium',
+                }}>
+                No data Found
+              </Text>
+            );
+          }}
+          style={{
+            backgroundColor: COLORS.white,
+            marginBottom: 15,
+          }}
           extraData={listData}
           keyExtractor={item => {
             return item.id;
-          }}
-          style={{
-            marginBottom: 10,
           }}
           renderItem={renderItem}
           ItemSeparatorComponent={() => {

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View, Modal} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {icons, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
@@ -18,6 +18,7 @@ import OfferCardView from './OfferCardView';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
+import {OfferSkeleton} from '../../utils/Skeleton';
 
 const Offer = ({
   navigation,
@@ -36,6 +37,7 @@ const Offer = ({
   const [recentData, setRecentData] = useState([]);
   const [nearByData, setNearByData] = useState([]);
   const [showError, setShowError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const permission = requestLocationPermission();
@@ -53,6 +55,8 @@ const Offer = ({
   }, [dataChange]);
 
   const getSearchOfferList = (search, catId, radius, location) => {
+    setLoading(true);
+
     let body = {
       latitude: STRING.CURRENT_LAT + '',
       longitude: STRING.CURRENT_LONG + '',
@@ -96,7 +100,9 @@ const Offer = ({
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const onReloadBtn = () => {
@@ -148,6 +154,7 @@ const Offer = ({
   };
 
   const getNearbyList = val => {
+    setLoading(true);
     let body = {
       latitude: STRING.CURRENT_LAT + '',
       longitude: STRING.CURRENT_LONG + '',
@@ -162,7 +169,7 @@ const Offer = ({
       timezone: timeZone,
     };
 
-    ShowConsoleLogMessage(JSON.stringify(body));
+    ShowConsoleLogMessage(JSON.stringify(body), '5555555555');
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -188,7 +195,9 @@ const Offer = ({
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -260,6 +269,23 @@ const Offer = ({
           {!showError ? (
             <FlatList
               data={recentData}
+              ListEmptyComponent={() => {
+                return loading ? (
+                  <OfferSkeleton />
+                ) : (
+                  <Text
+                    style={{
+                      flex: 1,
+                      alignSelf: 'center',
+                      textAlign: 'center',
+                      marginTop: 200,
+                      fontSize: 18,
+                      fontFamily: 'Quicksand-Medium',
+                    }}>
+                    No data Found
+                  </Text>
+                );
+              }}
               style={{
                 backgroundColor: COLORS.lightGrey,
                 marginBottom: 15,
@@ -282,9 +308,26 @@ const Offer = ({
           {!showError ? (
             <FlatList
               data={nearByData}
+              ListEmptyComponent={() => {
+                return loading ? (
+                  <OfferSkeleton />
+                ) : (
+                  <Text
+                    style={{
+                      flex: 1,
+                      alignSelf: 'center',
+                      textAlign: 'center',
+                      marginTop: 200,
+                      fontSize: 18,
+                      fontFamily: 'Quicksand-Medium',
+                    }}>
+                    No data Found
+                  </Text>
+                );
+              }}
               style={{
                 backgroundColor: COLORS.lightGrey,
-                paddingBottom: 5,
+                marginBottom: 15,
               }}
               renderItem={({item}) => {
                 return <OfferCardView item={item} />;

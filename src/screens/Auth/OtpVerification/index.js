@@ -313,7 +313,7 @@ const OtpVerification = ({navigation, route}) => {
           // console.log(response, '$$$$$');
 
           if (response?.data?.status == true) {
-            ShowToastMessage('OTP verify successfully');
+            ShowToastMessage(response?.data?.message);
             AsyncStorage.setItem(
               'userData',
               JSON.stringify(response?.data?.data),
@@ -331,7 +331,7 @@ const OtpVerification = ({navigation, route}) => {
             uploadImage(response?.data?.data?.id_user);
             navigation.navigate('MainContainer');
           } else {
-            ShowToastMessage('Otp Verification Failed');
+            ShowToastMessage(response?.data?.message);
           }
         })
         .catch(error => {

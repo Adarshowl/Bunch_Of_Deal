@@ -41,7 +41,9 @@ const About = ({navigation}) => {
         <Image source={images.splash_new_beta} style={GlobalStyle2.AboutIcon} />
         <View style={{flexDirection: 'row', alignSelf: 'center'}}>
           <Text style={{fontSize: 14}}>version : </Text>
-          <Text style={{fontSize: 14, color: COLORS.colorPrimary}}>2.0.2</Text>
+          <Text style={[FONTS.h4, {fontSize: 14, color: COLORS.colorPrimary}]}>
+            2.0.2
+          </Text>
         </View>
       </View>
       <View style={GlobalStyle2.AboutDes}>

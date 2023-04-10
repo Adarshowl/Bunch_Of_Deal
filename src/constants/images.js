@@ -1,3 +1,4 @@
+export const new_login_beta = require('../assets/images/new_login_beta.png');
 export const app_logo = require('../assets/images/app_logo_new_512.png');
 export const def_logo = require('../assets/images/def_logo.png');
 export const bg_no_item_cactus = require('../assets/images/bg_no_item_cactus.png');
@@ -22,6 +23,7 @@ export const intro_9 = require('../assets/images/intro/intro_9.png');
 
 export default {
   app_logo,
+  new_login_beta,
   bg_no_item_cactus,
   facebook,
   img_no_chat,

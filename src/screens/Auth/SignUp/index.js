@@ -155,7 +155,7 @@
 // code merge
 
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, View} from 'react-native';
+import {Image, SafeAreaView, View, Text} from 'react-native';
 import ImgToBase64 from 'react-native-image-base64';
 import ImagePicker from 'react-native-image-crop-picker';
 import {COLORS} from '../../../constants/Colors';
@@ -171,6 +171,7 @@ import {
   ShowConsoleLogMessage,
   ShowToastMessage,
   validateFieldNotEmpty,
+  validateEmail,
 } from '../../../utils/Utility';
 
 import ApiCall from '../../../network/ApiCall';
@@ -183,6 +184,8 @@ const SignUp = ({navigation}) => {
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [havePermission, setHavePermission] = useState(false);
+  const [emailValid, setEmailValid] = useState(false);
+  const [emailError, setEmailError] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -203,6 +206,10 @@ const SignUp = ({navigation}) => {
   const handleLogin = () => {
     if (validateFieldNotEmpty(email)) {
       ShowToastMessage('Email is required');
+    } else if (!validateEmail(email)) {
+      ShowToastMessage('Email is Invalid');
+
+      setEmailValid(true);
     } else if (validateFieldNotEmpty(fullName)) {
       ShowToastMessage('FullName is required');
     } else if (validateFieldNotEmpty(pseudo)) {
@@ -232,14 +239,14 @@ const SignUp = ({navigation}) => {
         .then(response => {
           // ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.status == true) {
-            ShowToastMessage('OTP sent Successfully');
+            ShowToastMessage(response?.data?.message);
             console.log(response);
             navigation.navigate('OtpVerification', {
               data,
               imageBase64: imageBase64,
             });
           } else {
-            ShowToastMessage('SignUp Failed');
+            ShowToastMessage(response?.data?.message);
           }
         })
         .catch(error => {})
@@ -328,6 +335,15 @@ const SignUp = ({navigation}) => {
           onChangeText={val => {
             setEmail(val);
           }}
+          error={
+            emailError ? (
+              <Text>{STRING.fieldRequired}</Text>
+            ) : emailValid ? (
+              <Text>{STRING.invalidEmailAddress}</Text>
+            ) : (
+              ''
+            )
+          }
         />
         <BunchDealEditText
           borderBottomWidth={1}

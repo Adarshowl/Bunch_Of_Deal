@@ -8,6 +8,7 @@ import GlobalStyle from '../../../styles/GlobalStyle';
 const OnBoarding = ({navigation}) => {
   useEffect(() => {
     AsyncStorage.setItem(STRING.onBoardComplete, 'true');
+    AsyncStorage.setItem(STRING.isFirstTime, 'true');
   }, []);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef();
@@ -104,7 +105,8 @@ const OnBoarding = ({navigation}) => {
   }, []);
 
   const handleSkipBtnClick = () => {
-    navigation.replace('Login');
+    // navigation.replace('Login');
+    navigation.replace('MainContainer');
   };
 
   const handleNextBtnClick = () => {
@@ -117,7 +119,8 @@ const OnBoarding = ({navigation}) => {
       });
       setActiveIndex(activeIndex + 1);
     } else {
-      navigation.replace('Login');
+      // navigation.replace('Login');
+      navigation.replace('MainContainer');
     }
   };
 

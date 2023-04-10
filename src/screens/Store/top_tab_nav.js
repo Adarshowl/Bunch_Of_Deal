@@ -1,5 +1,12 @@
-import React from 'react';
-import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+
+import {
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -10,17 +17,49 @@ import {COLORS} from '../../constants/Colors';
 import StoreOffer from './StoreOffer';
 import StoreReview from './StoreReview';
 import GalleryFragment from './GalleryFragment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 const Tab = createMaterialTopTabNavigator();
 
 const CAMERA_TAB_ITEM_WIDTH = SIZES.width * 0.1;
 const NORMAL_TAB_ITEM_WIDTH = SIZES.width / 2;
 
 const MyTabBar = ({state, descriptors, navigation, position}) => {
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    getUserFromStorage();
+  }, []);
+
+  const getUserFromStorage = async item => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+            ShowConsoleLogMessage(item);
+            if (item?.cid != undefined || null) {
+              markAsRead(item?.cid, JSON.parse(value)?.id_user);
+            }
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+
   return (
     <View
       style={{
         flexDirection: 'row',
         marginHorizontal: 10,
+
         // backgroundColor: 'white',
       }}>
       {state.routes.map((route, index) => {
@@ -41,12 +80,20 @@ const MyTabBar = ({state, descriptors, navigation, position}) => {
             target: route.key,
             canPreventDefault: true,
           });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate({
-              name: route.name,
-              merge: true,
+          if (userData?.id_user == null && label == 'Review') {
+            navigation.navigate('Auth', {
+              screen: 'Login',
+              params: {
+                screen: 'Login',
+              },
             });
+          } else {
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate({
+                name: route.name,
+                merge: true,
+              });
+            }
           }
         };
 
@@ -56,6 +103,10 @@ const MyTabBar = ({state, descriptors, navigation, position}) => {
             target: route.key,
           });
         };
+
+        const [recentData, setRecentData] = useState([]);
+
+        const [showError, setShowError] = useState(false);
 
         return (
           <TouchableOpacity
@@ -133,10 +184,12 @@ const TopTabBar = ({items}) => {
         name="Offers"
         children={item => <StoreOffer item={items} />}
       />
+
       <Tab.Screen
         name="Review"
         children={item => <StoreReview item={items} />}
       />
+
       <Tab.Screen
         name="Gallery"
         children={item => <GalleryFragment item={items} />}

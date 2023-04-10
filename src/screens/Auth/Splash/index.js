@@ -8,6 +8,7 @@ import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
 import GlobalStyle from '../../../styles/GlobalStyle';
 import {ShowConsoleLogMessage} from '../../../utils/Utility';
+import {COLORS} from '../../../constants/Colors';
 const Splash = ({navigation}) => {
   useEffect(() => {
     // navigation.replace('MainContainer');
@@ -37,7 +38,8 @@ const Splash = ({navigation}) => {
             checkUserExist(JSON.parse(value), onBoard);
           } else {
             if (onBoard == 'true') {
-              navigation.replace('Login');
+              // navigation.replace('Login');
+              navigation.replace('MainContainer');
             } else {
               navigation.replace('OnBoarding');
             }
@@ -146,14 +148,24 @@ const Splash = ({navigation}) => {
   };
 
   return (
-    <View style={GlobalStyle.mainContainerBgColor}>
+    <View
+      style={[
+        GlobalStyle.mainContainerBgColor,
+        {
+          backgroundColor: COLORS.white,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      ]}>
       <Image
         style={{
-          width: '100%',
-          height: '100%',
+          width: '80%',
+          height: '80%',
           padding: 15,
+          resizeMode: 'contain',
+          alignSelf: 'center',
         }}
-        source={images.one_splash_gif}
+        source={images.new_login_beta}
       />
     </View>
   );

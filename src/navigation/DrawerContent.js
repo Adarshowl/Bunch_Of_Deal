@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -20,16 +21,30 @@ import {FONTS} from '../constants/themes';
 import GlobalStyle from '../styles/GlobalStyle';
 import BunchDealImageLoader from '../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../utils/BunchDealVectorIcon';
-import {ShowConsoleLogMessage} from '../utils/Utility';
-const DrawerContent = props => {
+import {ShowConsoleLogMessage, ShowToastMessage} from '../utils/Utility';
+import {useIsFocused} from '@react-navigation/native';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+const DrawerContent = ({navigation, props}) => {
   const [userData, setUserData] = useState({});
   const [image, setImage] = useState('');
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     // ShowConsoleLogMessage(item);
     setTimeout(async () => {
       await getUserFromStorage();
     }, 0);
   }, []);
+
+  useEffect(() => {
+    getUserFromStorage();
+    if (isFocused) {
+      getUserFromStorage();
+    }
+  }, [isFocused]);
 
   const getUserFromStorage = async () => {
     try {
@@ -38,6 +53,7 @@ const DrawerContent = props => {
         } else {
           if (value !== null) {
             setUserData(JSON.parse(value));
+            // ShowConsoleLogMessage(value, '$$$$$$$$$$$$');
           } else {
           }
         }
@@ -56,6 +72,33 @@ const DrawerContent = props => {
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
+
+  const isSignedIn = async () => {
+    const isSignedIn = await GoogleSignin.isSignedIn();
+  };
+
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+
+      // Remember to remove the user from your app's state as well
+      navigation.replace('Auth', {
+        screen: 'Login',
+        params: {
+          screen: 'Login',
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const onLogouClick = () => {
+    {
+      AsyncStorage.clear().then(() => console.log('Cleared'));
+      isSignedIn() ? signOut() : ShowToastMessage('Logout Failed');
+    }
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -75,7 +118,8 @@ const DrawerContent = props => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            props?.navigation?.navigate('Account');
+            // props?.navigation?.navigate('Account');
+            navigation.navigate('Account');
           }}
           style={{
             padding: 25,
@@ -88,12 +132,31 @@ const DrawerContent = props => {
               '' + image
             }
           />
-          <Text style={styles.name} onPress={() => {}}>
-            {userData?.name}
-          </Text>
-          <Text style={styles.email} onPress={() => {}}>
-            {userData?.email}
-          </Text>
+          {userData?.id_user == null ? (
+            <View style={{marginTop: 10}}>
+              <Text
+                onPress={() => {
+                  navigation.navigate('Auth', {
+                    screen: 'Login',
+                    params: {
+                      screen: 'Login',
+                    },
+                  });
+                }}
+                style={[FONTS.h5, {color: COLORS.white}]}>
+                Log In/Create Acoount
+              </Text>
+            </View>
+          ) : (
+            <View>
+              <Text style={styles.name} onPress={() => {}}>
+                {userData?.name}
+              </Text>
+              <Text style={styles.email} onPress={() => {}}>
+                {userData?.email}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </ImageBackground>
       <View
@@ -101,13 +164,21 @@ const DrawerContent = props => {
           marginTop: 10,
         }}
       />
-      <DrawerItem name={'Home'} title={Entypo} iconName="home" />
+      <DrawerItem
+        name={'Home'}
+        title={Entypo}
+        iconName="home"
+        onPress={() => {
+          navigation.goBack();
+        }}
+      />
       <DrawerItem
         name={'Categories'}
         title={Ionicons}
         iconName="md-reorder-three-outline"
         onPress={() => {
-          props?.navigation?.navigate('Category');
+          // props?.navigation?.navigate('Category');
+          navigation.navigate('Category');
         }}
       />
       <DrawerItem
@@ -115,66 +186,130 @@ const DrawerContent = props => {
         title={Entypo}
         iconName="location"
         onPress={() => {
-          props?.navigation?.navigate('GeoStore');
+          // props?.navigation?.navigate('GeoStore');
+          navigation.navigate('GeoStore');
         }}
       />
-      <DrawerItem
-        name={'Orders'}
-        title={Ionicons}
-        iconName="ios-cart"
-        onPress={() => {
-          props?.navigation?.navigate('Invoice');
-        }}
-      />
-      <DrawerItem
-        name={'Edit Profile'}
-        title={Ionicons}
-        iconName="ios-person-sharp"
-        onPress={() => {
-          props?.navigation?.navigate('Account');
-        }}
-      />
+      {userData?.id_user == null ? null : (
+        <DrawerItem
+          name={'Orders'}
+          title={Ionicons}
+          iconName="ios-cart"
+          onPress={() => {
+            // props?.navigation?.navigate('Invoice');
+            navigation.navigate('Invoice');
+          }}
+        />
+      )}
+      {userData?.id_user == null ? null : (
+        <DrawerItem
+          name={'Edit Profile'}
+          title={Ionicons}
+          iconName="ios-person-sharp"
+          onPress={() => {
+            // props?.navigation?.navigate('Account');
+            navigation.navigate('Account');
+          }}
+        />
+      )}
+
+      {/* {userData?.id_user == null ? null : ( */}
       <DrawerItem
         name={'Favorite Store'}
         title={Fontisto}
         iconName="favorite"
         onPress={() => {
-          props?.navigation?.navigate('FavStore');
+          // props?.navigation?.navigate('FavStore');
+          navigation.navigate('FavStore');
         }}
       />
+      {/* )} */}
+      {/* {userData?.id_user == null ? null : ( */}
       <DrawerItem
         name={'Favorite Offer'}
         title={Fontisto}
         iconName="favorite"
         onPress={() => {
-          props?.navigation?.navigate('FavOffer');
+          // props?.navigation?.navigate('FavOffer');
+          navigation.navigate('FavOffer');
         }}
       />
+      {/* )} */}
+
       <DrawerItem
         name={'Settings'}
         title={Feather}
         iconName="settings"
         onPress={() => {
-          props?.navigation.navigate('Setting');
+          // props?.navigation.navigate('Setting');
+          navigation.navigate('Setting');
         }}
       />
+
       <DrawerItem
         name={'About Us'}
         title={Feather}
         iconName="info"
         onPress={() => {
-          props?.navigation?.navigate('About');
+          // props?.navigation?.navigate('About');
+          navigation?.navigate('About');
         }}
       />
-      <DrawerItem
-        name={'Logout'}
-        title={Feather}
-        iconName="log-in"
-        onPress={() => {
-          AsyncStorage.clear();
-          props?.navigation?.replace('Auth');
-        }}
-      />
+
+      {userData?.id_user == null ? (
+        <DrawerItem
+          name={'LogIn'}
+          title={Feather}
+          iconName="log-in"
+          onPress={() => {
+            navigation.navigate('Auth', {
+              screen: 'Login',
+              params: {
+                screen: 'Login',
+              },
+            });
+          }}
+        />
+      ) : (
+        <DrawerItem
+          name={'Logout'}
+          title={Feather}
+          iconName="log-in"
+          onPress={() => {
+            Alert.alert(
+              'Log out',
+              'Do you want to logout?',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => {
+                    return null;
+                  },
+                },
+                {
+                  text: 'Confirm',
+                  // onPress: () => {
+
+                  //   props?.navigation?.replace('Auth');
+                  //   AsyncStorage.clear().then(() => console.log('Cleared'));
+
+                  //   navigation.replace('Auth', {
+                  //     screen: 'Login',
+                  //     params: {
+                  //       screen: 'Login',
+                  //     },
+                  //   });
+                  // },
+                  onPress: () => {
+                    onLogouClick();
+                  },
+                },
+              ],
+              {cancelable: false},
+            );
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -210,7 +345,7 @@ const DrawerItem = ({name, title, iconName, iconSize, onPress}) => {
         style={{
           fontSize: 16,
           fontFamily: 'Montserrat-Regular',
-          color: COLORS.shimmer_loading_color_darker,
+          color: COLORS.editTextBorder,
         }}>
         {name}
       </Text>

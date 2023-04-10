@@ -45,7 +45,7 @@ import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
-const StoreDetails = ({navigation, route}) => {
+const TestStoreDetail = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(true);
   const [changeTwo, setChangeTwo] = useState(false);
   const [changeThree, setChangeThree] = useState(false);
@@ -465,7 +465,7 @@ const StoreDetails = ({navigation, route}) => {
 
   const renderOfferItem = ({item}) => {
     // ShowConsoleLogMessage(item);
-    let imageUrl = item.images['0']['560_560'].url;
+    // let imageUrl = item.images['0']['560_560'].url;
     return (
       <TouchableOpacity
         activeOpacity={0.8}
@@ -1388,7 +1388,7 @@ const StoreDetails = ({navigation, route}) => {
   );
 };
 
-export default StoreDetails;
+export default TestStoreDetail;
 const styles = StyleSheet.create({
   container: {
     height: SIZES.width,
