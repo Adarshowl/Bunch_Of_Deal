@@ -335,6 +335,7 @@ const Account = ({navigation}) => {
           placeholder={STRING.phoneHint}
           style={FONTS.body3}
           value={mobile}
+          maxLength={10}
           onChangeText={val => {
             setMobile(val);
             setUpdate(true);

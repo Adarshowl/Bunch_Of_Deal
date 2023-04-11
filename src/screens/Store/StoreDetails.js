@@ -1018,9 +1018,18 @@ const StoreDetails = ({navigation, route}) => {
               key={route.name}
               accessibilityRole="button"
               onPress={onPress => {
-                setChangeTwo(true);
-                setChangeThree(false);
-                setChangeOne(false);
+                if (userData?.id_user == null) {
+                  navigation.navigate('Auth', {
+                    screen: 'Login',
+                    params: {
+                      screen: 'Login',
+                    },
+                  });
+                } else {
+                  setChangeTwo(true);
+                  setChangeThree(false);
+                  setChangeOne(false);
+                }
               }}
               style={{
                 flex: 1,

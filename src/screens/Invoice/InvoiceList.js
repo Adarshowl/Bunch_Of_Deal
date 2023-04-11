@@ -204,6 +204,7 @@ import base64 from 'react-native-base64';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import {InvoiceListSkeleton} from '../../utils/Skeleton';
+import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 
 const InvoiceList = ({navigation}) => {
   const [listData, setListData] = useState([]);
@@ -454,7 +455,7 @@ const InvoiceList = ({navigation}) => {
               data={Object.values(item?.items)}
               renderItem={renderInterItem}
             />
-            <AntDesign
+            {/* <AntDesign
               name="eye"
               style={{
                 alignSelf: 'center',
@@ -473,7 +474,27 @@ const InvoiceList = ({navigation}) => {
                 // });
                 onEyeItemClick(item);
               }}
-            />
+            /> */}
+            <View
+              style={{
+                alignItems: 'center',
+                marginBottom: 5,
+              }}>
+              <BunchDealCommonBtn
+                height={30}
+                width={80}
+                backgroundColor={COLORS.colorAccent}
+                marginHorizontal={0}
+                text={'Invoice'}
+                textStyle={FONTS.body4}
+                onPress={() => {
+                  onEyeItemClick(item);
+                }}
+                textColor={COLORS.white}
+                borderRadius={2}
+                textSize={15}
+              />
+            </View>
           </>
         ) : null}
       </View>
