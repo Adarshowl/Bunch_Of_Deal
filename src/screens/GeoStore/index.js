@@ -457,7 +457,8 @@ const GeoStore = ({navigation}) => {
           }}>
           <Ionicons
             onPress={() => {
-              closeSearchModal();
+              // closeSearchModal();
+              navigation.navigate('UniversalSearch');
             }}
             marginStart={15}
             color={COLORS.colorPrimary}

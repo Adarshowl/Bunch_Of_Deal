@@ -32,6 +32,8 @@ export const STRING = {
   fieldRequired: 'Field is required',
   welcome_to: 'Welcome to',
   get_started: 'Get Started',
+  you_ve_already_reviewd: 'You have already add your review!',
+  thank_you: 'Thank you!',
   login_create_account: 'Log In / Create Account',
   register_now: 'Register Now',
   skip: 'SKIP',

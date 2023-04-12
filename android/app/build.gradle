@@ -98,7 +98,7 @@ android {
     namespace "com.bunch.of.deals"
     // namespace "com.bunchofdeals"
     defaultConfig {
-        applicationId "com.bunch.of.dealss"
+        applicationId "com.bunch.of.deals"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -505,6 +505,7 @@ const OtpVerification = ({navigation, route}) => {
               separatorStyle={{
                 color: 'black',
                 marginHorizontal: -10,
+                paddingTop: 20,
               }}
               digitTxtStyle={[FONTS.h6, {color: COLORS.black}]}
               timeToShow={['M', 'S']}

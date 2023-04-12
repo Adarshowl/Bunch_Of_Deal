@@ -336,6 +336,7 @@ const Account = ({navigation}) => {
           style={FONTS.body3}
           value={mobile}
           maxLength={10}
+          keyBoardType={'number-pad'}
           onChangeText={val => {
             setMobile(val);
             setUpdate(true);

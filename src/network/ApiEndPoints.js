@@ -92,7 +92,8 @@ export const API_END_POINTS = {
   API_USER_GET_STORES: CLONE_BASE_URL + API + 'store/getStores',
   API_USER_GET_REVIEWS: CLONE_BASE_URL + API + 'store/getComments',
   API_USER_UPDATE_STORE: CLONE_BASE_URL + API + 'webservice/updateStore',
-  API_RATING_STORE: CLONE_BASE_URL + API + 'store/rate',
+  API_RATING_STORE:
+    'https://bunchofdeals.com.au/APP_CLONE/index.php/api/1.0/store/rate',
   API_SAVE_STORE: CLONE_BASE_URL + API + 'store/saveStore',
   API_REMOVE_STORE: CLONE_BASE_URL + API + 'store/removeStore',
 

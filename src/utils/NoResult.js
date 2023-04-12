@@ -14,6 +14,7 @@ const NoResult = ({onReloadBtn}) => {
         {
           alignItems: 'center',
           backgroundColor: '#e6e6e6',
+          // backgroundColor: 'red',
         },
       ]}>
       <Text

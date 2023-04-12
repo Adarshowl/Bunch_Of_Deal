@@ -183,7 +183,8 @@ const CategoryList = ({navigation, route}) => {
 
         <Fontisto
           onPress={() => {
-            closeSearchModal();
+            // closeSearchModal();
+            navigation.navigate('UniversalSearch');
           }}
           marginEnd={15}
           color={COLORS.colorPrimary}

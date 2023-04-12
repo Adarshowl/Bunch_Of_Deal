@@ -37,6 +37,12 @@ import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {
+  doDeleteOfferOffline,
+  doSaveOfferOffline,
+  getSavedOfferAsString,
+  isOfferSaved,
+} from '../../utils/RealmUtility';
+import {
   ShowConsoleLogMessage,
   ShowToastMessage,
   getDateDiff,
@@ -134,14 +140,21 @@ const OfferDetails = ({navigation, route}) => {
 
   const [counterTime, setCounterTime] = useState(0);
   let t = 0;
-  useEffect(() => {
+  useEffect(async () => {
     let {item} = route.params;
 
     if (item?.intentFromNotification) {
       getSearchOfferList(item?.id_offer);
+      let is_offer_save = await isOfferSaved(item?.id_offer || item?.offer_id);
+      // ShowConsoleLogMessage(is_offer_save);
+      setFavorite(is_offer_save);
     } else {
       if (item?.id_offer == undefined || null) {
         getSearchOfferList(item?.id_offer);
+        let is_offer_save = await isOfferSaved(
+          item?.id_offer || item?.offer_id,
+        );
+        setFavorite(is_offer_save);
       } else {
         setReceivedData(item);
 
@@ -190,6 +203,14 @@ const OfferDetails = ({navigation, route}) => {
 
         if (diff_Will_Start < 0 && diff_will_end < 0) {
         }
+
+        let is_offer_save = await isOfferSaved(
+          item?.id_offer || item?.offer_id,
+        );
+        setFavorite(is_offer_save);
+
+        // let temp = await getSavedOfferAsString();
+        // ShowConsoleLogMessage(temp);
       }
     }
   }, []);
@@ -881,7 +902,7 @@ const OfferDetails = ({navigation, route}) => {
                 FONTS.body4,
                 {
                   color: 'grey',
-                  marginHorizontal: 15,
+                  marginHorizontal: 18,
                 },
               ]}>
               {receivedData?.description?.replace(/<\/?[^>]+(>|$)/g, '\n')}
@@ -1268,8 +1289,14 @@ const OfferDetails = ({navigation, route}) => {
             onPress={() => {
               if (favorite) {
                 unSaveOnline();
+                doDeleteOfferOffline(
+                  receivedData?.id_offer || receivedData?.offer_id,
+                );
               } else {
                 doSaveOnline();
+                doSaveOfferOffline(
+                  receivedData?.id_offer || receivedData?.offer_id,
+                );
               }
             }}
           />

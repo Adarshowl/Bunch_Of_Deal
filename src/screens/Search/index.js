@@ -1,24 +1,24 @@
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {
+  FlatList,
+  Modal,
   StyleSheet,
   Text,
-  View,
-  Modal,
-  FlatList,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {images, SIZES, STRING} from '../../constants';
-import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
-import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import {FONTS} from '../../constants/themes';
-import {COLORS} from '../../constants/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
-import ApiCall from '../../network/ApiCall';
-import LinearGradient from 'react-native-linear-gradient';
 import {Slider} from 'react-native-elements';
-import {useNavigation} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {SIZES, STRING, images} from '../../constants';
+import {COLORS} from '../../constants/Colors';
+import {FONTS} from '../../constants/themes';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
+import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 const SearchDialog = ({
   show,

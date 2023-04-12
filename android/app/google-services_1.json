@@ -10,23 +10,15 @@
       "client_info": {
         "mobilesdk_app_id": "1:719363581249:android:cebb216d6e789bb163adc0",
         "android_client_info": {
-          "package_name": "com.bunch.of.deals"
+          "package_name": "com.bunch.of.dealss"
         }
       },
       "oauth_client": [
         {
-          "client_id": "719363581249-6iqvq2oiojtkrtn0ifvp6egr6i64r91i.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.bunch.of.deals",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
           "client_id": "719363581249-7r2mbaaanli2h0rfh9org7mpfp7oht1k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "c45abe07212bba29fab335a1517478fb9e99dfa8"
           }
         },
@@ -34,7 +26,7 @@
           "client_id": "719363581249-93vrgmqg1752cpu8u658vi7mi3vb4fuh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "5bb58c87bee7cd85d013ecaadbab64ca8bdbaed3"
           }
         },
@@ -42,7 +34,7 @@
           "client_id": "719363581249-du881l29g6lqas7gseu8m0906lbig17u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "97ecd73e97794156e7bb355e1cbe0cbf8b2e5c2a"
           }
         },
@@ -50,7 +42,7 @@
           "client_id": "719363581249-i3h5g8qs71pk3bc4njho5ira22jovjl3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "81605bfdca0c559340bdc3f7e58c67e4f7150665"
           }
         },
@@ -58,7 +50,7 @@
           "client_id": "719363581249-ke0c309b8u8fq91tf53nq2b7tbat92gj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "711ab42a5b4f2c253d3dddec068f02e3870e935f"
           }
         },
@@ -66,7 +58,7 @@
           "client_id": "719363581249-ocjkrlpadbsja2lq1s6i651m3du9c7i6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "5d177416d64c39d522031580652c2d0ab6b0aba5"
           }
         },
@@ -74,7 +66,7 @@
           "client_id": "719363581249-uv673qlk1aivis0lhiah2decsh64g5g1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bunch.of.deals",
+            "package_name": "com.bunch.of.dealss",
             "certificate_hash": "cc3ca58ebd2dc60a375e698a33f60123ac2a678e"
           }
         },
@@ -117,14 +109,6 @@
         }
       },
       "oauth_client": [
-        {
-          "client_id": "719363581249-dp8cdc2149ev99eoca2612tprb1bpg7c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.bunchofdeals",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
         {
           "client_id": "719363581249-lj3e13e04l88b565s5qgsa9k18p86089.apps.googleusercontent.com",
           "client_type": 1,

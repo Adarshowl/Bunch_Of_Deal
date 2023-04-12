@@ -42,6 +42,14 @@ import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import {STRING} from '../../constants';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
+import {
+  doDeleteStoreOffline,
+  doSaveStoreOffline,
+  doSaveStoreReview,
+  isStoreReviewSaved,
+  isStoreSaved,
+} from '../../utils/RealmUtility';
+import {index} from 'realm';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
@@ -155,6 +163,7 @@ const StoreDetails = ({navigation, route}) => {
       .finally(() => {});
   };
   const [favorite, setFavorite] = useState(false);
+  const [reviewAdded, setReviewAdded] = useState(false);
 
   const doSaveOnline = val => {
     let body = {
@@ -215,7 +224,7 @@ const StoreDetails = ({navigation, route}) => {
       .finally(() => {});
   };
 
-  useEffect(() => {
+  useEffect(async () => {
     let {item} = route.params;
     // ShowConsoleLogMessage(item);
     if (item?.intentFromNotification) {
@@ -223,18 +232,34 @@ const StoreDetails = ({navigation, route}) => {
       getOfferList(item?.store_id);
       getReviewList(item?.store_id);
       getGalleryList(item?.store_id);
+      let is_store_save = await isStoreSaved(item?.store_id || item?.id_store);
+      setFavorite(is_store_save);
+      let is_store_review = await isStoreReviewSaved(
+        item?.store_id || item?.id_store,
+      );
+      setReviewAdded(is_store_review);
     } else {
       if (item?.store_id != undefined || null) {
         getStoreList(item?.store_id);
         getOfferList(item?.store_id);
         getReviewList(item?.store_id);
         getGalleryList(item?.store_id);
+
+        let is_store_save = await isStoreSaved(
+          item?.store_id || item?.id_store,
+        );
+        setFavorite(is_store_save);
+        let is_store_review = await isStoreReviewSaved(
+          item?.store_id || item?.id_store,
+        );
+        setReviewAdded(is_store_review);
       } else {
         setReceivedData(item);
         ShowConsoleLogMessage(item);
         getOfferList(item?.id_store);
         getReviewList(item?.id_store);
         getGalleryList(item?.id_store);
+
         var res = [];
 
         try {
@@ -242,11 +267,21 @@ const StoreDetails = ({navigation, route}) => {
             res.push(key['560_560' || 'full']?.url + '');
           });
         } catch (err) {}
-        // console.log(res, ' -> res');
         setImages(res);
 
         setImageUrl(item?.images['0']['560_560'].url);
         setCatImageUrl(item?.images['0']['200_200'].url);
+
+        let is_store_save = await isStoreSaved(
+          item?.store_id || item?.id_store,
+        );
+        setFavorite(is_store_save);
+
+        let is_store_review = await isStoreReviewSaved(
+          item?.store_id || item?.id_store,
+        );
+        ShowConsoleLogMessage(is_store_review + ' << isStoreReviewSaved');
+        setReviewAdded(is_store_review);
       }
     }
   }, []);
@@ -259,6 +294,8 @@ const StoreDetails = ({navigation, route}) => {
 
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // const [galleryActiveIndex, setGalleryActiveIndex] = useState(0);
+
   useEffect(() => {
     // console.log('use effect active index -> ', activeIndex);
   }, [activeIndex]);
@@ -268,8 +305,10 @@ const StoreDetails = ({navigation, route}) => {
 
   const [images, setImages] = useState([]);
   const bigPhotoRef = useRef();
+  const bigGalleryPhotoRef = useRef();
 
-  const [showImageModal, setShowImageModal] = useState('');
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showGalleryImageModal, setShowGalleryImageModal] = useState(false);
 
   const closeImageModal = () => {
     setShowImageModal(!showImageModal);
@@ -277,8 +316,64 @@ const StoreDetails = ({navigation, route}) => {
       setActiveIndex(0);
     }
   };
+  const closeGalleryImageModal = () => {
+    setShowGalleryImageModal(!showGalleryImageModal);
+  };
 
   const renderBigPhotoItems = ({item, index}) => {
+    if (galleryItemClick) {
+      // ShowConsoleLogMessage(item);
+      let imageUrl = item['560_560'].url;
+      return (
+        <View
+          activeOpacity={1.0}
+          onPress={() => {}}
+          style={{
+            height: 300,
+            width: Dimensions.get('window').width,
+            alignItems: 'center',
+          }}>
+          <Image
+            style={{
+              height: 300,
+              width: Dimensions.get('window').width,
+              resizeMode: 'stretch',
+            }}
+            source={{uri: imageUrl}}
+            PlaceholderContent={
+              <ActivityIndicator color={COLORS.white} size="large" />
+            }
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View
+          activeOpacity={1.0}
+          onPress={() => {}}
+          style={{
+            height: 300,
+            width: Dimensions.get('window').width,
+            alignItems: 'center',
+          }}>
+          <Image
+            style={{
+              height: 300,
+              width: Dimensions.get('window').width,
+              resizeMode: 'stretch',
+            }}
+            source={{uri: item}}
+            PlaceholderContent={
+              <ActivityIndicator color={COLORS.white} size="large" />
+            }
+          />
+        </View>
+      );
+    }
+  };
+
+  const renderBigGalleryPhotoItems = ({item, index}) => {
+    let imageUrl = item['560_560'].url;
     return (
       <View
         activeOpacity={1.0}
@@ -294,7 +389,7 @@ const StoreDetails = ({navigation, route}) => {
             width: Dimensions.get('window').width,
             resizeMode: 'stretch',
           }}
-          source={{uri: item}}
+          source={{uri: imageUrl}}
           PlaceholderContent={
             <ActivityIndicator color={COLORS.white} size="large" />
           }
@@ -407,6 +502,87 @@ const StoreDetails = ({navigation, route}) => {
       </Modal>
     );
   };
+
+  const renderGalleryImageModal = () => {
+    return (
+      <Modal
+        visible={showGalleryImageModal}
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent
+        onRequestClose={() => closeGalleryImageModal()}
+        style={{flexGrow: 1}}>
+        <View
+          style={{
+            backgroundColor: COLORS.black,
+            flexGrow: 1,
+            // justifyContent: 'flex-end',
+          }}>
+          <View
+            style={[
+              {
+                height: SIZES.height,
+                backgroundColor: COLORS.black,
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                // closeImageModal();
+              }}
+              activeOpacity={0.8}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'flex-start',
+              }}>
+              <AntDesign
+                name="close"
+                size={25}
+                color={COLORS.white}
+                style={{
+                  marginHorizontal: 20,
+                  // marginTop: 60,
+                  opacity: 0.0,
+                }}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 18,
+                color: COLORS.white,
+                textAlign: 'center',
+                marginTop: 30,
+                fontFamily: 'Montserrat-Medium',
+              }}></Text>
+            <View
+              style={{
+                marginBottom: 'auto',
+                marginTop: 'auto',
+              }}>
+              <FlatList
+                data={galleryListData}
+                ref={bigGalleryPhotoRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                pagingEnabled
+                // initialScrollIndex={galleryActiveIndex}
+                onScrollToIndexFailed={info => {
+                  const wait = new Promise(resolve => setTimeout(resolve, 500));
+                  wait.then(() => {
+                    bigGalleryPhotoRef.current?.scrollToIndex({
+                      index: info.index,
+                      animated: true,
+                    });
+                  });
+                }}
+                renderItem={renderBigGalleryPhotoItems}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
   const openMap = () => {
     const scheme = Platform.select({ios: 'maps:0,0?q=', android: 'geo:0,0?q='});
     const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
@@ -429,7 +605,10 @@ const StoreDetails = ({navigation, route}) => {
 
   /**offer page code start */
   const [offerListData, setOfferListData] = useState([]);
+  const [offerListLoading, setOfferListLoading] = useState(false);
+
   const getOfferList = val => {
+    setOfferListLoading(true);
     let body = {
       store_id: val,
       page: '1',
@@ -460,7 +639,9 @@ const StoreDetails = ({navigation, route}) => {
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => {
+        setOfferListLoading(false);
+      });
   };
 
   const renderOfferItem = ({item}) => {
@@ -578,31 +759,43 @@ const StoreDetails = ({navigation, route}) => {
     setShowAddReviewModal(!showAddReviewModal);
   };
 
-  const addReview = () => {
+  const addReview = async () => {
     if (parseInt(rate) > 0) {
       let body = {
-        store_id: receivedData?.id_store,
-        rate: rate.toString(),
-        review: password,
-        guest_id: '1',
-        user_id: userData?.id_user,
-        pseudo: userData?.username,
-        token: 'fjksdjfksdfkdsjflsdjflsdkj',
+        store_id: receivedData?.id_store + '',
+        rate: rate.toString() + '',
+        review: password + '',
+        guest_id: userData?.id_user + '',
+        user_id: userData?.id_user + '',
+        pseudo: userData?.username + '',
+        token: 'token',
         mac_adr: '02:00:00:00:00:00',
       };
 
-      ShowConsoleLogMessage(JSON.stringify(body));
+      // ShowConsoleLogMessage('\n\n\n\n\n\\n\n\n\n');
+      // ShowConsoleLogMessage(JSON.stringify(body));
+      // ShowConsoleLogMessage('\n\n\n\n\n\\n\n\n\n');
 
       // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
       ApiCall('post', body, API_END_POINTS.API_RATING_STORE, {
         Accept: 'application/json',
         'Content-Type': 'multipart/form-data',
       })
-        .then(response => {
+        .then(async response => {
           ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.success == 1) {
+            ShowToastMessage(STRING.thank_you);
             getReviewList(receivedData?.id_store);
+            doSaveStoreReview(receivedData?.id_store);
+            setPassword('');
+            setRate(3);
           } else {
+            doSaveStoreReview(receivedData?.id_store);
+            let is_store_review = await isStoreReviewSaved(
+              receivedData?.id_store,
+            );
+            ShowConsoleLogMessage(is_store_review + ' <<< isStoreReviewSaved');
+            setReviewAdded(is_store_review);
             ShowConsoleLogMessage('Unable to add review');
           }
         })
@@ -615,6 +808,9 @@ const StoreDetails = ({navigation, route}) => {
     } else {
       ShowToastMessage('Please select from 1 star to 5 star');
     }
+    let is_store_review = await isStoreReviewSaved(receivedData?.id_store);
+    ShowConsoleLogMessage(is_store_review + ' <<< isStoreReviewSaved');
+    setReviewAdded(is_store_review);
   };
 
   function ratingCompleted(rating) {
@@ -678,9 +874,22 @@ const StoreDetails = ({navigation, route}) => {
               text={STRING.add_review}
               textStyle={FONTS.body3}
               textColor={COLORS.white}
-              onPress={() => {
-                addReview();
-                closeAddReviewModal();
+              onPress={async () => {
+                let is_store_review = await isStoreReviewSaved(
+                  receivedData?.store_id || receivedData?.id_store,
+                );
+                setReviewAdded(is_store_review);
+
+                if (is_store_review) {
+                  ShowToastMessage(STRING.you_ve_already_reviewd);
+                } else {
+                  addReview();
+                  closeAddReviewModal();
+                  let is_store_review = await isStoreReviewSaved(
+                    receivedData?.store_id || receivedData?.id_store,
+                  );
+                  setReviewAdded(is_store_review);
+                }
               }}
               marginTop={40}
               borderRadius={1}
@@ -783,9 +992,7 @@ const StoreDetails = ({navigation, route}) => {
     })
       .then(response => {
         if (response?.data?.success == 1) {
-          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
-          // ShowConsoleLogMessage(JSON.stringify(result));
           setGalleryListData(result);
         } else {
           setGalleryListData([]);
@@ -799,11 +1006,29 @@ const StoreDetails = ({navigation, route}) => {
       .finally(() => {});
   };
 
-  const renderGalleryItem = ({item}) => {
+  const [galleryItemClick, setGalleryItemClick] = useState(false);
+
+  const renderGalleryItem = ({item, index}) => {
     // ShowConsoleLogMessage(item);
     let imageUrl = item['200_200'].url;
     return (
-      <TouchableOpacity activeOpacity={0.8}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => {
+          setTimeout(() => {
+            bigGalleryPhotoRef.current?.scrollToIndex({
+              animated: true,
+              index: index,
+            });
+          }, 100);
+          // bigGalleryPhotoRef?.current?.scrollToOffset({
+          //   offset: index * SIZES.width,
+          //   animated: true,
+          // });
+
+          ShowConsoleLogMessage(index);
+          closeGalleryImageModal();
+        }}>
         <BunchDealImageLoader
           defaultImg={images.def_logo}
           source={imageUrl}
@@ -827,15 +1052,14 @@ const StoreDetails = ({navigation, route}) => {
     <SafeAreaView
       style={GlobalStyle1.mainContainerBgColor}
       showsVerticalScrollIndicator={false}>
-      <ScrollView
-        // contentContainerStyle={{
-        //   flexGrow: 1,
-        // }}
-        nestedScrollEnabled={true}>
+      <ScrollView nestedScrollEnabled={true}>
         <View style={{}}>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
+              if (galleryItemClick) {
+                setGalleryItemClick(!galleryItemClick);
+              }
               closeImageModal();
             }}>
             <BunchDealImageLoader
@@ -1016,7 +1240,6 @@ const StoreDetails = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               key={route.name}
-              accessibilityRole="button"
               onPress={onPress => {
                 if (userData?.id_user == null) {
                   navigation.navigate('Auth', {
@@ -1111,6 +1334,20 @@ const StoreDetails = ({navigation, route}) => {
                 data={offerListData}
                 keyExtractor={item => item?.id_store}
                 renderItem={renderOfferItem}
+                ListEmptyComponent={() => {
+                  return offerListLoading ? null : (
+                    <Text
+                      style={{
+                        color: COLORS.editTextBorder,
+                        fontSize: 16,
+                        fontFamily: 'Montserrat-Regular',
+                        textAlign: 'center',
+                        paddingVertical: 10,
+                      }}>
+                      No data found
+                    </Text>
+                  );
+                }}
               />
             </ScrollView>
           ) : null}
@@ -1128,6 +1365,20 @@ const StoreDetails = ({navigation, route}) => {
                   data={reviewListData}
                   keyExtractor={item => item?.id_store}
                   renderItem={renderReviewItem}
+                  ListEmptyComponent={() => {
+                    return (
+                      <Text
+                        style={{
+                          color: COLORS.editTextBorder,
+                          fontSize: 16,
+                          fontFamily: 'Montserrat-Regular',
+                          textAlign: 'center',
+                          paddingVertical: 10,
+                        }}>
+                        No data found
+                      </Text>
+                    );
+                  }}
                 />
               </ScrollView>
               <BunchDealCommonBtn
@@ -1137,8 +1388,16 @@ const StoreDetails = ({navigation, route}) => {
                 text={STRING.add_review}
                 textStyle={FONTS.body3}
                 textColor={COLORS.white}
-                onPress={() => {
-                  closeAddReviewModal();
+                onPress={async () => {
+                  let is_store_review = await isStoreReviewSaved(
+                    receivedData?.store_id || receivedData?.id_store,
+                  );
+                  setReviewAdded(is_store_review);
+                  if (is_store_review) {
+                    ShowToastMessage(STRING.you_ve_already_reviewd);
+                  } else {
+                    closeAddReviewModal();
+                  }
                 }}
                 marginTop={25}
                 borderRadius={1}
@@ -1168,6 +1427,20 @@ const StoreDetails = ({navigation, route}) => {
                 keyExtractor={item => item?.id_store}
                 renderItem={renderGalleryItem}
                 numColumns={4}
+                ListEmptyComponent={() => {
+                  return (
+                    <Text
+                      style={{
+                        color: COLORS.editTextBorder,
+                        fontSize: 16,
+                        fontFamily: 'Montserrat-Regular',
+                        textAlign: 'center',
+                        paddingVertical: 10,
+                      }}>
+                      No data found
+                    </Text>
+                  );
+                }}
               />
             </View>
           ) : null}
@@ -1175,7 +1448,11 @@ const StoreDetails = ({navigation, route}) => {
         <View
           style={{
             flex: 1,
-            marginTop: changeTwo ? (reviewListData?.length > 5 ? 100 : 30) : 20,
+            marginTop: changeTwo
+              ? reviewListData?.length >= 5
+                ? 100
+                : 30
+              : 20,
           }}>
           <View
             style={{
@@ -1231,8 +1508,14 @@ const StoreDetails = ({navigation, route}) => {
               onPress={() => {
                 if (favorite) {
                   unSaveOnline();
+                  doDeleteStoreOffline(
+                    receivedData?.id_store || receivedData?.store_id,
+                  );
                 } else {
                   doSaveOnline();
+                  doSaveStoreOffline(
+                    receivedData?.id_store || receivedData?.store_id,
+                  );
                 }
               }}
               style={[GlobalStyle1.iconBOX, {}]}>
@@ -1392,6 +1675,7 @@ const StoreDetails = ({navigation, route}) => {
       </LinearGradient>
 
       {renderImageModal()}
+      {renderGalleryImageModal()}
       {renderAddReviewModal()}
     </SafeAreaView>
   );

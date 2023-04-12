@@ -314,24 +314,29 @@ const Login = ({navigation}) => {
             setLoading(false);
             let arr = [];
             arr.push(response?.data?.result);
-            for (let i = 0; i < arr.length; i++) {
-              // console.log(arr[i]['0']?.images['0']['560_560']?.url);
-              AsyncStorage.setItem('userData', JSON.stringify(arr[i]['0']));
-              // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
+            try {
+              for (let i = 0; i < arr.length; i++) {
+                // console.log(arr[i]['0']?.images['0']['560_560']?.url);
+                AsyncStorage.setItem('userData', JSON.stringify(arr[i]['0']));
 
-              AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email);
-              if (arr[i]['0']?.images != null || undefined) {
-                AsyncStorage.setItem(
-                  'userImage',
-                  arr[i]['0']?.images['0']['560_560']?.url || '',
-                );
+                AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email);
+                if (arr[i]['0']?.images != null || undefined) {
+                  AsyncStorage.setItem(
+                    'userImage',
+                    arr[i]['0']?.images['0']['560_560']?.url || '',
+                  );
+                }
               }
-            }
-            console.log(arr.length);
-            console.log(JSON.stringify(response));
+              // console.log(arr.length);
+              // console.log(JSON.stringify(response));
+              // closeFilterModal();
 
-            // closeFilterModal();
-            navigation.replace('MainContainer');
+              navigation.replace('MainContainer');
+            } catch (error) {
+              AsyncStorage.setItem('userData', JSON.stringify(arr[0]['0']));
+              AsyncStorage.setItem(STRING.userEmail, arr[0]['0']?.email);
+              navigation.replace('MainContainer');
+            }
           } else {
             ShowToastMessage(response?.data?.errors?.connect2);
             setLoading(false);
@@ -461,7 +466,7 @@ const Login = ({navigation}) => {
         <BunchDealEditText
           borderBottomWidth={1}
           placeholder={STRING.password}
-          keyBoardType="number-pad"
+          // keyBoardType=""
           style={FONTS.body3}
           value={password}
           secureTextEntry={true}

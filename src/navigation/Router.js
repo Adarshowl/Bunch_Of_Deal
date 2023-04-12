@@ -19,6 +19,7 @@ import Order from '../screens/Order';
 import Setting from '../screens/Setting/Setting';
 import StoreDetails from '../screens/Store/StoreDetails';
 import TestStoreDetail from '../screens/Store/TestStoreDetail';
+import UniversalSearch from '../screens/UniversalSearch';
 
 const Stack = createNativeStackNavigator();
 const Router = () => {
@@ -48,6 +49,7 @@ const Router = () => {
       <Stack.Screen name="CategoryList" component={CategoryList} />
       <Stack.Screen name="TermsOfUse" component={TermsOfUse} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+      <Stack.Screen name="UniversalSearch" component={UniversalSearch} />
     </Stack.Navigator>
   );
 };

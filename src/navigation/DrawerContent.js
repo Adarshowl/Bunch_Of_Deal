@@ -93,10 +93,8 @@ const DrawerContent = ({navigation, props}) => {
     }
   };
   const onLogouClick = () => {
-    {
-      AsyncStorage.clear().then(() => console.log('Cleared'));
-      isSignedIn() ? signOut() : ShowToastMessage('Logout Failed');
-    }
+    AsyncStorage.clear().then(() => console.log('Cleared'));
+    isSignedIn() ? signOut() : ShowToastMessage('Logout Failed');
   };
 
   return (
@@ -119,7 +117,16 @@ const DrawerContent = ({navigation, props}) => {
           activeOpacity={1}
           onPress={() => {
             // props?.navigation?.navigate('Account');
-            navigation.navigate('Account');
+            if (userData?.id_user == null) {
+              navigation.navigate('Auth', {
+                screen: 'Login',
+                params: {
+                  screen: 'Login',
+                },
+              });
+            } else {
+              navigation.navigate('Account');
+            }
           }}
           style={{
             padding: 25,
@@ -144,7 +151,7 @@ const DrawerContent = ({navigation, props}) => {
                   });
                 }}
                 style={[FONTS.h5, {color: COLORS.white}]}>
-                Log In/Create Acoount
+                Log In/Create Account
               </Text>
             </View>
           ) : (
@@ -169,7 +176,8 @@ const DrawerContent = ({navigation, props}) => {
         title={Entypo}
         iconName="home"
         onPress={() => {
-          navigation.goBack();
+          // navigation.goBack();
+          navigation.navigate('Home');
         }}
       />
       <DrawerItem

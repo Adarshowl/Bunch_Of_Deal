@@ -190,7 +190,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, View} from 'react-native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import base64 from 'react-native-base64';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {images} from '../../constants';
@@ -199,12 +199,9 @@ import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS, CLONE_BASE_URL} from '../../network/ApiEndPoints';
 import GlobalStyle2 from '../../styles/GlobalStyle2';
-import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import base64 from 'react-native-base64';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
-import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
-import {InvoiceListSkeleton} from '../../utils/Skeleton';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import {InvoiceListSkeleton} from '../../utils/Skeleton';
 
 const InvoiceList = ({navigation}) => {
   const [listData, setListData] = useState([]);
@@ -245,7 +242,7 @@ const InvoiceList = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        console.log('ERROR IN GET USer PROFILE => ', JSON.stringify(response));
+        // console.log('ERROR IN GET USer PROFILE => ', JSON.stringify(response));
 
         if (response?.data?.success == 1) {
           let result = Object.values(response.data?.result);
@@ -279,7 +276,7 @@ const InvoiceList = ({navigation}) => {
   const onEyeItemClick = item => {
     let a = base64.encode(item?.id);
     let url = CLONE_BASE_URL + '/user/Data_Order?Id=' + a;
-    ShowConsoleLogMessage(url);
+    // ShowConsoleLogMessage(url);
     navigation.navigate('InvoiceDetail', {
       url: url + '',
       order_id: item?.id + '',
@@ -354,7 +351,7 @@ const InvoiceList = ({navigation}) => {
   };
 
   const renderItem = ({item, index}) => {
-    ShowConsoleLogMessage(item?.owner_name);
+    // ShowConsoleLogMessage(item?.owner_name);
     let order_status =
       item?.status?.split(';')[0].substring(0, 1).toUpperCase() +
       item?.status?.split(';')[0].substring(1);

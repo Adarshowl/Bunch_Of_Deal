@@ -271,7 +271,8 @@ const Home = ({navigation}) => {
           style={GlobalStyle.marginHorizontal10}
           onPress={() => {
             // ShowToastMessage('Coming soon!');
-            closeSearchModal();
+            // closeSearchModal();
+            navigation.navigate('UniversalSearch');
           }}
         />
         <TouchableOpacity

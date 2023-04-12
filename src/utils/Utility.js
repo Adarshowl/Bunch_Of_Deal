@@ -38,21 +38,21 @@ export const getMacAddress = async () => {
 export const getDateDiff = date => {
   try {
     let newData = moment(date).format('yyyy-MM-DD HH:mm:ss');
-    ShowConsoleLogMessage(newData + ' new data');
+    // ShowConsoleLogMessage(newData + ' new data');
     let d1 = new Date(newData).getTime();
-    ShowConsoleLogMessage(d1 + ' d1 new data');
-
+    // ShowConsoleLogMessage(d1 + ' d1 new data');
+    //
     let d2 = new Date().getTime();
-    ShowConsoleLogMessage(d2 + ' d2 new data');
+    // ShowConsoleLogMessage(d2 + ' d2 new data');
 
     // let d3 = d2 - d1;
     let d3 = d1 - d2;
 
-    ShowConsoleLogMessage(d3 + ' d3 new data');
-
+    // ShowConsoleLogMessage(d3 + ' d3 new data');
+    //
     let seconds = d3 / 1000;
 
-    ShowConsoleLogMessage(seconds + ' seconds new data');
+    // ShowConsoleLogMessage(seconds + ' seconds new data');
 
     if (seconds > 0) {
       return seconds;

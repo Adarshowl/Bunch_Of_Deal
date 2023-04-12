@@ -22,7 +22,7 @@ import {API_END_POINTS} from '../../network/ApiEndPoints';
 import {NotificationSkeleton} from '../../utils/Skeleton';
 
 const Notification = ({navigation}) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [listData, setListData] = useState([]);
   const [userData, setUserData] = useState({});
 
@@ -358,9 +358,9 @@ const Notification = ({navigation}) => {
                 textAlign: 'center',
                 marginTop: 200,
                 fontSize: 18,
-                fontFamily: 'Quicksand-Medium',
+                fontFamily: 'Montserrat-Medium',
               }}>
-              No data Found
+              No Data Found
             </Text>
           );
         }}
