@@ -81,6 +81,8 @@ const CategoryList = ({navigation, route}) => {
       })
       .catch(err => {
         // console.log('eorir < ', err);
+        setShowError(true);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -89,6 +91,7 @@ const CategoryList = ({navigation, route}) => {
   };
 
   const onReloadBtn = () => {
+    setShowError(false);
     getOfferList(receivedData);
   };
 

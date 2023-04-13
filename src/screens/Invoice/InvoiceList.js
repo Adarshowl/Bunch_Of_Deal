@@ -202,14 +202,21 @@ import GlobalStyle2 from '../../styles/GlobalStyle2';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {InvoiceListSkeleton} from '../../utils/Skeleton';
+import NoResult from '../../utils/NoResult';
 
 const InvoiceList = ({navigation}) => {
   const [listData, setListData] = useState([]);
-  const [apiToken, setApiToken] = useState('');
-  const [userId, setUserId] = useState('');
+
   const [loading, setLoading] = useState(true);
-  const [show, setShow] = useState(false);
+
   const [userData, setUserData] = useState({});
+
+  const [showError, setShowError] = useState(false);
+
+  const onReloadBtn = () => {
+    setShowError(false);
+    getOrderList(userData?.id_user);
+  };
 
   useEffect(() => {
     getUserFromStorage();
@@ -242,19 +249,21 @@ const InvoiceList = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // console.log('ERROR IN GET USer PROFILE => ', JSON.stringify(response));
-
         if (response?.data?.success == 1) {
           let result = Object.values(response.data?.result);
-          // console.log(JSON.stringify(result));
 
           setListData(result);
+          setShowError(result.length <= 0);
         } else if (response.data?.success == 0) {
           console.log('error');
+          setShowError(true);
+        } else {
+          setShowError(true);
         }
       })
       .catch(error => {
         console.log('ERROR IN GET USer PROFILE => ', error);
+        setShowError(true);
       })
       .finally(() => {
         setLoading(false);
@@ -533,44 +542,48 @@ const InvoiceList = ({navigation}) => {
           width: '100%',
           paddingTop: 3,
         }}>
-        <FlatList
-          data={listData}
-          ListEmptyComponent={() => {
-            return loading ? (
-              <InvoiceListSkeleton />
-            ) : (
-              <Text
-                style={{
-                  flex: 1,
-                  alignSelf: 'center',
-                  textAlign: 'center',
-                  marginTop: 200,
-                  fontSize: 18,
-                  fontFamily: 'Quicksand-Medium',
-                }}>
-                No data Found
-              </Text>
-            );
-          }}
-          style={{
-            backgroundColor: COLORS.white,
-            marginBottom: 15,
-          }}
-          extraData={listData}
-          keyExtractor={item => {
-            return item.id;
-          }}
-          renderItem={renderItem}
-          ItemSeparatorComponent={() => {
-            return (
-              <View
-                style={{
-                  height: 0.5,
-                  backgroundColor: 'grey',
-                }}></View>
-            );
-          }}
-        />
+        {!showError ? (
+          <FlatList
+            data={listData}
+            ListEmptyComponent={() => {
+              return loading ? (
+                <InvoiceListSkeleton />
+              ) : (
+                <Text
+                  style={{
+                    flex: 1,
+                    alignSelf: 'center',
+                    textAlign: 'center',
+                    marginTop: 200,
+                    fontSize: 18,
+                    fontFamily: 'Quicksand-Medium',
+                  }}>
+                  No data Found
+                </Text>
+              );
+            }}
+            style={{
+              backgroundColor: COLORS.white,
+              marginBottom: 15,
+            }}
+            extraData={listData}
+            keyExtractor={item => {
+              return item.id;
+            }}
+            renderItem={renderItem}
+            ItemSeparatorComponent={() => {
+              return (
+                <View
+                  style={{
+                    height: 0.5,
+                    backgroundColor: 'grey',
+                  }}></View>
+              );
+            }}
+          />
+        ) : (
+          <NoResult onReloadBtn={onReloadBtn} />
+        )}
       </View>
     </View>
   );

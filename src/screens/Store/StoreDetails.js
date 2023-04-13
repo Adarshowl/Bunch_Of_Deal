@@ -51,7 +51,9 @@ import {
 } from '../../utils/RealmUtility';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 
-// import {ShowToastMessage} from '../../../utils/Utility';
+import RenderOfferItem from './RenderOfferItem';
+import RenderReviewItem from './RenderReviewItem';
+import RenderGalleryItem from './RenderGalleryItem';
 
 const StoreDetails = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(true);
@@ -89,12 +91,7 @@ const StoreDetails = ({navigation, route}) => {
 
   const triggerCall = () => {
     let m = receivedData?.telephone + '';
-    // if (m.includes('+91')) {
-    //   m.replace('+91');
-    // } else {
-    //   m.replace('+91');
-    // }
-    // ShowConsoleLogMessage(m);
+
     try {
       Linking.openURL(`tel:${m}`);
     } catch (error) {}
@@ -259,7 +256,7 @@ const StoreDetails = ({navigation, route}) => {
           setReviewAdded(is_store_review);
         } else {
           setReceivedData(item);
-          ShowConsoleLogMessage(item);
+          // ShowConsoleLogMessage(item);
           getOfferList(item?.id_store);
           getReviewList(item?.id_store);
           getGalleryList(item?.id_store);
@@ -284,7 +281,7 @@ const StoreDetails = ({navigation, route}) => {
           let is_store_review = await isStoreReviewSaved(
             item?.store_id || item?.id_store,
           );
-          ShowConsoleLogMessage(is_store_review + ' << isStoreReviewSaved');
+          // ShowConsoleLogMessage(is_store_review + ' << isStoreReviewSaved');
           setReviewAdded(is_store_review);
         }
       }
@@ -327,10 +324,14 @@ const StoreDetails = ({navigation, route}) => {
 
   const renderBigPhotoItems = ({item, index}) => {
     if (galleryItemClick) {
-      // ShowConsoleLogMessage(item);
+      ShowConsoleLogMessage('\n\n\n\n\n\n\n\n');
+      ShowConsoleLogMessage('renderBigPhotoItems =>' + JSON.stringify(item));
+      ShowConsoleLogMessage('\n\n\n\n\n\n\n\n');
+
       let imageUrl = item['560_560'].url;
       return (
         <View
+          key={imageUrl}
           activeOpacity={1.0}
           onPress={() => {}}
           style={{
@@ -355,7 +356,7 @@ const StoreDetails = ({navigation, route}) => {
       return (
         <View
           activeOpacity={1.0}
-          onPress={() => {}}
+          key={item}
           style={{
             height: 300,
             width: Dimensions.get('window').width,
@@ -381,6 +382,7 @@ const StoreDetails = ({navigation, route}) => {
     let imageUrl = item['560_560'].url;
     return (
       <View
+        key={index}
         activeOpacity={1.0}
         onPress={() => {}}
         style={{
@@ -461,32 +463,13 @@ const StoreDetails = ({navigation, route}) => {
                 marginBottom: 'auto',
                 marginTop: 'auto',
               }}>
-              <FlatList
+              {/* <FlatList
                 data={images}
                 ref={bigPhotoRef}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 pagingEnabled
                 initialScrollIndex={activeIndex}
-                // onMomentumScrollBegin={ev => {
-                //   scrollToActiveIndex(
-                //     Math.floor(ev.nativeEvent.contentOffset.x / SIZES.width),
-                //   );
-                // }}
-                // onMomentumScrollEnd={ev => {
-                //   scrollToActiveIndex(
-                //     Math.floor(ev.nativeEvent.contentOffset.x / 2),
-                //   );
-                // }}
-                // onScrollEndDrag={ev => {
-                //   scrollToActiveIndex(
-                //     Math.floor(ev.nativeEvent.contentOffset.x / SIZES.width),
-                //   );
-                // }}
-                // remove the following statement
-                // onViewableItemsChanged={(info) =>console.log(info)}
-
-                // 3. add the following statement, instead of the one above
                 viewabilityConfigCallbackPairs={
                   viewabilityConfigCallbackPairs.current
                 }
@@ -500,7 +483,7 @@ const StoreDetails = ({navigation, route}) => {
                   });
                 }}
                 renderItem={renderBigPhotoItems}
-              />
+              /> */}
             </View>
           </View>
         </View>
@@ -622,7 +605,7 @@ const StoreDetails = ({navigation, route}) => {
       // timezone: '',
     };
 
-    ShowConsoleLogMessage(JSON.stringify(body));
+    // ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -650,10 +633,11 @@ const StoreDetails = ({navigation, route}) => {
   };
 
   const renderOfferItem = ({item}) => {
-    // ShowConsoleLogMessage(item);
+    ShowConsoleLogMessage(item);
     let imageUrl = item.images['0']['560_560'].url;
     return (
       <TouchableOpacity
+        key={imageUrl}
         activeOpacity={0.8}
         style={[GlobalStyle1.StoreBOX]}
         onPress={() => {
@@ -799,7 +783,7 @@ const StoreDetails = ({navigation, route}) => {
             let is_store_review = await isStoreReviewSaved(
               receivedData?.id_store,
             );
-            ShowConsoleLogMessage(is_store_review + ' <<< isStoreReviewSaved');
+            // ShowConsoleLogMessage(is_store_review + ' <<< isStoreReviewSaved');
             setReviewAdded(is_store_review);
             ShowConsoleLogMessage('Unable to add review');
           }
@@ -819,7 +803,7 @@ const StoreDetails = ({navigation, route}) => {
   };
 
   function ratingCompleted(rating) {
-    console.log('Rating is: ' + rating);
+    // console.log('Rating is: ' + rating);
     setRate(rating);
   }
   const [password, setPassword] = useState('');
@@ -906,75 +890,6 @@ const StoreDetails = ({navigation, route}) => {
     );
   };
 
-  const renderReviewItem = ({item}) => {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={[
-          GlobalStyle1.StoreBOX,
-          {
-            marginHorizontal: 5,
-          },
-        ]}>
-        <BunchDealImageLoader
-          defaultImg={images.def_logo}
-          source={item?.image}
-          styles={{
-            width: 50,
-            height: 50,
-            borderRadius: 50,
-            borderWidth: 2,
-            borderColor: COLORS.lightGrey,
-            marginTop: 5,
-          }}
-        />
-        <View
-          style={{
-            marginTop: 5,
-            marginEnd: 15,
-            marginStart: 10,
-            flex: 1,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text
-              style={[
-                {
-                  color: COLORS.black,
-                  fontSize: 14,
-                  fontFamily: 'Montserrat-Regular',
-                  flex: 1,
-                },
-              ]}
-              numberOfLines={2}>
-              {item?.pseudo}
-            </Text>
-            <AirbnbRating
-              count={5}
-              isDisabled={true}
-              showRating={false}
-              defaultRating={parseInt(item?.rate)}
-              size={15}
-            />
-          </View>
-          <Text
-            style={[
-              {
-                color: COLORS.shimmer_loading_color_darker,
-                fontSize: 13,
-                fontFamily: 'Montserrat-Regular',
-              },
-            ]}>
-            {item?.review}
-          </Text>
-        </View>
-      </TouchableOpacity>
-      // <Text>hi</Text>
-    );
-  };
   /** review end */
 
   /** gallery start */
@@ -1012,44 +927,6 @@ const StoreDetails = ({navigation, route}) => {
   };
 
   const [galleryItemClick, setGalleryItemClick] = useState(false);
-
-  const renderGalleryItem = ({item, index}) => {
-    // ShowConsoleLogMessage(item);
-    let imageUrl = item['200_200'].url;
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() => {
-          setTimeout(() => {
-            bigGalleryPhotoRef.current?.scrollToIndex({
-              animated: true,
-              index: index,
-            });
-          }, 100);
-          // bigGalleryPhotoRef?.current?.scrollToOffset({
-          //   offset: index * SIZES.width,
-          //   animated: true,
-          // });
-
-          ShowConsoleLogMessage(index);
-          closeGalleryImageModal();
-        }}>
-        <BunchDealImageLoader
-          defaultImg={images.def_logo}
-          source={imageUrl}
-          styles={[
-            {
-              width: SIZES.width / 4.6,
-              height: 80,
-              alignSelf: 'center',
-              marginVertical: 3,
-              marginHorizontal: 3,
-            },
-          ]}
-        />
-      </TouchableOpacity>
-    );
-  };
 
   /** gallery end */
 
@@ -1207,7 +1084,7 @@ const StoreDetails = ({navigation, route}) => {
               alignItems: 'center',
             }}>
             <TouchableOpacity
-              key={route.name}
+              key={'Offers'}
               accessibilityRole="button"
               onPress={onPress => {
                 setChangeOne(true);
@@ -1244,7 +1121,7 @@ const StoreDetails = ({navigation, route}) => {
               </Animated.Text>
             </TouchableOpacity>
             <TouchableOpacity
-              key={route.name}
+              key={'Reviews'}
               onPress={onPress => {
                 if (userData?.id_user == null) {
                   navigation.navigate('Auth', {
@@ -1290,7 +1167,7 @@ const StoreDetails = ({navigation, route}) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              key={route.name}
+              key={'Gallery'}
               accessibilityRole="button"
               onPress={onPress => {
                 setChangeThree(true);
@@ -1338,7 +1215,12 @@ const StoreDetails = ({navigation, route}) => {
               <FlatList
                 data={offerListData}
                 keyExtractor={item => item?.id_store}
-                renderItem={renderOfferItem}
+                // renderItem={renderOfferItem}
+                renderItem={({item}) => {
+                  return (
+                    <RenderOfferItem item={item} navigation={navigation} />
+                  );
+                }}
                 ListEmptyComponent={() => {
                   return offerListLoading ? null : (
                     <Text
@@ -1369,7 +1251,10 @@ const StoreDetails = ({navigation, route}) => {
                 <FlatList
                   data={reviewListData}
                   keyExtractor={item => item?.id_store}
-                  renderItem={renderReviewItem}
+                  // renderItem={renderReviewItem}
+                  renderItem={({item}) => {
+                    return <RenderReviewItem item={item} />;
+                  }}
                   ListEmptyComponent={() => {
                     return (
                       <Text
@@ -1420,17 +1305,27 @@ const StoreDetails = ({navigation, route}) => {
                 style={{
                   marginTop: 5,
                 }}
-                // data={[
-                //   'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
-                //   'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
-                //   'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg',
-                //   'https://images.pexels.com/photos/428364/pexels-photo-428364.jpeg',
-                //   'https://images.pexels.com/photos/428364/pexels-photo-428364.jpeg',
-                //   'https://images.pexels.com/photos/2726111/pexels-photo-2726111.jpeg',
-                //   'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg',
-                // ]}
                 keyExtractor={item => item?.id_store}
-                renderItem={renderGalleryItem}
+                // renderItem={renderGalleryItem}
+                renderItem={({item, index}) => {
+                  return (
+                    <RenderGalleryItem
+                      bigGalleryPhotoRef={bigGalleryPhotoRef}
+                      closeGalleryImageModal={() => {
+                        closeGalleryImageModal();
+                      }}
+                      bigGallery={() => {
+                        // ShowConsoleLogMessage('big gallery called 1');
+                        bigGalleryPhotoRef.current?.scrollToIndex({
+                          animated: true,
+                          index: index,
+                        });
+                        // ShowConsoleLogMessage('big gallery called 2');
+                      }}
+                      item={item}
+                    />
+                  );
+                }}
                 numColumns={4}
                 ListEmptyComponent={() => {
                   return (

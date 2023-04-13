@@ -7,13 +7,20 @@ import {API_END_POINTS} from '../../network/ApiEndPoints';
 import ApiCall from '../../network/ApiCall';
 import {images} from '../../constants';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import NoResult from '../../utils/NoResult';
 
 const Category = ({navigation}) => {
   const [listData, setListData] = useState([]);
+  const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     getCategoryList();
   }, []);
+
+  const onReloadBtn = () => {
+    setShowError(false);
+    getCategoryList();
+  };
 
   const getCategoryList = () => {
     setLoading(true);
@@ -25,14 +32,18 @@ const Category = ({navigation}) => {
       .then(response => {
         if (response?.data?.success == 1) {
           let result = Object.values(response.data?.result);
-
           setListData(result);
+          setShowError(result.length <= 0);
         } else if (response.data?.success == 0) {
           console.log('error');
+          setShowError(true);
+        } else {
+          setShowError(true);
         }
       })
       .catch(error => {
         console.log('ERROR IN GET USer PROFILE => ', error);
+        setShowError(true);
       })
       .finally(() => {
         setLoading(false);
@@ -159,11 +170,15 @@ const Category = ({navigation}) => {
           flexGrow: 1,
           height: '90%',
         }}>
-        <FlatList
-          data={listData}
-          extraData={listData}
-          renderItem={renderItem}
-        />
+        {!showError ? (
+          <FlatList
+            data={listData}
+            extraData={listData}
+            renderItem={renderItem}
+          />
+        ) : (
+          <NoResult onReloadBtn={onReloadBtn} />
+        )}
       </View>
     </View>
   );

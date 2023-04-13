@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   FlatList,
@@ -13,20 +14,22 @@ import {COLORS} from '../../constants/Colors';
 import images from '../../constants/images';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
-import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
-import {useIsFocused} from '@react-navigation/native';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
 import {NotificationSkeleton} from '../../utils/Skeleton';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import NoResult from '../../utils/NoResult';
 
 const Notification = ({navigation}) => {
   const [loading, setLoading] = useState(false);
+  const [showError, setShowError] = useState(false);
   const [listData, setListData] = useState([]);
   const [userData, setUserData] = useState({});
 
   const isFocused = useIsFocused();
+
+  ShowConsoleLogMessage(showError);
 
   useEffect(() => {
     getUserFromStorage();
@@ -59,22 +62,29 @@ const Notification = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // console.log(
-        //   'ERROR IN GET Notification List => ',
-        //   JSON.stringify(response),
-        // );
+        console.log(
+          'ERROR IN GET Notification List res=> ',
+          JSON.stringify(response),
+        );
 
         if (response?.data?.status == 1) {
           let result = Object.values(response.data?.result);
-          // console.log(JSON.stringify(result));
+          console.log(JSON.stringify(result));
+
+          setShowError(result.length <= 0);
 
           setListData(result);
         } else if (response.data?.success == 0) {
-          console.log('error');
+          setListData([]);
+          setShowError(true);
+        } else {
+          setShowError(true);
         }
       })
       .catch(error => {
         console.log('ERROR IN GET Notification List => ', error);
+        setShowError(true);
+        setListData([]);
       })
       .finally(() => {
         setLoading(false);
@@ -175,6 +185,11 @@ const Notification = ({navigation}) => {
       return temp;
     });
     setListData(a);
+  };
+
+  const onReloadBtn = () => {
+    setShowError(false);
+    getNotification(userData?.id_user);
   };
 
   const renderItem = ({item, index}) => {
@@ -345,31 +360,35 @@ const Notification = ({navigation}) => {
           Notifications
         </Text>
       </View>
-      <FlatList
-        data={listData}
-        ListEmptyComponent={() => {
-          return loading ? (
-            <NotificationSkeleton />
-          ) : (
-            <Text
-              style={{
-                flex: 1,
-                alignSelf: 'center',
-                textAlign: 'center',
-                marginTop: 200,
-                fontSize: 18,
-                fontFamily: 'Montserrat-Medium',
-              }}>
-              No Data Found
-            </Text>
-          );
-        }}
-        extraData={listData}
-        keyExtractor={item => {
-          return item.item;
-        }}
-        renderItem={renderItem}
-      />
+      {!showError ? (
+        <FlatList
+          data={listData}
+          ListEmptyComponent={() => {
+            return loading ? (
+              <NotificationSkeleton />
+            ) : (
+              <Text
+                style={{
+                  flex: 1,
+                  alignSelf: 'center',
+                  textAlign: 'center',
+                  marginTop: 200,
+                  fontSize: 18,
+                  fontFamily: 'Montserrat-Medium',
+                }}>
+                No Data Found
+              </Text>
+            );
+          }}
+          extraData={listData}
+          keyExtractor={item => {
+            return item.item;
+          }}
+          renderItem={renderItem}
+        />
+      ) : (
+        <NoResult onReloadBtn={onReloadBtn} />
+      )}
     </SafeAreaView>
   );
 };

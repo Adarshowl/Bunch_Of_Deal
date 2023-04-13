@@ -307,6 +307,7 @@ const OfferDetails = ({navigation, route}) => {
   const renderBigPhotoItems = ({item, index}) => {
     return (
       <View
+        key={item}
         activeOpacity={1.0}
         onPress={() => {}}
         style={{
