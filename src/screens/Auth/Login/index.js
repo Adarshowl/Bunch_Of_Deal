@@ -293,7 +293,7 @@ const Login = ({navigation}) => {
     } else {
       setLoading(true);
       let body = {
-        login: email,
+        login: email.replace(/ /g, ''),
         password: password,
         social_type: 'Normal',
         guest_id: '1',

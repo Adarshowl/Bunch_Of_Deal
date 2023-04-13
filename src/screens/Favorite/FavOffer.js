@@ -13,18 +13,24 @@ import {getSavedOfferAsString} from '../../utils/RealmUtility';
 import {OfferSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import OfferCardView from '../Offer/OfferCardView';
+import {useIsFocused} from '@react-navigation/native';
+
 const FavOffer = ({navigation}) => {
   const [storeId, setStoreId] = useState('');
   const [showError, setShowError] = useState(false);
   const [recentData, setRecentData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(async () => {
-    let ids = await getSavedOfferAsString();
-    ShowConsoleLogMessage(ids);
-    getOfferList(ids);
-    setStoreId(ids);
-  }, []);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    (async function () {
+      let ids = await getSavedOfferAsString();
+      ShowConsoleLogMessage(ids);
+      getOfferList(ids);
+      setStoreId(ids);
+    })();
+  }, [isFocused]);
 
   const getOfferList = val => {
     if (val != '') {

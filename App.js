@@ -52,7 +52,7 @@ const App = () => {
       // ShowConsoleLogMessage(
       //   'Remote message arrived: App screen' + JSON.stringify(remoteMessage),
       // );
-      // DisplayNotification(remoteMessage);
+      DisplayNotification(remoteMessage);
     });
 
     return () => {

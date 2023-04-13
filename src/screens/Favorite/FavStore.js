@@ -14,6 +14,7 @@ import NoResult from '../../utils/NoResult';
 import {getSavedStoreAsString} from '../../utils/RealmUtility';
 import {StoreSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
+import {useIsFocused} from '@react-navigation/native';
 
 const FavStore = ({navigation}) => {
   const [storeId, setStoreId] = useState('');
@@ -21,12 +22,16 @@ const FavStore = ({navigation}) => {
   const [recentData, setRecentData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(async () => {
-    let ids = await getSavedStoreAsString();
-    ShowConsoleLogMessage(ids);
-    getStoreList(ids);
-    setStoreId(ids);
-  }, []);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    (async function () {
+      let ids = await getSavedStoreAsString();
+      ShowConsoleLogMessage(ids);
+      getStoreList(ids);
+      setStoreId(ids);
+    })();
+  }, [isFocused]);
 
   const getStoreList = val => {
     if (val != '') {

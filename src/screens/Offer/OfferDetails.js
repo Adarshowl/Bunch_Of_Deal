@@ -20,7 +20,6 @@ import {
   default as Entypofrom,
 } from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import moment from 'moment';
@@ -131,90 +130,89 @@ const OfferDetails = ({navigation, route}) => {
     setActiveIndex(info?.viewableItems[0]?.index + 1);
   };
 
-  useEffect(() => {
-    // console.log('use effect active index -> ', activeIndex);
-  }, [activeIndex]);
-
   // 2. create a reference to the function (above)
   const viewabilityConfigCallbackPairs = useRef([{onViewableItemsChanged}]);
 
   const [counterTime, setCounterTime] = useState(0);
   let t = 0;
-  useEffect(async () => {
-    let {item} = route.params;
+  useEffect(() => {
+    (async function () {
+      let {item} = route.params;
 
-    if (item?.intentFromNotification) {
-      getSearchOfferList(item?.id_offer);
-      let is_offer_save = await isOfferSaved(item?.id_offer || item?.offer_id);
-      // ShowConsoleLogMessage(is_offer_save);
-      setFavorite(is_offer_save);
-    } else {
-      if (item?.id_offer == undefined || null) {
+      if (item?.intentFromNotification) {
         getSearchOfferList(item?.id_offer);
         let is_offer_save = await isOfferSaved(
           item?.id_offer || item?.offer_id,
         );
+        // ShowConsoleLogMessage(is_offer_save);
         setFavorite(is_offer_save);
       } else {
-        setReceivedData(item);
+        if (item?.id_offer == undefined || null) {
+          getSearchOfferList(item?.id_offer);
+          let is_offer_save = await isOfferSaved(
+            item?.id_offer || item?.offer_id,
+          );
+          setFavorite(is_offer_save);
+        } else {
+          setReceivedData(item);
 
-        var res = [];
+          var res = [];
 
-        try {
-          Object.values(item?.images).forEach((key, index) => {
-            let temp = Object.keys(key);
-            // console.log('key -??? ?? >>> ', temp[index], index);
-            // console.log('key -??? ?? >>> ', key['560_560' || 'full']?.url);
-            res.push(key['560_560' || 'full']?.url + '');
-          });
-          // console.log('image -> > \n\n\n => ', res);
-        } catch (err) {}
+          try {
+            Object.values(item?.images).forEach((key, index) => {
+              let temp = Object.keys(key);
+              // console.log('key -??? ?? >>> ', temp[index], index);
+              // console.log('key -??? ?? >>> ', key['560_560' || 'full']?.url);
+              res.push(key['560_560' || 'full']?.url + '');
+            });
+            // console.log('image -> > \n\n\n => ', res);
+          } catch (err) {}
 
-        setImages(res);
-        // img.map(x => {
-        //   console.log(x, 'xxx');
-        //   let url = x?.url;
-        //   setImages(...images, url);
-        // });
-        setImageUrl(item?.images['0']['560_560'].url);
-        setPrice(item?.offer_value + '');
+          setImages(res);
+          // img.map(x => {
+          //   console.log(x, 'xxx');
+          //   let url = x?.url;
+          //   setImages(...images, url);
+          // });
+          setImageUrl(item?.images['0']['560_560'].url);
+          setPrice(item?.offer_value + '');
 
-        setOriginalPrice(item?.offer_value);
+          setOriginalPrice(item?.offer_value);
 
-        let start_date = item?.date_start;
-        let end_date = item?.date_end;
+          let start_date = item?.date_start;
+          let end_date = item?.date_end;
 
-        let diff_Will_Start = getDateDiff(start_date);
+          let diff_Will_Start = getDateDiff(start_date);
 
-        if (diff_Will_Start > 0) {
-          if (item?.is_deal == 1) {
-            t = diff_Will_Start;
-            setCounterTime(diff_Will_Start);
-            setDiffWillStart(diff_Will_Start);
+          if (diff_Will_Start > 0) {
+            if (item?.is_deal == 1) {
+              t = diff_Will_Start;
+              setCounterTime(diff_Will_Start);
+              setDiffWillStart(diff_Will_Start);
+            }
           }
+          let diff_will_end = getDateDiff(end_date);
+
+          if (diff_will_end > 0 && diff_Will_Start < 0) {
+            t = diff_will_end;
+            setCounterTime(diff_will_end);
+            setDiffWillEnd(diff_will_end);
+          }
+
+          if (diff_Will_Start < 0 && diff_will_end < 0) {
+          }
+
+          let is_offer_save = await isOfferSaved(
+            item?.id_offer || item?.offer_id,
+          );
+          setFavorite(is_offer_save);
+
+          // let temp = await getSavedOfferAsString();
+          // ShowConsoleLogMessage(temp);
         }
-        let diff_will_end = getDateDiff(end_date);
-
-        if (diff_will_end > 0 && diff_Will_Start < 0) {
-          t = diff_will_end;
-          setCounterTime(diff_will_end);
-          setDiffWillEnd(diff_will_end);
-        }
-
-        if (diff_Will_Start < 0 && diff_will_end < 0) {
-        }
-
-        let is_offer_save = await isOfferSaved(
-          item?.id_offer || item?.offer_id,
-        );
-        setFavorite(is_offer_save);
-
-        // let temp = await getSavedOfferAsString();
-        // ShowConsoleLogMessage(temp);
       }
-    }
-  }, []);
-
+    })();
+  }, [isFocused]);
   const getSearchOfferList = offer_ids => {
     let body = {
       latitude: STRING.CURRENT_LAT + '',
@@ -1287,16 +1285,25 @@ const OfferDetails = ({navigation, route}) => {
               marginHorizontal: 5,
             }}
             onPress={() => {
-              if (favorite) {
-                unSaveOnline();
-                doDeleteOfferOffline(
-                  receivedData?.id_offer || receivedData?.offer_id,
-                );
+              if (userData?.id_user == null || '') {
+                navigation.navigate('Auth', {
+                  screen: 'Login',
+                  params: {
+                    screen: 'Login',
+                  },
+                });
               } else {
-                doSaveOnline();
-                doSaveOfferOffline(
-                  receivedData?.id_offer || receivedData?.offer_id,
-                );
+                if (favorite) {
+                  unSaveOnline();
+                  doDeleteOfferOffline(
+                    receivedData?.id_offer || receivedData?.offer_id,
+                  );
+                } else {
+                  doSaveOnline();
+                  doSaveOfferOffline(
+                    receivedData?.id_offer || receivedData?.offer_id,
+                  );
+                }
               }
             }}
           />

@@ -28,7 +28,7 @@ const saveStoreReviewDatabaseOptions = {
 
 // realm setup to save offer
 
-export const doSaveOfferOffline = id => {
+export let doSaveOfferOffline = id => {
   try {
     Realm.open(saveOfferDatabaseOptions).then(realm => {
       let obj = {
@@ -45,7 +45,7 @@ export const doSaveOfferOffline = id => {
   }
 };
 
-export const isOfferSaved = async id => {
+export let isOfferSaved = async id => {
   let isAvail = false;
   await Realm.open(saveOfferDatabaseOptions).then(realm => {
     realm.write(() => {
@@ -60,7 +60,7 @@ export const isOfferSaved = async id => {
   return isAvail;
 };
 
-export const doDeleteOfferOffline = id => {
+export let doDeleteOfferOffline = id => {
   try {
     Realm.open(saveOfferDatabaseOptions).then(realm => {
       realm.write(() => {
@@ -79,7 +79,7 @@ export const doDeleteOfferOffline = id => {
   }
 };
 
-export const getSavedOfferAsString = async () => {
+export let getSavedOfferAsString = async () => {
   let ids = '';
   await Realm.open(saveOfferDatabaseOptions).then(realm => {
     if (realm.objects(SAVE_OFFER_SCHEMA).length > 0) {
@@ -97,7 +97,7 @@ export const getSavedOfferAsString = async () => {
 };
 
 // realm setup to save store
-export const doSaveStoreOffline = id => {
+export let doSaveStoreOffline = id => {
   try {
     Realm.open(saveStoreDatabaseOptions).then(realm => {
       let obj = {
@@ -114,7 +114,7 @@ export const doSaveStoreOffline = id => {
   }
 };
 
-export const isStoreSaved = async id => {
+export let isStoreSaved = async id => {
   let isAvail = false;
   await Realm.open(saveStoreDatabaseOptions).then(realm => {
     realm.write(() => {
@@ -129,7 +129,7 @@ export const isStoreSaved = async id => {
   return isAvail;
 };
 
-export const doDeleteStoreOffline = id => {
+export let doDeleteStoreOffline = id => {
   try {
     Realm.open(saveStoreDatabaseOptions).then(realm => {
       realm.write(() => {
@@ -148,7 +148,7 @@ export const doDeleteStoreOffline = id => {
   }
 };
 
-export const getSavedStoreAsString = async () => {
+export let getSavedStoreAsString = async () => {
   let ids = '';
   await Realm.open(saveStoreDatabaseOptions).then(realm => {
     if (realm.objects(SAVE_STORE_SCHEMA).length > 0) {
@@ -166,7 +166,7 @@ export const getSavedStoreAsString = async () => {
 };
 
 // realm setup to save store
-export const doSaveStoreReview = id => {
+export let doSaveStoreReview = id => {
   try {
     Realm.open(saveStoreReviewDatabaseOptions).then(realm => {
       let obj = {
@@ -182,7 +182,7 @@ export const doSaveStoreReview = id => {
     console.log(err);
   }
 };
-export const isStoreReviewSaved = async id => {
+export let isStoreReviewSaved = async id => {
   let isAvail = false;
   await Realm.open(saveStoreReviewDatabaseOptions).then(realm => {
     realm.write(() => {

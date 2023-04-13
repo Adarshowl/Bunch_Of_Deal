@@ -1,3 +1,5 @@
+import {useIsFocused} from '@react-navigation/native';
+import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
@@ -16,8 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import moment from 'moment';
-import {Rating, AirbnbRating} from 'react-native-elements';
+import {AirbnbRating} from 'react-native-elements';
 
 import {Image} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
@@ -31,16 +32,15 @@ import Entypofrom from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS, SIZES} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
-import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import {STRING} from '../../constants';
+import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {
   doDeleteStoreOffline,
@@ -49,7 +49,7 @@ import {
   isStoreReviewSaved,
   isStoreSaved,
 } from '../../utils/RealmUtility';
-import {index} from 'realm';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 
 // import {ShowToastMessage} from '../../../utils/Utility';
 
@@ -223,28 +223,17 @@ const StoreDetails = ({navigation, route}) => {
       })
       .finally(() => {});
   };
+  const isFocused = useIsFocused();
 
-  useEffect(async () => {
-    let {item} = route.params;
-    // ShowConsoleLogMessage(item);
-    if (item?.intentFromNotification) {
-      getStoreList(item?.store_id);
-      getOfferList(item?.store_id);
-      getReviewList(item?.store_id);
-      getGalleryList(item?.store_id);
-      let is_store_save = await isStoreSaved(item?.store_id || item?.id_store);
-      setFavorite(is_store_save);
-      let is_store_review = await isStoreReviewSaved(
-        item?.store_id || item?.id_store,
-      );
-      setReviewAdded(is_store_review);
-    } else {
-      if (item?.store_id != undefined || null) {
+  useEffect(() => {
+    (async function () {
+      let {item} = route.params;
+      // ShowConsoleLogMessage(item);
+      if (item?.intentFromNotification) {
         getStoreList(item?.store_id);
         getOfferList(item?.store_id);
         getReviewList(item?.store_id);
         getGalleryList(item?.store_id);
-
         let is_store_save = await isStoreSaved(
           item?.store_id || item?.id_store,
         );
@@ -254,37 +243,53 @@ const StoreDetails = ({navigation, route}) => {
         );
         setReviewAdded(is_store_review);
       } else {
-        setReceivedData(item);
-        ShowConsoleLogMessage(item);
-        getOfferList(item?.id_store);
-        getReviewList(item?.id_store);
-        getGalleryList(item?.id_store);
+        if (item?.store_id != undefined || null) {
+          getStoreList(item?.store_id);
+          getOfferList(item?.store_id);
+          getReviewList(item?.store_id);
+          getGalleryList(item?.store_id);
 
-        var res = [];
+          let is_store_save = await isStoreSaved(
+            item?.store_id || item?.id_store,
+          );
+          setFavorite(is_store_save);
+          let is_store_review = await isStoreReviewSaved(
+            item?.store_id || item?.id_store,
+          );
+          setReviewAdded(is_store_review);
+        } else {
+          setReceivedData(item);
+          ShowConsoleLogMessage(item);
+          getOfferList(item?.id_store);
+          getReviewList(item?.id_store);
+          getGalleryList(item?.id_store);
 
-        try {
-          Object.values(item?.images).forEach((key, index) => {
-            res.push(key['560_560' || 'full']?.url + '');
-          });
-        } catch (err) {}
-        setImages(res);
+          var res = [];
 
-        setImageUrl(item?.images['0']['560_560'].url);
-        setCatImageUrl(item?.images['0']['200_200'].url);
+          try {
+            Object.values(item?.images).forEach((key, index) => {
+              res.push(key['560_560' || 'full']?.url + '');
+            });
+          } catch (err) {}
+          setImages(res);
 
-        let is_store_save = await isStoreSaved(
-          item?.store_id || item?.id_store,
-        );
-        setFavorite(is_store_save);
+          setImageUrl(item?.images['0']['560_560'].url);
+          setCatImageUrl(item?.images['0']['200_200'].url);
 
-        let is_store_review = await isStoreReviewSaved(
-          item?.store_id || item?.id_store,
-        );
-        ShowConsoleLogMessage(is_store_review + ' << isStoreReviewSaved');
-        setReviewAdded(is_store_review);
+          let is_store_save = await isStoreSaved(
+            item?.store_id || item?.id_store,
+          );
+          setFavorite(is_store_save);
+
+          let is_store_review = await isStoreReviewSaved(
+            item?.store_id || item?.id_store,
+          );
+          ShowConsoleLogMessage(is_store_review + ' << isStoreReviewSaved');
+          setReviewAdded(is_store_review);
+        }
       }
-    }
-  }, []);
+    })();
+  }, [isFocused]);
 
   // 1. Define a function outside the component:
   const onViewableItemsChanged = info => {
@@ -1506,16 +1511,25 @@ const StoreDetails = ({navigation, route}) => {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                if (favorite) {
-                  unSaveOnline();
-                  doDeleteStoreOffline(
-                    receivedData?.id_store || receivedData?.store_id,
-                  );
+                if (userData?.id_user == null || '') {
+                  navigation.navigate('Auth', {
+                    screen: 'Login',
+                    params: {
+                      screen: 'Login',
+                    },
+                  });
                 } else {
-                  doSaveOnline();
-                  doSaveStoreOffline(
-                    receivedData?.id_store || receivedData?.store_id,
-                  );
+                  if (favorite) {
+                    unSaveOnline();
+                    doDeleteStoreOffline(
+                      receivedData?.id_store || receivedData?.store_id,
+                    );
+                  } else {
+                    doSaveOnline();
+                    doSaveStoreOffline(
+                      receivedData?.id_store || receivedData?.store_id,
+                    );
+                  }
                 }
               }}
               style={[GlobalStyle1.iconBOX, {}]}>
