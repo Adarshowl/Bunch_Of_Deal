@@ -1166,45 +1166,47 @@ const StoreDetails = ({navigation, route}) => {
               </Animated.Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              key={'Gallery'}
-              accessibilityRole="button"
-              onPress={onPress => {
-                setChangeThree(true);
-                setChangeOne(false);
-                setChangeTwo(false);
-              }}
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 45,
-                backgroundColor: changeThree
-                  ? COLORS.white
-                  : COLORS.colorAccent,
-                paddingHorizontal: 10,
-                borderColor: COLORS.white,
-                borderWidth: 0.5,
-                flexDirection: 'row',
-              }}>
-              <MaterialCommunityIcons
-                name="view-gallery"
-                color={changeThree ? COLORS.colorPrimary : COLORS.white}
-                size={18}
-                style={{
-                  marginEnd: 10,
+            {galleryListData?.length > 0 ? (
+              <TouchableOpacity
+                key={'Gallery'}
+                accessibilityRole="button"
+                onPress={onPress => {
+                  setChangeThree(true);
+                  setChangeOne(false);
+                  setChangeTwo(false);
                 }}
-              />
-              <Animated.Text
                 style={{
-                  color: changeThree ? COLORS.colorPrimary : COLORS.white,
-                  fontFamily: 'Montserrat-Medium',
-                  textTransform: 'uppercase',
-                  fontSize: 12,
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 45,
+                  backgroundColor: changeThree
+                    ? COLORS.white
+                    : COLORS.colorAccent,
+                  paddingHorizontal: 10,
+                  borderColor: COLORS.white,
+                  borderWidth: 0.5,
+                  flexDirection: 'row',
                 }}>
-                Gallery
-              </Animated.Text>
-            </TouchableOpacity>
+                <MaterialCommunityIcons
+                  name="view-gallery"
+                  color={changeThree ? COLORS.colorPrimary : COLORS.white}
+                  size={18}
+                  style={{
+                    marginEnd: 10,
+                  }}
+                />
+                <Animated.Text
+                  style={{
+                    color: changeThree ? COLORS.colorPrimary : COLORS.white,
+                    fontFamily: 'Montserrat-Medium',
+                    textTransform: 'uppercase',
+                    fontSize: 12,
+                  }}>
+                  Gallery
+                </Animated.Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
           {changeOne ? (
             <ScrollView
@@ -1295,54 +1297,56 @@ const StoreDetails = ({navigation, route}) => {
               />
             </View>
           ) : null}
-          {changeThree ? (
-            <View
-              style={{
-                justifyContent: 'center',
-              }}>
-              <FlatList
-                data={galleryListData}
+          {galleryListData?.length > 0 ? (
+            changeThree ? (
+              <View
                 style={{
-                  marginTop: 5,
-                }}
-                keyExtractor={item => item?.id_store}
-                // renderItem={renderGalleryItem}
-                renderItem={({item, index}) => {
-                  return (
-                    <RenderGalleryItem
-                      bigGalleryPhotoRef={bigGalleryPhotoRef}
-                      closeGalleryImageModal={() => {
-                        closeGalleryImageModal();
-                      }}
-                      bigGallery={() => {
-                        // ShowConsoleLogMessage('big gallery called 1');
-                        bigGalleryPhotoRef.current?.scrollToIndex({
-                          animated: true,
-                          index: index,
-                        });
-                        // ShowConsoleLogMessage('big gallery called 2');
-                      }}
-                      item={item}
-                    />
-                  );
-                }}
-                numColumns={4}
-                ListEmptyComponent={() => {
-                  return (
-                    <Text
-                      style={{
-                        color: COLORS.editTextBorder,
-                        fontSize: 16,
-                        fontFamily: 'Montserrat-Regular',
-                        textAlign: 'center',
-                        paddingVertical: 10,
-                      }}>
-                      No data found
-                    </Text>
-                  );
-                }}
-              />
-            </View>
+                  justifyContent: 'center',
+                }}>
+                <FlatList
+                  data={galleryListData}
+                  style={{
+                    marginTop: 5,
+                  }}
+                  keyExtractor={item => item?.id_store}
+                  // renderItem={renderGalleryItem}
+                  renderItem={({item, index}) => {
+                    return (
+                      <RenderGalleryItem
+                        bigGalleryPhotoRef={bigGalleryPhotoRef}
+                        closeGalleryImageModal={() => {
+                          closeGalleryImageModal();
+                        }}
+                        bigGallery={() => {
+                          // ShowConsoleLogMessage('big gallery called 1');
+                          bigGalleryPhotoRef.current?.scrollToIndex({
+                            animated: true,
+                            index: index,
+                          });
+                          // ShowConsoleLogMessage('big gallery called 2');
+                        }}
+                        item={item}
+                      />
+                    );
+                  }}
+                  numColumns={4}
+                  ListEmptyComponent={() => {
+                    return (
+                      <Text
+                        style={{
+                          color: COLORS.editTextBorder,
+                          fontSize: 16,
+                          fontFamily: 'Montserrat-Regular',
+                          textAlign: 'center',
+                          paddingVertical: 10,
+                        }}>
+                        No data found
+                      </Text>
+                    );
+                  }}
+                />
+              </View>
+            ) : null
           ) : null}
         </View>
         <View

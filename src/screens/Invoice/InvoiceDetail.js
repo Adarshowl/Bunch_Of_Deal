@@ -147,6 +147,7 @@ import {
   View,
   Platform,
   PermissionsAndroid,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {WebView} from 'react-native-webview';
@@ -213,7 +214,13 @@ const InvoiceDetail = ({navigation, route}) => {
       let file = await RNHTMLtoPDF.convert(options);
       // console.log(file.filePath);
       // alert(file.filePath);
-      ShowToastMessage('File Downloaded Successfully');
+      // ShowToastMessage('File Downloaded Successfully');
+      Alert.alert(
+        'File Downloaded Successfully',
+        'File saved to : Documents/BOD_INVOICES/BOD_OrderID_' +
+          order_id +
+          '.pdf',
+      );
     } catch (err) {
       ShowToastMessage('Failed to download invoice');
     }
