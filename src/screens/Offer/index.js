@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View, Modal} from 'react-native';
+import {FlatList, StyleSheet, Text, View, Modal, SafeAreaView} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {icons, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
@@ -11,7 +11,7 @@ import {requestLocationPermission} from '../../utils/RequestUserPermission';
 import {
   getMacAddress,
   ShowConsoleLogMessage,
-  Timezone,
+
 } from '../../utils/Utility';
 import moment from 'moment';
 import OfferCardView from './OfferCardView';
@@ -19,7 +19,7 @@ import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
 import {OfferSkeleton} from '../../utils/Skeleton';
-
+import TimeZone from 'react-native-timezone';
 const Offer = ({
   navigation,
   searchText,
@@ -42,7 +42,7 @@ const Offer = ({
   useEffect(() => {
     const permission = requestLocationPermission();
     setHaveLocationPermission(permission);
-    Timezone.getTimeZone().then(result => {
+    TimeZone?.getTimeZone().then(result => {
       setTimezone(result);
     });
     getOfferList('recent');
@@ -201,7 +201,7 @@ const Offer = ({
   };
 
   return (
-    <View style={GlobalStyle.mainContainerBgColor}>
+    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
       <View
         style={[
           GlobalStyle.commonToolbarBG,
@@ -338,7 +338,7 @@ const Offer = ({
           )}
         </View>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 

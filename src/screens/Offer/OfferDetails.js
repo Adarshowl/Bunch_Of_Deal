@@ -1,3 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused} from '@react-navigation/native';
+import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
@@ -12,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import CountDown from 'react-native-countdown-component';
 import {Image} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -20,11 +24,8 @@ import {
   default as Entypofrom,
 } from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useIsFocused} from '@react-navigation/native';
-import moment from 'moment';
-import CountDown from 'react-native-countdown-component';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../../constants/Colors';
 import {STRING} from '../../constants/String';
 import {FONTS, SIZES} from '../../constants/themes';
@@ -38,7 +39,6 @@ import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {
   doDeleteOfferOffline,
   doSaveOfferOffline,
-  getSavedOfferAsString,
   isOfferSaved,
 } from '../../utils/RealmUtility';
 import {
@@ -49,6 +49,16 @@ import {
 import {markAsRead} from '../CampaignController';
 
 const OfferDetails = ({navigation, route}) => {
+  const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+    const paddingToBottom = 30;
+    return (
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom
+    );
+  };
+
+  const [showDown, setShowDown] = useState(false);
+
   const isFocused = useIsFocused();
 
   const [intentCause, setIntentCause] = useState(false);
@@ -89,6 +99,10 @@ const OfferDetails = ({navigation, route}) => {
     getUserFromStorage(item);
   }, []);
 
+  useEffect(() => {
+    getisFocusedUserFromStorage();
+  }, [isFocused]);
+
   const getUserFromStorage = async item => {
     try {
       await AsyncStorage.getItem('userData', (error, value) => {
@@ -101,6 +115,21 @@ const OfferDetails = ({navigation, route}) => {
             if (item?.cid != undefined || null) {
               markAsRead(item?.cid, JSON.parse(value)?.id_user);
             }
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+  const getisFocusedUserFromStorage = async item => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
+            setUserData(JSON.parse(value));
           } else {
           }
         }
@@ -362,37 +391,50 @@ const OfferDetails = ({navigation, route}) => {
                 backgroundColor: COLORS.black,
               },
             ]}>
-            <TouchableOpacity
-              onPress={() => {
-                // closeImageModal();
-              }}
-              activeOpacity={0.8}
+            <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                alignSelf: 'flex-start',
+                justifyContent: 'space-between',
               }}>
-              <AntDesign
-                name="close"
-                size={25}
-                color={COLORS.white}
+              <TouchableOpacity
+                onPress={() => {
+                  closeImageModal();
+                }}
+                activeOpacity={0.8}
                 style={{
                   marginHorizontal: 20,
-                  // marginTop: 60,
-                  opacity: 0.0,
-                }}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontSize: 18,
-                color: COLORS.white,
-                textAlign: 'center',
-                marginTop: 30,
-                fontFamily: 'Montserrat-Medium',
-              }}>
-              {images.length > 1 ? `${activeIndex}/${images.length}` : ''}
-            </Text>
+                }}>
+                <AntDesign
+                  name="close"
+                  size={25}
+                  color={COLORS.white}
+                  style={{
+                    marginTop: 60,
+                    //   opacity: 0.0,
+                  }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: COLORS.white,
+                  textAlign: 'center',
+                  marginTop: 60,
+                  fontFamily: 'Montserrat-Medium',
+                }}>
+                {images.length > 1 ? `${activeIndex}/${images.length}` : ''}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: COLORS.white,
+                  textAlign: 'center',
+                  marginTop: 60,
+                  fontFamily: 'Montserrat-Medium',
+                  marginHorizontal: 20,
+                }}></Text>
+            </View>
             <View
               style={{
                 marginBottom: 'auto',
@@ -722,9 +764,19 @@ const OfferDetails = ({navigation, route}) => {
 
   return (
     <SafeAreaView
-      style={GlobalStyle1.mainContainerBgColor}
-      showsVerticalScrollIndicator={false}>
-      <ScrollView>
+      style={{
+        flex: 1,
+        backgroundColor: COLORS.white,
+      }}>
+      <ScrollView
+        onScroll={({nativeEvent}) => {
+          if (isCloseToBottom(nativeEvent)) {
+            setShowDown(true);
+          } else {
+            setShowDown(false);
+          }
+        }}
+        scrollEventThrottle={8}>
         <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -736,6 +788,79 @@ const OfferDetails = ({navigation, route}) => {
               source={imageUrl + ''}
               styles={GlobalStyle1.Product_image}
             />
+            {/* <LinearGradient
+       colors={[ "#00000090","#00000090",COLORS.transparent]}
+       style={[{
+         width: '100%',
+         flexDirection: 'row',
+         alignItems: 'center',
+         height: 45,
+        backgroundColor: COLORS.transparent,
+         padding: 10,
+       position:'absolute'
+  
+       }]}>
+        <BunchDealVectorIcon
+          title={Ionicons}
+          name={'arrow-back'}
+          color={COLORS.colorAccent}
+          size={25}
+          style={{}}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}>
+          <Entypofrom
+            name="share"
+            size={22}
+            color={COLORS.colorAccent}
+            style={{
+              marginHorizontal: 15,
+            }}
+            onPress={() => {
+              onShare();
+            }}
+          />
+          <FontAwesome
+            name={favorite ? 'heart' : 'heart-o'}
+            size={22}
+            color={COLORS.colorAccent}
+            style={{
+              marginHorizontal: 5,
+            }}
+            onPress={() => {
+              if (userData?.id_user == null || '') {
+                navigation.navigate('Auth', {
+                  screen: 'Login',
+                  params: {
+                    screen: 'Login',
+                  },
+                });
+              } else {
+                if (favorite) {
+                  unSaveOnline();
+                  doDeleteOfferOffline(
+                    receivedData?.id_offer || receivedData?.offer_id,
+                  );
+                } else {
+                  doSaveOnline();
+                  doSaveOfferOffline(
+                    receivedData?.id_offer || receivedData?.offer_id,
+                  );
+                }
+              }
+            }}
+          />
+        </View>
+      
+          </LinearGradient>*/}
 
             {/* <View
               style={[
@@ -854,10 +979,11 @@ const OfferDetails = ({navigation, route}) => {
 
           <View
             style={{
-              backgroundColor: '#F4B400',
-              marginHorizontal: 30,
+              backgroundColor: COLORS.colorCountdownView,
+              marginHorizontal: 26,
               marginTop: 15,
-              borderRadius: 3,
+              borderRadius: 5,
+              flex: 1,
             }}>
             <CountDown
               digitStyle={{
@@ -924,9 +1050,9 @@ const OfferDetails = ({navigation, route}) => {
               }}
               activeOpacity={0.8}
               style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Ionicons
-                name="md-location-sharp"
-                size={20}
+              <MaterialCommunityIcons
+                name={'storefront-outline'}
+                size={15}
                 color={COLORS.colorAccent}
                 style={{
                   marginTop: 5,
@@ -1247,83 +1373,216 @@ const OfferDetails = ({navigation, route}) => {
           </View>
         </SafeAreaView>
       </ScrollView>
-      <LinearGradient
-        colors={['#00000090', '#00000090', COLORS.transparent]}
-        style={GlobalStyle.offerDetailToolBar}>
-        <BunchDealVectorIcon
-          title={Ionicons}
-          name={'arrow-back'}
-          color={COLORS.colorAccent}
-          size={25}
-          style={{}}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}>
-          <Entypofrom
-            name="share"
-            size={22}
+      {!showDown ? (
+        <LinearGradient
+          colors={['#00000090', '#00000090', COLORS.transparent]}
+          style={[
+            GlobalStyle.offerDetailToolBar,
+            {
+              // top:StatusBar.currentHeight<=10 ? 45:StatusBar.currentHeight
+            },
+          ]}>
+          <BunchDealVectorIcon
+            title={Ionicons}
+            name={'arrow-back'}
             color={COLORS.colorAccent}
-            style={{
-              marginHorizontal: 15,
-            }}
+            size={25}
+            style={{}}
             onPress={() => {
-              onShare();
+              navigation.goBack();
             }}
           />
-          <FontAwesome
-            name={favorite ? 'heart' : 'heart-o'}
-            size={22}
-            color={COLORS.colorAccent}
+          <View
             style={{
-              marginHorizontal: 5,
-            }}
-            onPress={() => {
-              if (userData?.id_user == null || '') {
-                navigation.navigate('Auth', {
-                  screen: 'Login',
-                  params: {
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+            <Entypofrom
+              name="share"
+              size={22}
+              color={COLORS.colorAccent}
+              style={{
+                marginHorizontal: 15,
+              }}
+              onPress={() => {
+                onShare();
+              }}
+            />
+            <FontAwesome
+              name={favorite ? 'heart' : 'heart-o'}
+              size={22}
+              color={COLORS.colorAccent}
+              style={{
+                marginHorizontal: 5,
+              }}
+              onPress={() => {
+                if (userData?.id_user == null || '') {
+                  navigation.navigate('Auth', {
                     screen: 'Login',
-                  },
-                });
-              } else {
-                if (favorite) {
-                  unSaveOnline();
-                  doDeleteOfferOffline(
-                    receivedData?.id_offer || receivedData?.offer_id,
-                  );
+                    params: {
+                      screen: 'Login',
+                    },
+                  });
                 } else {
-                  doSaveOnline();
-                  doSaveOfferOffline(
-                    receivedData?.id_offer || receivedData?.offer_id,
-                  );
+                  if (favorite) {
+                    unSaveOnline();
+                    doDeleteOfferOffline(
+                      receivedData?.id_offer || receivedData?.offer_id,
+                    );
+                  } else {
+                    doSaveOnline();
+                    doSaveOfferOffline(
+                      receivedData?.id_offer || receivedData?.offer_id,
+                    );
+                  }
                 }
-              }
+              }}
+            />
+          </View>
+          {/* </View> */}
+        </LinearGradient>
+      ) : (
+        <View
+          // colors={[COLORS.white, COLORS.white, COLORS.white]}
+          style={[
+            GlobalStyle.offerDetailToolBar,
+            {
+              // top:StatusBar.currentHeight<=10 ? 45:StatusBar.currentHeight
+              elevation: 10,
+              backgroundColor: COLORS.white,
+            },
+          ]}>
+          <BunchDealVectorIcon
+            title={Ionicons}
+            name={'arrow-back'}
+            color={COLORS.colorAccent}
+            size={25}
+            style={{}}
+            onPress={() => {
+              navigation.goBack();
             }}
           />
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: 'Montserrat-Regular',
+              color: COLORS.colorAccent,
+              marginStart: 7,
+              marginEnd: 3,
+              flex: 1,
+            }}
+            numberOfLines={1}>
+            {receivedData?.name}
+          </Text>
+          <View
+            style={{
+              // flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+            <Entypofrom
+              name="share"
+              size={22}
+              color={COLORS.colorAccent}
+              style={{
+                marginHorizontal: 15,
+              }}
+              onPress={() => {
+                onShare();
+              }}
+            />
+            <FontAwesome
+              name={favorite ? 'heart' : 'heart-o'}
+              size={22}
+              color={COLORS.colorAccent}
+              style={{
+                marginHorizontal: 5,
+              }}
+              onPress={() => {
+                if (userData?.id_user == null || '') {
+                  navigation.navigate('Auth', {
+                    screen: 'Login',
+                    params: {
+                      screen: 'Login',
+                    },
+                  });
+                } else {
+                  if (favorite) {
+                    unSaveOnline();
+                    doDeleteOfferOffline(
+                      receivedData?.id_offer || receivedData?.offer_id,
+                    );
+                  } else {
+                    doSaveOnline();
+                    doSaveOfferOffline(
+                      receivedData?.id_offer || receivedData?.offer_id,
+                    );
+                  }
+                }
+              }}
+            />
+          </View>
+          {/* </View> */}
         </View>
-        {/* </View> */}
-      </LinearGradient>
+      )}
 
       {receivedData?.order_button != null || '' ? (
-        <BunchDealCommonBtn
-          height={50}
-          backgroundColor={COLORS.colorAccent}
-          marginHorizontal={0}
-          text={receivedData?.order_button?.toUpperCase()}
-          textStyle={FONTS.body4}
-          onPress={onOrderClick}
-          textColor={COLORS.white}
-          borderRadius={1}
-          textSize={16}
-        />
+        !showDown ? (
+          <BunchDealCommonBtn
+            height={50}
+            backgroundColor={COLORS.colorAccent}
+            marginHorizontal={0}
+            text={receivedData?.order_button?.toUpperCase()}
+            textStyle={FONTS.body4}
+            onPress={onOrderClick}
+            textColor={COLORS.white}
+            borderRadius={1}
+            textSize={16}
+          />
+        ) : (
+          <View
+            style={{
+              height: 50,
+              width: '100%',
+              flexDirection: 'row',
+            }}>
+            <BunchDealCommonBtn
+              height={50}
+              width={'50%'}
+              backgroundColor={COLORS.colorPromo}
+              marginHorizontal={0}
+              text={
+                receivedData?.currency?.symbol +
+                '' +
+                receivedData?.offer_value +
+                '.0'
+              }
+              textStyle={{
+                fontFamily: 'Montserrat-SemiBold',
+              }}
+              onPress={() => {}}
+              textColor={COLORS.white}
+              borderRadius={1}
+              textSize={16}
+            />
+
+            <BunchDealCommonBtn
+              width={'50%'}
+              height={50}
+              backgroundColor={COLORS.colorAccent}
+              marginHorizontal={0}
+              text={receivedData?.order_button?.toUpperCase()}
+              textStyle={FONTS.body4}
+              onPress={onOrderClick}
+              textColor={COLORS.white}
+              borderRadius={1}
+              textSize={16}
+            />
+          </View>
+        )
       ) : null}
       {renderQtyModal()}
       {renderImageModal()}

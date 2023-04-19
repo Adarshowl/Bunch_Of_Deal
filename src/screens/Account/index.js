@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, Text, View} from 'react-native';
+import {Image, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import ImgToBase64 from 'react-native-image-base64';
 import ImagePicker from 'react-native-image-crop-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,6 +16,7 @@ import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {requestExternalWritePermission} from '../../utils/RequestUserPermission';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const Account = ({navigation}) => {
   const [userData, setUserData] = useState({});
@@ -111,20 +112,24 @@ const Account = ({navigation}) => {
   const [image, setImage] = useState();
 
   const openImagePicker = () => {
-    ImagePicker.openPicker({
-      multiple: false,
-      cropping: true,
-    }).then(images => {
-      setImage(images.path);
-      ImgToBase64.getBase64String(images.path)
-        .then(base64String => {
-          // console.log(base64String);
-          setImageBase64(base64String);
-        })
-        .catch(err => {});
+    try {
+      ImagePicker.openPicker({
+        multiple: false,
+        cropping: true,
+      }).then(images => {
+        setImage(images.path);
+        ImgToBase64.getBase64String(images.path)
+          .then(base64String => {
+            // console.log(base64String);
+            setImageBase64(base64String);
+          })
+          .catch(err => {});
 
-      setUpdate(true);
-    });
+        setUpdate(true);
+      });
+    } catch (error) {
+      ShowConsoleLogMessage('Image picker error => ' + JSON.stringify(error));
+    }
   };
 
   const uploadImage = val => {
@@ -243,106 +248,107 @@ const Account = ({navigation}) => {
             flex: 1,
           }}></View>
       </View>
-      <View
-        style={[
-          {
-            paddingHorizontal: 15,
-            width: '77%',
-            paddingTop: 10,
-            paddingHorizontal: 10,
-            alignSelf: 'center',
-            // bottom: -150,
-            borderRadius: 6,
-            backgroundColor: COLORS.white,
-            marginTop: 100,
-          },
-        ]}>
+      <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
         <View
           style={[
             {
-              // height: 100,
-              // backgroundColor: 'red',
-              paddingHorizontal: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: 5,
+              paddingHorizontal: 15,
+              width: '77%',
+              paddingTop: 10,
+              paddingHorizontal: 10,
+              alignSelf: 'center',
+              // bottom: -150,
+              borderRadius: 6,
+              backgroundColor: COLORS.white,
+              marginTop: 100,
             },
           ]}>
-          {image ? (
-            <Image
-              source={{
-                uri: image,
-              }}
-              style={GlobalStyle.profile_placeholder}
+          <View
+            style={[
+              {
+                // height: 100,
+                // backgroundColor: 'red',
+                paddingHorizontal: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 5,
+              },
+            ]}>
+            {image ? (
+              <Image
+                source={{
+                  uri: image,
+                }}
+                style={GlobalStyle.profile_placeholder}
+              />
+            ) : (
+              <Image
+                source={images.profile_placeholder}
+                style={GlobalStyle.profile_placeholder}
+              />
+            )}
+            <BunchDealCommonBtn
+              width={140}
+              height={35}
+              backgroundColor={COLORS.colorAccent}
+              marginHorizontal={5}
+              text={STRING.pickPhoto}
+              textStyle={FONTS.body3}
+              textColor={COLORS.white}
+              onPress={onPickPhotoClick}
+              borderRadius={1}
+              textSize={14}
             />
-          ) : (
-            <Image
-              source={images.profile_placeholder}
-              style={GlobalStyle.profile_placeholder}
-            />
-          )}
-          <BunchDealCommonBtn
-            width={140}
-            height={35}
-            backgroundColor={COLORS.colorAccent}
-            marginHorizontal={5}
-            text={STRING.pickPhoto}
-            textStyle={FONTS.body3}
-            textColor={COLORS.white}
-            onPress={onPickPhotoClick}
-            borderRadius={1}
-            textSize={14}
+          </View>
+
+          <BunchDealEditText
+            borderBottomWidth={1}
+            placeholder={STRING.email}
+            style={[FONTS.body3, {color: COLORS.lightGrey}]}
+            value={userData?.email}
+            onChangeText={val => {
+              setEmail(val);
+            }}
+            editable={false}
+            backgroundColor={COLORS.backgroundColor}
           />
-        </View>
+          <BunchDealEditText
+            borderBottomWidth={1}
+            placeholder={STRING.pseudo}
+            style={FONTS.body3}
+            // value={userData?.username}
+            value={fullName}
+            onChangeText={val => {
+              setFullName(val);
+              setUpdate(true);
+            }}
+          />
+          <BunchDealEditText
+            borderBottomWidth={1}
+            placeholder={STRING.fullName}
+            style={FONTS.body3}
+            // value={userData?.name}
+            value={name}
+            onChangeText={val => {
+              setName(val);
+              setUpdate(true);
+            }}
+          />
 
-        <BunchDealEditText
-          borderBottomWidth={1}
-          placeholder={STRING.email}
-          style={[FONTS.body3, {color: COLORS.lightGrey}]}
-          value={userData?.email}
-          onChangeText={val => {
-            setEmail(val);
-          }}
-          editable={false}
-          backgroundColor={COLORS.backgroundColor}
-        />
-        <BunchDealEditText
-          borderBottomWidth={1}
-          placeholder={STRING.pseudo}
-          style={FONTS.body3}
-          // value={userData?.username}
-          value={fullName}
-          onChangeText={val => {
-            setFullName(val);
-            setUpdate(true);
-          }}
-        />
-        <BunchDealEditText
-          borderBottomWidth={1}
-          placeholder={STRING.fullName}
-          style={FONTS.body3}
-          // value={userData?.name}
-          value={name}
-          onChangeText={val => {
-            setName(val);
-            setUpdate(true);
-          }}
-        />
-
-        <BunchDealEditText
-          borderBottomWidth={1}
-          placeholder={STRING.phoneHint}
-          style={FONTS.body3}
-          value={mobile}
-          maxLength={10}
-          keyBoardType={'number-pad'}
-          onChangeText={val => {
-            setMobile(val);
-            setUpdate(true);
-          }}
-        />
-        {/* <BunchDealEditText
+          <BunchDealEditText
+            borderBottomWidth={1}
+            placeholder={STRING.phoneHint}
+            style={FONTS.body3}
+            value={mobile}
+            maxLength={10}
+            keyBoardType={'number-pad'}
+            onChangeText={val => {
+              setMobile(val);
+              setUpdate(true);
+            }}
+          />
+          {/* <BunchDealEditText
           borderBottomWidth={1}
           placeholder={STRING.password}
           style={FONTS.body3}
@@ -353,25 +359,26 @@ const Account = ({navigation}) => {
           }}
           editable={false}
         /> */}
-        <BunchDealCommonBtn
-          height={40}
-          backgroundColor={COLORS.colorAccent}
-          marginHorizontal={5}
-          text={'Save'}
-          textStyle={FONTS.body3}
-          textColor={COLORS.white}
-          // onPress={onLoginClick}
-          onPress={onLoginClick}
-          marginTop={25}
-          borderRadius={1}
-          textSize={16}
-        />
-        <View
-          style={{
-            paddingBottom: 30,
-          }}
-        />
-      </View>
+          <BunchDealCommonBtn
+            height={40}
+            backgroundColor={COLORS.colorAccent}
+            marginHorizontal={5}
+            text={'Save'}
+            textStyle={FONTS.body3}
+            textColor={COLORS.white}
+            // onPress={onLoginClick}
+            onPress={onLoginClick}
+            marginTop={25}
+            borderRadius={1}
+            textSize={16}
+          />
+          <View
+            style={{
+              paddingBottom: 30,
+            }}
+          />
+        </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

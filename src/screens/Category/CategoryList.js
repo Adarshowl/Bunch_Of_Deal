@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View,SafeAreaView} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -10,13 +10,13 @@ import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
-import {ShowConsoleLogMessage, Timezone} from '../../utils/Utility';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
 import StoreCardView from '../Store/StoreCardView';
 import SearchDialog from '../Search';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 import {StoreSkeleton} from '../../utils/Skeleton';
-
+import TimeZone from 'react-native-timezone';
 const CategoryList = ({navigation, route}) => {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ const CategoryList = ({navigation, route}) => {
   const [timeZone, setTimezone] = useState('');
 
   useEffect(() => {
-    Timezone.getTimeZone().then(result => {
+    TimeZone.getTimeZone().then(result => {
       setTimezone(result);
     });
     let {item} = route.params;
@@ -150,7 +150,7 @@ const CategoryList = ({navigation, route}) => {
       .finally(() => {});
   };
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.white}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       <View
         style={[
           {
@@ -255,7 +255,7 @@ const CategoryList = ({navigation, route}) => {
         onChangeLocation={closePlacePickModal}
         show={showPlaceChooseModal}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

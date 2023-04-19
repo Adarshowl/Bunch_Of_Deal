@@ -6,9 +6,9 @@ import {
   View,
   TouchableOpacity,
   Modal,
-  BackHandler,
+  BackHandler,SafeAreaView
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -250,7 +250,7 @@ const Home = ({navigation}) => {
   // code for privacy popup end
 
   return (
-    <View style={GlobalStyle.mainContainerBgColor}>
+    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
       <View style={GlobalStyle.commonToolbarBG}>
         <BunchDealVectorIcon
           title={Entypo}
@@ -318,6 +318,20 @@ const Home = ({navigation}) => {
             height: 45,
           },
         ]}>
+          <TouchableOpacity
+          activeOpacity={0.8}
+          style={{
+            flexGrow:1,
+            alignItems:'center'
+          }}
+           onPress={() => {
+            setPercent(true);
+            setStoreFront(false);
+            setToolbarTitle('Offers');
+            setUpdate(false);
+            setStoreUpdate(false);
+          }}
+          >
         <Text
           style={[
             FONTS.h6,
@@ -328,15 +342,25 @@ const Home = ({navigation}) => {
               fontSize: 16,
             },
           ]}
-          onPress={() => {
-            setPercent(true);
-            setStoreFront(false);
-            setToolbarTitle('Offers');
-            setUpdate(false);
-            setStoreUpdate(false);
-          }}>
+         >
           Offers
         </Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+activeOpacity={0.8}
+
+          style={{
+            flexGrow:1,
+            alignItems:'center',
+          }}
+
+          onPress={() => {
+            setPercent(false);
+            setStoreFront(true);
+            setToolbarTitle('Store');
+            setStoreUpdate(false);
+            setUpdate(false);
+          }}>
         <Text
           style={[
             FONTS.h6,
@@ -347,15 +371,10 @@ const Home = ({navigation}) => {
               fontSize: 16,
             },
           ]}
-          onPress={() => {
-            setPercent(false);
-            setStoreFront(true);
-            setToolbarTitle('Store');
-            setStoreUpdate(false);
-            setUpdate(false);
-          }}>
+        >
           Store
         </Text>
+        </TouchableOpacity>
       </View>
       <View
         style={{
@@ -418,7 +437,7 @@ const Home = ({navigation}) => {
         show={showPlaceChooseModal}
       />
       {renderFilterModal()}
-    </View>
+    </SafeAreaView>
   );
 };
 

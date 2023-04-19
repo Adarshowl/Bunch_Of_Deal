@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     paddingEnd: 8,
     fontFamily: 'Montserrat-Regular',
     fontSize: 11,
-    color: COLORS.black,
+    color: COLORS.black, 
   },
   dealPriceText: {
     marginEnd: 5,

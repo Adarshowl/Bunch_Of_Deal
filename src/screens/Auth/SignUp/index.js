@@ -173,7 +173,8 @@ import {
   validateFieldNotEmpty,
   validateEmail,
 } from '../../../utils/Utility';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
 
@@ -282,20 +283,48 @@ const SignUp = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+    <KeyboardAwareScrollView
+      style={{
+        flex: 1,
+        backgroundColor: COLORS.backgroundColor,
+      }}
+      // scrollEnabled={false}
+    >
       <BunchDealProgressBar loading={loading} />
-      <View style={GlobalStyle.nav_bg}>
+
+      <View style={[GlobalStyle.nav_bg, {}]}>
         <Image
           source={images.navigation_icon_bg}
           style={GlobalStyle.nav_bg_image}
         />
       </View>
+      <Ionicons
+        onPress={() => {
+          navigation.goBack();
+        }}
+        marginStart={10}
+        color={COLORS.black}
+        name="ios-arrow-back-sharp"
+        size={25}
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 2,
+          backgroundColor: COLORS.white,
+          paddingVertical: 5,
+          paddingHorizontal: 10,
+          borderRadius: 50,
+        }}
+      />
+
       <View
         style={[
           GlobalStyle.loginCard,
           {
-            top: 160,
-            paddingHorizontal: 15,
+            // paddingHorizontal: 15,
+            position: 'relative',
+            bottom: 160,
+            // overflow: 'scroll',
           },
         ]}>
         <View style={GlobalStyle.pickPhotoBg}>
@@ -404,7 +433,7 @@ const SignUp = ({navigation}) => {
           }}
         />
       </View>
-    </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 };
 

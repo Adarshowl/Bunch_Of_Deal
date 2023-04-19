@@ -148,6 +148,7 @@ import {
   Platform,
   PermissionsAndroid,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {WebView} from 'react-native-webview';
@@ -227,7 +228,7 @@ const InvoiceDetail = ({navigation, route}) => {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
       }}>
@@ -297,7 +298,7 @@ const InvoiceDetail = ({navigation, route}) => {
         borderRadius={1}
         textSize={16}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

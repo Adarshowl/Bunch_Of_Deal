@@ -21,6 +21,10 @@ import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import moment from 'moment';
+import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
+import {FONTS} from '../../constants/themes';
+
 const Order = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(false);
   const [showDone, setShowDone] = useState(false);
@@ -28,6 +32,8 @@ const Order = ({navigation, route}) => {
   const [userData, setUserData] = useState({});
 
   const [receivedData, setReceivedData] = useState();
+  const [orderId, setOfferId] = useState('');
+  const [orderDateTime, setOfferDateTime] = useState('');
   const [count, setCount] = useState('');
   const [price, setPrice] = useState('');
 
@@ -221,10 +227,14 @@ const Order = ({navigation, route}) => {
       .then(response => {
         let da = response?.data?.split(':')[1];
 
-        ShowConsoleLogMessage('response -> ' + response?.data?.split(':')[1]);
-        ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
+        ShowConsoleLogMessage(
+          'response -> ' + response?.data?.split(',')[1]?.split(':')[1],
+        );
+        // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
         if (da.split(',')[0] == 1) {
           setShowDone(true);
+          setOfferDateTime(moment().format('LLL'));
+          setOfferId(response?.data?.split(',')[1]?.split(':')[1] + '');
         } else {
           ShowToastMessage('Something went wrong');
           setSelectedPayment(null);
@@ -404,10 +414,12 @@ const Order = ({navigation, route}) => {
       {showDone ? (
         <View
           style={{
-            flex: 1,
+            // flex: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: SIZES.width / 2,
+            // justifyContent: 'center',
+            marginTop: SIZES.width / 4,
+            // backgroundColor: 'red',
+            paddingBottom: 20,
           }}>
           <Ionicons
             name="checkmark-circle"
@@ -423,10 +435,113 @@ const Order = ({navigation, route}) => {
               marginTop: 5,
               color: COLORS.shimmer_loading_color_darker,
               textAlign: 'center',
-              flex: 1,
+              // flex: 1,
             }}>
             Your order has been sent successfully!
           </Text>
+          {/* <View
+            style={{
+              height: 1,
+              backgroundColor: COLORS.shimmer_loading_color,
+              width: '100%',
+              marginTop: 20,
+            }}
+          /> */}
+          <View
+            style={{
+              // borderWidth: 1,
+              // borderRadius: 3,
+              borderColor: COLORS.grey_20,
+              paddingVertical: 5,
+              paddingHorizontal: 8,
+              marginBottom: 10,
+              marginTop: 20,
+              // flex: 1,
+              width: '90%',
+              elevation: 10,
+              backgroundColor: '#e7e7e7',
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-SemiBold',
+                color: COLORS.black,
+
+                textAlign: 'center',
+              }}>
+              Order Details
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+                marginTop: 5,
+                marginStart: 5,
+              }}>
+              Order Id: #{orderId}
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+                marginTop: 5,
+                marginStart: 5,
+              }}>
+              Product Name: {receivedData?.name}
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+                marginTop: 5,
+                marginStart: 5,
+              }}
+              numberOfLines={2}>
+              Order Total:{' '}
+              {receivedData?.currency?.symbol + '' + receivedData?.offer_value}
+              .0
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+                marginTop: 5,
+                marginStart: 5,
+              }}
+              numberOfLines={2}>
+              {/* Order Date & Time: {moment().format('LLL')} */}
+              Order Date & Time: {orderDateTime}
+            </Text>
+          </View>
+          {/* <View
+            style={{
+              height: 1,
+              backgroundColor: COLORS.shimmer_loading_color,
+              width: '100%',
+            }}
+          /> */}
+          <BunchDealCommonBtn
+            height={40}
+            width={'90%'}
+            backgroundColor={COLORS.colorAccent}
+            marginHorizontal={0}
+            text={'CONTACT VENDOR TO CLAIM THIS OFFER'}
+            textStyle={FONTS.body4}
+            onPress={() => {
+              ShowToastMessage('Coming soon!');
+            }}
+            textColor={COLORS.white}
+            borderRadius={2}
+            textSize={14}
+            marginTop={20}
+          />
         </View>
       ) : !changeOne ? (
         <>

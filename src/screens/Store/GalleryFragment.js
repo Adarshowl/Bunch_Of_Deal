@@ -4,12 +4,14 @@ import {images, SIZES} from '../../constants';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowConsoleLogMessage, Timezone} from '../../utils/Utility';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+
+import TimeZone from 'react-native-timezone';
 
 const GalleryFragment = props => {
   useEffect(() => {
     // ShowConsoleLogMessage('propse -> ' + JSON.stringify(props?.item?.id_store));
-    Timezone.getTimeZone().then(result => {
+    TimeZone.getTimeZone().then(result => {
       // console.log(result);
       setTimezone(result);
     });

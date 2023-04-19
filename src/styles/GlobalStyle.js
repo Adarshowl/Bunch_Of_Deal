@@ -28,14 +28,12 @@ export default StyleSheet.create({
     top: 30,
   },
   loginCard: {
-    position: 'absolute',
     width: '77%',
     backgroundColor: COLORS.white,
     paddingTop: 10,
     paddingHorizontal: 10,
     alignSelf: 'center',
     // bottom: -150,
-    top: 225,
     borderRadius: 6,
   },
   primaryColorText: {

@@ -11,7 +11,7 @@ import {requestLocationPermission} from '../../utils/RequestUserPermission';
 import {
   getMacAddress,
   ShowConsoleLogMessage,
-  Timezone,
+
 } from '../../utils/Utility';
 import moment from 'moment';
 import StoreCardView from './StoreCardView';
@@ -19,6 +19,8 @@ import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
 import {StoreSkeleton} from '../../utils/Skeleton';
+
+import TimeZone from 'react-native-timezone';
 
 const Store = ({
   navigation,
@@ -44,7 +46,7 @@ const Store = ({
   useEffect(() => {
     const permission = requestLocationPermission();
     setHaveLocationPermission(permission);
-    Timezone.getTimeZone().then(result => {
+    TimeZone.getTimeZone().then(result => {
       // console.log(result);
       setTimezone(result);
     });

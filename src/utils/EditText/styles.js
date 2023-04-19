@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 import {COLORS} from '../../constants/Colors';
 export default StyleSheet.create({
   wrapper: {
     height: 45,
     paddingHorizontal: 0,
-    marginTop: 5,
+   // marginTop: 5,
     backgroundColor: COLORS.white,
   },
   inputContainer: {
@@ -12,12 +12,13 @@ export default StyleSheet.create({
     paddingHorizontal: 5,
   },
   textInput: {
-    // flex: 1,
+    flex: 1,
     width: '100%',
     color: COLORS.black,
-    backgroundColor: COLORS.white,
+   // backgroundColor: COLORS.red,
     // paddingStart: 8,
     // paddingEnd: 15,
+  // marginBottom:Platform.OS=="android" ? 0:5
   },
   error: {
     color: COLORS.red,

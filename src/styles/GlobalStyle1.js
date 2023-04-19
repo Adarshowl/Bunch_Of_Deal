@@ -332,7 +332,7 @@ export default StyleSheet.create({
     marginTop: 10,
   },
   StoreBOX2: {
-    height: 65,
+    minHeight: 65,
     width: '94%',
     backgroundColor: COLORS.white,
     marginStart: 10,

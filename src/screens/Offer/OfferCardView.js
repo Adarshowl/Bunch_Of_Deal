@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {icons, images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
@@ -18,7 +19,7 @@ import {ShowConsoleLogMessage} from '../../utils/Utility';
 
 const OfferCardView = ({item}) => {
   const navigation = useNavigation();
-  // ShowConsoleLogMessage(item?.distance);
+  // ShowConsoleLogMessage(item);
   return (
     <TouchableOpacity
       style={styles.wrapper}
@@ -99,8 +100,8 @@ const OfferCardView = ({item}) => {
             marginTop: 2,
           }}>
           <BunchDealVectorIcon
-            title={Entypo}
-            name={'location-pin'}
+            title={MaterialCommunityIcons}
+            name={'storefront-outline'}
             color={COLORS.black}
             size={15}
             style={{}}
@@ -108,6 +109,34 @@ const OfferCardView = ({item}) => {
           />
           <Text style={[FONTS.body5, styles.dealName]} numberOfLines={1}>
             {item?.store_name}
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            // alignItems: 'center',
+            marginTop: 5,
+            flex: 1,
+          }}>
+          <BunchDealVectorIcon
+            title={Entypo}
+            name={'location-pin'}
+            color={COLORS.black}
+            size={15}
+            style={{
+              marginTop: 2,
+            }}
+            onPress={() => {}}
+          />
+          <Text
+            style={[
+              styles.dealName,
+              {
+                fontFamily: 'Montserrat-Regular',
+              },
+            ]}
+            numberOfLines={2}>
+            {item?.store_address || ''}
           </Text>
         </View>
       </View>
@@ -205,6 +234,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Regular',
     fontSize: 11,
     color: COLORS.black,
+    paddingVertical: 5,
   },
   dealPriceText: {
     marginEnd: 5,
@@ -218,5 +248,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Medium',
     fontSize: 12,
     color: COLORS.white,
+    paddingVertical: 5,
   },
 });

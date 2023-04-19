@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   ScrollView,
   Share,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -56,6 +57,18 @@ import RenderReviewItem from './RenderReviewItem';
 import RenderGalleryItem from './RenderGalleryItem';
 
 const StoreDetails = ({navigation, route}) => {
+  const isFocused = useIsFocused();
+
+  const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+    const paddingToBottom = 30;
+    return (
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom
+    );
+  };
+
+  const [showDown, setShowDown] = useState(false);
+
   const [changeOne, setChangeOne] = useState(true);
   const [changeTwo, setChangeTwo] = useState(false);
   const [changeThree, setChangeThree] = useState(false);
@@ -79,6 +92,26 @@ const StoreDetails = ({navigation, route}) => {
         } else {
           if (value !== null) {
             // ShowConsoleLogMessage(value);
+            setUserData(JSON.parse(value));
+          } else {
+          }
+        }
+      });
+    } catch (err) {
+      console.log('ERROR IN GETTING USER FROM STORAGE');
+    }
+  };
+
+  useEffect(() => {
+    getisFocusedUserFromStorage();
+  }, [isFocused]);
+
+  const getisFocusedUserFromStorage = async item => {
+    try {
+      await AsyncStorage.getItem('userData', (error, value) => {
+        if (error) {
+        } else {
+          if (value !== null) {
             setUserData(JSON.parse(value));
           } else {
           }
@@ -220,7 +253,6 @@ const StoreDetails = ({navigation, route}) => {
       })
       .finally(() => {});
   };
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     (async function () {
@@ -286,7 +318,7 @@ const StoreDetails = ({navigation, route}) => {
         }
       }
     })();
-  }, [isFocused]);
+  }, []);
 
   // 1. Define a function outside the component:
   const onViewableItemsChanged = info => {
@@ -427,43 +459,56 @@ const StoreDetails = ({navigation, route}) => {
                 backgroundColor: COLORS.black,
               },
             ]}>
-            <TouchableOpacity
-              onPress={() => {
-                // closeImageModal();
-              }}
-              activeOpacity={0.8}
+            <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                alignSelf: 'flex-start',
+                justifyContent: 'space-between',
               }}>
-              <AntDesign
-                name="close"
-                size={25}
-                color={COLORS.white}
+              <TouchableOpacity
+                onPress={() => {
+                  closeImageModal();
+                }}
+                activeOpacity={0.8}
                 style={{
                   marginHorizontal: 20,
-                  // marginTop: 60,
-                  opacity: 0.0,
-                }}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontSize: 18,
-                color: COLORS.white,
-                textAlign: 'center',
-                marginTop: 30,
-                fontFamily: 'Montserrat-Medium',
-              }}>
-              {images.length > 1 ? `${activeIndex}/${images.length}` : ''}
-            </Text>
+                }}>
+                <AntDesign
+                  name="close"
+                  size={25}
+                  color={COLORS.white}
+                  style={{
+                    marginTop: 60,
+                    //   opacity: 0.0,
+                  }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: COLORS.white,
+                  textAlign: 'center',
+                  marginTop: 60,
+                  fontFamily: 'Montserrat-Medium',
+                }}>
+                {images.length > 1 ? `${activeIndex}/${images.length}` : ''}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: COLORS.white,
+                  textAlign: 'center',
+                  marginTop: 60,
+                  fontFamily: 'Montserrat-Medium',
+                  marginHorizontal: 20,
+                }}></Text>
+            </View>
             <View
               style={{
                 marginBottom: 'auto',
                 marginTop: 'auto',
               }}>
-              {/* <FlatList
+              <FlatList
                 data={images}
                 ref={bigPhotoRef}
                 horizontal
@@ -483,7 +528,7 @@ const StoreDetails = ({navigation, route}) => {
                   });
                 }}
                 renderItem={renderBigPhotoItems}
-              /> */}
+              />
             </View>
           </View>
         </View>
@@ -515,7 +560,7 @@ const StoreDetails = ({navigation, route}) => {
             ]}>
             <TouchableOpacity
               onPress={() => {
-                // closeImageModal();
+                closeGalleryImageModal();
               }}
               activeOpacity={0.8}
               style={{
@@ -529,8 +574,8 @@ const StoreDetails = ({navigation, route}) => {
                 color={COLORS.white}
                 style={{
                   marginHorizontal: 20,
-                  // marginTop: 60,
-                  opacity: 0.0,
+                  paddingTop: 60,
+                  //opacity: 0.0,
                 }}
               />
             </TouchableOpacity>
@@ -572,7 +617,7 @@ const StoreDetails = ({navigation, route}) => {
     );
   };
   const openMap = () => {
-    const scheme = Platform.select({ios: 'maps:0,0?q=', android: 'geo:0,0?q='});
+    const scheme = Platform.select({ios: `maps:0,0?q=`, android: 'geo:0,0?q='});
     const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
     const label = receivedData?.name;
     // const label = 'Open Google Map';
@@ -934,7 +979,16 @@ const StoreDetails = ({navigation, route}) => {
     <SafeAreaView
       style={GlobalStyle1.mainContainerBgColor}
       showsVerticalScrollIndicator={false}>
-      <ScrollView nestedScrollEnabled={true}>
+      <ScrollView
+        nestedScrollEnabled={true}
+        onScroll={({nativeEvent}) => {
+          if (isCloseToBottom(nativeEvent)) {
+            setShowDown(true);
+          } else {
+            setShowDown(false);
+          }
+        }}
+        scrollEventThrottle={8}>
         <View style={{}}>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -949,6 +1003,54 @@ const StoreDetails = ({navigation, route}) => {
               source={imageUrl + ''}
               styles={GlobalStyle1.store_image}
             />
+            {/*<LinearGradient
+        colors={[ "#00000090","#00000090",COLORS.transparent]}
+        style={[{
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          height: 45,
+         backgroundColor: COLORS.transparent,
+          padding: 10,
+        position:'absolute'
+   
+        }]}>
+        <BunchDealVectorIcon
+          title={Ionicons}
+          name={'arrow-back'}
+          color={COLORS.colorAccent}
+          size={25}
+          style={{}}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          
+          }}>
+          <Entypofrom
+            name="share"
+            size={22}
+            color={COLORS.colorAccent}
+            style={{
+              marginHorizontal: 5,
+             
+            }}
+            onPress={() => {
+              onShare();
+            }}
+          />
+         
+        </View>
+       
+      </LinearGradient>
+          */}
+
             {/* <View
               style={[
                 GlobalStyle1.price,
@@ -1484,23 +1586,38 @@ const StoreDetails = ({navigation, route}) => {
             style={[
               GlobalStyle1.StoreBOX2,
               {
-                flexDirection: 'row',
-                alignItems: 'center',
                 paddingHorizontal: 10,
                 marginBottom: 15,
               },
             ]}>
-            <Ionicons
-              name="md-location-sharp"
-              size={18}
-              color={COLORS.colorAccent}
-              style={{}}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Ionicons
+                name="md-location-sharp"
+                size={18}
+                color={COLORS.colorAccent}
+                style={{}}
+              />
+              <Text
+                style={[
+                  FONTS.body4,
+                  {
+                    marginStart: 10,
+                    color: COLORS.black,
+                    flex: 1,
+                  },
+                ]}>
+                Store Location
+              </Text>
+            </View>
             <Text
               style={[
                 FONTS.body4,
                 {
-                  marginStart: 10,
                   color: 'grey',
                   flex: 1,
                 },
@@ -1540,39 +1657,45 @@ const StoreDetails = ({navigation, route}) => {
         </View>
       </ScrollView>
 
-      <LinearGradient
-        colors={['#00000090', '#00000090', COLORS.transparent]}
-        style={GlobalStyle.offerDetailToolBar}>
-        <BunchDealVectorIcon
-          title={Ionicons}
-          name={'arrow-back'}
-          color={COLORS.colorAccent}
-          size={25}
-          style={{}}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-        <View
-          style={{
-            flexGrow: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-          }}>
-          <Entypofrom
-            name="share"
-            size={22}
+      {!showDown ? (
+        <LinearGradient
+          colors={['#00000090', '#00000090', COLORS.transparent]}
+          style={[
+            GlobalStyle.offerDetailToolBar,
+            {
+              // top:StatusBar.currentHeight<=10 ? 45:StatusBar.currentHeight
+            },
+          ]}>
+          <BunchDealVectorIcon
+            title={Ionicons}
+            name={'arrow-back'}
             color={COLORS.colorAccent}
-            style={{
-              marginHorizontal: 5,
-              // marginHorizontal: 15,
-            }}
+            size={25}
+            style={{}}
             onPress={() => {
-              onShare();
+              navigation.goBack();
             }}
           />
-          {/* <FontAwesome
+          <View
+            style={{
+              flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+            <Entypofrom
+              name="share"
+              size={22}
+              color={COLORS.colorAccent}
+              style={{
+                marginHorizontal: 5,
+                // marginHorizontal: 15,
+              }}
+              onPress={() => {
+                onShare();
+              }}
+            />
+            {/* <FontAwesome
             name="heart-o"
             size={22}
             color={COLORS.colorAccent}
@@ -1583,9 +1706,63 @@ const StoreDetails = ({navigation, route}) => {
               doSaveOnline();
             }}
           /> */}
+          </View>
+          {/* </View> */}
+        </LinearGradient>
+      ) : (
+        <View
+          style={[
+            GlobalStyle.offerDetailToolBar,
+            {
+              // top:StatusBar.currentHeight<=10 ? 45:StatusBar.currentHeight
+              elevation: 10,
+              backgroundColor: COLORS.white,
+            },
+          ]}>
+          <BunchDealVectorIcon
+            title={Ionicons}
+            name={'arrow-back'}
+            color={COLORS.colorAccent}
+            size={25}
+            style={{}}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: 'Montserrat-Regular',
+              color: COLORS.colorAccent,
+              marginStart: 7,
+              marginEnd: 3,
+              flex: 1,
+            }}
+            numberOfLines={1}>
+            {receivedData?.name}
+          </Text>
+          <View
+            style={{
+              // flexGrow: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+            <Entypofrom
+              name="share"
+              size={22}
+              color={COLORS.colorAccent}
+              style={{
+                marginHorizontal: 5,
+                // marginHorizontal: 15,
+              }}
+              onPress={() => {
+                onShare();
+              }}
+            />
+          </View>
         </View>
-        {/* </View> */}
-      </LinearGradient>
+      )}
 
       {renderImageModal()}
       {renderGalleryImageModal()}

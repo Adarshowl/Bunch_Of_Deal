@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {WebView} from 'react-native-webview';
 import {COLORS} from '../../../constants/Colors';
@@ -13,7 +13,7 @@ const ForgotPassword = ({navigation, route}) => {
   const hideSpinner = () => setWebViewLoading(false);
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
       }}>
@@ -67,7 +67,7 @@ const ForgotPassword = ({navigation, route}) => {
         scalesPageToFit={true}
         style={{marginTop: 0, flex: 1}}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

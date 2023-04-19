@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -138,7 +139,7 @@ const UniversalSearch = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.white}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -177,6 +178,7 @@ const UniversalSearch = ({navigation}) => {
         style={{
           flexGrow: 1,
           height: '90%',
+          //backgroundColor:'red'
         }}>
         <BunchDealEditText
           borderBottomWidth={1}
@@ -187,6 +189,7 @@ const UniversalSearch = ({navigation}) => {
           onChangeText={val => {
             setSearchText(val);
           }}
+          height={60}
           returnKeyType={'search'}
           onSubmitEditing={() => {
             getSearchOfferList();
@@ -279,7 +282,7 @@ const UniversalSearch = ({navigation}) => {
           ) : null
         ) : null}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

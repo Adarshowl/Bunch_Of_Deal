@@ -378,7 +378,7 @@ export default StyleSheet.create({
   },
   AboutIcon: {
     height: 200,
-    width: '100%',
+    width: 200,
     alignSelf: 'center',
     resizeMode: 'center',
     marginTop: 40,

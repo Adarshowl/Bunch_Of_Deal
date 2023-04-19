@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity,SafeAreaView} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
@@ -132,7 +132,7 @@ const Category = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.white}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       <View
         style={[
           {
@@ -180,7 +180,7 @@ const Category = ({navigation}) => {
           <NoResult onReloadBtn={onReloadBtn} />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -189,7 +189,14 @@
 // code merge
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 import base64 from 'react-native-base64';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -379,7 +386,11 @@ const InvoiceList = ({navigation}) => {
         style={{
           backgroundColor: '#f7f7f7',
         }}>
-        <View
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            onItemClick(index);
+          }}
           style={{
             paddingVertical: 5,
             paddingHorizontal: 10,
@@ -450,11 +461,11 @@ const InvoiceList = ({navigation}) => {
               paddingVertical: 10,
               paddingHorizontal: 10,
             }}
-            onPress={() => {
-              onItemClick(index);
-            }}
+            // onPress={() => {
+            //   onItemClick(index);
+            // }}
           />
-        </View>
+        </TouchableOpacity>
         {item?.selected ? (
           <>
             <FlatList
@@ -508,7 +519,7 @@ const InvoiceList = ({navigation}) => {
   };
 
   return (
-    <View style={{backgroundColor: COLORS.white, flex: 1}}>
+    <SafeAreaView style={{backgroundColor: COLORS.white, flex: 1}}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -585,7 +596,7 @@ const InvoiceList = ({navigation}) => {
           <NoResult onReloadBtn={onReloadBtn} />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

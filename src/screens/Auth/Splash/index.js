@@ -103,7 +103,7 @@ const Splash = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.log('ERROR IN GET Notification List => ', error);
+        console.log('ERROR IN GET Notification List 1=> ', error);
       })
       .finally(() => {});
   };
@@ -126,7 +126,7 @@ const Splash = ({navigation}) => {
     })
       .then(async response => {
         console.log(
-          'ERROR IN GET Notification List => ',
+          'ERROR IN GET Notification List 2 => ',
           JSON.stringify(response),
         );
 
@@ -136,13 +136,13 @@ const Splash = ({navigation}) => {
             deviceId: deviceId,
             token: response?.data?.token,
           };
-          ShowConsoleLogMessage(JSON.stringify(toSave));
+          //   ShowConsoleLogMessage(JSON.stringify(toSave));
           await AsyncStorage.setItem(STRING.initConfig, JSON.stringify(toSave));
         } else {
         }
       })
       .catch(error => {
-        console.log('ERROR IN GET Notification List => ', error);
+        console.log('ERROR IN GET Notification List 3 => ', error);
       })
       .finally(() => {});
   };

@@ -63,7 +63,7 @@ const Notification = ({navigation}) => {
     })
       .then(response => {
         console.log(
-          'ERROR IN GET Notification List res=> ',
+          'ERROR IN GET Notification List 4 res=> ',
           JSON.stringify(response),
         );
 
@@ -82,7 +82,7 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.log('ERROR IN GET Notification List => ', error);
+        console.log('ERROR IN GET Notification List 5=> ', error);
         setShowError(true);
         setListData([]);
       })
@@ -112,7 +112,7 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.log('ERROR IN GET Notification List => ', error);
+        console.log('ERROR IN GET Notification List 6=> ', error);
       })
       .finally(() => {
         // setLoading(false);
@@ -129,7 +129,7 @@ const Notification = ({navigation}) => {
     })
       .then(response => {
         console.log(
-          'ERROR IN GET Notification List => ',
+          'ERROR IN GET Notification List 7=> ',
           JSON.stringify(response),
         );
         if (response?.data?.success == 1) {
@@ -139,7 +139,7 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.log('ERROR IN GET Notification List => ', error);
+        console.log('ERROR IN GET Notification List 8 => ', error);
       })
       .finally(() => {
         // setLoading(false);
@@ -156,7 +156,7 @@ const Notification = ({navigation}) => {
     })
       .then(response => {
         console.log(
-          'ERROR IN GET Notification List => ',
+          'ERROR IN GET Notification List 9=> ',
           JSON.stringify(response),
         );
 
@@ -167,7 +167,7 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
-        console.log('ERROR IN GET Notification List => ', error);
+        console.log('ERROR IN GET Notification List 10=> ', error);
       })
       .finally(() => {
         setLoading(false);
@@ -375,8 +375,9 @@ const Notification = ({navigation}) => {
                   marginTop: 200,
                   fontSize: 18,
                   fontFamily: 'Montserrat-Medium',
+                  color: 'grey',
                 }}>
-                No Data Found
+                {loading && listData?.length == 0 ? 'No Data Found' : ''}
               </Text>
             );
           }}

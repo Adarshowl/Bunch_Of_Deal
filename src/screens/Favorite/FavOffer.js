@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View,SafeAreaView} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
@@ -89,7 +89,7 @@ const FavOffer = ({navigation}) => {
   };
 
   return (
-    <View style={{backgroundColor: COLORS.white, flex: 1}}>
+    <SafeAreaView style={{backgroundColor: COLORS.backgroundColor, flex: 1}}>
       <View
         style={[
           GlobalStyle2.headerFooterStyle,
@@ -174,7 +174,7 @@ const FavOffer = ({navigation}) => {
         </View>
       )}
       {/* <NoResult onReloadBtn={onReloadBtn} /> */}
-    </View>
+    </SafeAreaView>
   );
 };
 

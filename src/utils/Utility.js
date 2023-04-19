@@ -71,15 +71,15 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-const Timezone = NativeModules.Timezone
-  ? NativeModules.Timezone
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      },
-    );
+//const Timezone = NativeModules.Timezone
+//? NativeModules.Timezone
+ // : new Proxy(
+   //   {},
+   //   {
+   //     get() {
+   //       throw new Error(LINKING_ERROR);
+   //     },
+   //   },
+   // );
 
-export {Timezone};
+//export {Timezone};

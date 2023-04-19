@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
 import {AirbnbRating} from 'react-native-elements';
@@ -23,11 +24,14 @@ import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowConsoleLogMessage, Timezone} from '../../utils/Utility';
+import {ShowConsoleLogMessage,} from '../../utils/Utility';
 import {FlatList} from 'react-native';
 import SearchDialog from '../Search';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
+import TimeZone from 'react-native-timezone';
+
+
 var {width, height} = Dimensions.get('window');
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -35,6 +39,8 @@ const ASPECT_RATIO = windowWidth / windowHeight;
 const LATITUDE_DELTA = 0.9222;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const apiKey = 'AIzaSyCIcyfvlmMVSAxxvPTASWasIN8ncskIj0w';
+
+
 
 const GeoStore = ({navigation}) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -144,7 +150,7 @@ const GeoStore = ({navigation}) => {
       }
     };
     requestLocationPermission();
-    Timezone.getTimeZone().then(result => {
+    TimeZone.getTimeZone().then(result => {
       setTimezone(result);
     });
   }, []);
@@ -157,7 +163,9 @@ const GeoStore = ({navigation}) => {
     if (latitude && longitude) {
       setTimeout(() => {
         // markerRef.current.animateMarkerToCoordinate(newCoord, 7000);
+        if (Platform.OS == 'android') {
         markerRef?.current?.animateMarkerToCoordinate(newCoord, 7000);
+        }
       }, 2000);
     }
 
@@ -416,7 +424,7 @@ const GeoStore = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.white}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
       <View
         style={{
           height: 56,
@@ -552,22 +560,15 @@ const GeoStore = ({navigation}) => {
           region={mapRegion}></MapView>
       </View> */}
       <View>
-        <MapView
+      <MapView
           ref={mapRef}
           style={{
-            width: Dimensions.get('screen').width,
+                        width: Dimensions.get('screen').width,
             height: Dimensions.get('screen').height - 100,
-          }}
-          pointerEvents="none"
-          loadingEnabled
-          region={mapRegion}
-          pitchEnabled={true}
-          rotateEnabled={true}
-          scrollEnabled={true}
-          zoomEnabled={true}
-          minZoomLevel={0} // default => 0
-          maxZoomLevel={20} // default => 20
-          onMapReady={() => {}}>
+                      }}
+        
+          
+         >
           {recentData &&
             recentData.map(item => (
               <Marker
@@ -659,7 +660,7 @@ const GeoStore = ({navigation}) => {
         onChangeLocation={closePlacePickModal}
         show={showPlaceChooseModal}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -10,7 +10,8 @@ export const one_splash_gif = require('../assets/images/one_splash_gif.gif');
 export const profile_placeholder = require('../assets/images/profile_placeholder.png');
 export const navigation_icon_bg = require('../assets/images/navigation_icon_bg.png');
 export const splash_new_beta = require('../assets/images/splash_new_beta.png');
-
+export const fb_logo = require('../assets/images/fb_logo.png');
+export const google_btn = require('../assets/images/google_btn.png');
 export const intro_1 = require('../assets/images/intro/intro_1.png');
 export const intro_2 = require('../assets/images/intro/intro_2.png');
 export const intro_3 = require('../assets/images/intro/intro_3.png');
@@ -43,4 +44,6 @@ export default {
   intro_2,
   intro_1,
   def_logo,
+  google_btn,
+  fb_logo,
 };

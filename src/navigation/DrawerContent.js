@@ -82,12 +82,13 @@ const DrawerContent = ({navigation, props}) => {
       await GoogleSignin.signOut();
 
       // Remember to remove the user from your app's state as well
-      navigation.replace('Auth', {
-        screen: 'Login',
-        params: {
-          screen: 'Login',
-        },
-      });
+      // navigation.replace('Auth', {
+      //   screen: 'Login',
+      //   params: {
+      //     screen: 'Login',
+      //   },
+      // });
+      navigation.replace('MainContainer');
     } catch (error) {
       console.error(error);
     }

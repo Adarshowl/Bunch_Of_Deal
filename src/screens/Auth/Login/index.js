@@ -176,12 +176,22 @@ import {
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {AccessToken, LoginManager} from 'react-native-fbsdk';
+//apple login
+
+// import appleAuth, {
+//   AppleAuthCredentialState,
+//   AppleAuthRequestOperation,
+//   AppleAuthRequestScope,
+//   AppleButton,
+// } from "@invertase/react-native-apple-authentication";
 
 // import {LoginButton, AccessToken} from 'react-native-fbsdk';
 GoogleSignin.configure({
@@ -201,6 +211,116 @@ const Login = ({navigation}) => {
   const closeFilterModal = () => {
     setShowFilterModal(!showFilterModal);
   };
+
+  /** fb login start */
+  async function fbSignIn() {
+    try {
+      // Login the User and get his public profile and email id.
+      const result = await LoginManager.logInWithPermissions([
+        'public_profile',
+        'email',
+      ]);
+      ShowConsoleLogMessage('fb result -> ' + JSON.stringify(result));
+
+      // If the user cancels the login process, the result will have a
+      // isCancelled boolean set to true. We can use that to break out of this function.
+      if (result.isCancelled) {
+        throw 'User cancelled the login process';
+      }
+
+      // Get the Access Token
+      const data = await AccessToken.getCurrentAccessToken();
+      ShowConsoleLogMessage('fb data -> ' + JSON.stringify(data));
+      // If we don't get the access token, then something has went wrong.
+      if (!data) {
+        throw 'Something went wrong obtaining access token';
+      }
+
+      // Use the Access Token to create a facebook credential.
+      const facebookCredential = auth.FacebookAuthProvider.credential(
+        data.accessToken,
+      );
+      ShowConsoleLogMessage(
+        'fb facebookCredential -> ' + JSON.stringify(facebookCredential),
+      );
+
+      // Use the facebook credential to sign in to the application.
+      return auth()
+        .signInWithCredential(facebookCredential)
+        .then(response => {
+          ShowConsoleLogMessage(
+            'login fb response -> ' + JSON.stringify(response),
+          );
+          handleFbLogin(response);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  const handleFbLogin = response => {
+    let googleImage =
+      response?.additionalUserInfo?.profile?.picture?.data?.url + '';
+    let body = {
+      email: response?.additionalUserInfo?.profile?.email,
+      name: response?.additionalUserInfo?.profile?.name,
+      username: response?.additionalUserInfo?.profile?.name,
+      telephone: '',
+      social_type: 'Facebook',
+      guest_id: '1',
+      lng: '1234',
+      lat: '123',
+      mac_adr: '02.00:00:00:00',
+      images: response?.additionalUserInfo?.profile?.picture?.data?.url,
+      password: '',
+    };
+
+    console.log('response -> ' + JSON.stringify(body));
+
+    ApiCall('post', body, API_END_POINTS.API_FACEBOOK_SIGNUP, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        console.log(JSON.stringify(response), 'google ');
+
+        if (response?.data?.status == true) {
+          ShowToastMessage('Login successful');
+          setLoading(false);
+          let arr = [];
+          arr.push(response?.data?.data);
+          for (let i = 0; i < arr.length; i++) {
+            // console.log(arr[i]['0']?.images['0']['560_560']?.url);
+            AsyncStorage.setItem('userData', JSON.stringify(arr[i]));
+            // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
+
+            AsyncStorage.setItem(STRING.userEmail, arr[i]?.email);
+            if (googleImage != null || '') {
+              AsyncStorage.setItem('userImage', googleImage || '');
+            }
+            // console.log(googleImage + ' imatgwe profile  ');
+            uploadImage(arr[i]?.id_user, googleImage);
+          }
+          // console.log(arr.length);
+          // console.log(JSON.stringify(response));
+          navigation.navigate('MainContainer');
+        } else {
+          ShowToastMessage('Login failed');
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  /** fb login end */
 
   const renderFilterModal = () => {
     return (
@@ -396,6 +516,47 @@ const Login = ({navigation}) => {
   //   }
   // };
 
+  const onAppleButtonPress = async () => {
+    try {
+      // Make a request to apple.
+      // const appleAuthRequestResponse = await appleAuth.performRequest({
+      //requestedOperation: AppleAuthRequestOperation.LOGIN,
+      //   requestedScopes: [
+      //      AppleAuthRequestScope.EMAIL,
+      //      AppleAuthRequestScope.FULL_NAME,
+      //    ],
+      //   });
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: 1,
+        requestedScopes: [0, 1],
+      });
+
+      // Get the credential for the user.
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      // If the Auth is authorized, we call our API and pass the authorization code.
+      //    if (credentialState === AppleAuthCredentialState.AUTHORIZED) {
+      if (credentialState === 1) {
+        console.log(
+          'apple login -> ',
+          appleAuthRequestResponse.authorizationCode,
+        );
+
+        // Axios.post("http://172.20.10.9:3000/auth/apple", {
+        // token: appleAuthRequestResponse.authorizationCode,
+        //  }).then((res) => {
+        //   if (res?.data?.user) {
+        ////     Alert.alert('Number of connections: ' + res.data.user.nbOfConnections.toString());
+        // }
+        // });
+      }
+    } catch (error) {
+      ShowConsoleLogMessage('error in aple login -> ' + error);
+    }
+  };
+
   const onCreateAccountClick = () => {
     navigation.navigate('SignUp');
   };
@@ -441,7 +602,7 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+    <KeyboardAwareScrollView style={GlobalStyle.mainContainerBgColor}>
       <View style={GlobalStyle.nav_bg}>
         <Image
           source={images.navigation_icon_bg}
@@ -452,8 +613,33 @@ const Login = ({navigation}) => {
           style={GlobalStyle.loginAppIcon}
         />
       </View>
+      <Ionicons
+        onPress={() => {
+          navigation.goBack();
+        }}
+        marginStart={10}
+        color={COLORS.black}
+        name="ios-arrow-back-sharp"
+        size={25}
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 2,
+          backgroundColor: COLORS.white,
+          paddingVertical: 5,
+          paddingHorizontal: 10,
+          borderRadius: 50,
+        }}
+      />
       <BunchDealProgressBar loading={loading} />
-      <View style={GlobalStyle.loginCard}>
+      <View
+        style={[
+          GlobalStyle.loginCard,
+          {
+            position: 'relative',
+            bottom: 100,
+          },
+        ]}>
         <BunchDealEditText
           borderBottomWidth={1}
           placeholder={STRING.email_username}
@@ -491,36 +677,56 @@ const Login = ({navigation}) => {
         </Text>
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: 'column',
             justifyContent: 'space-around',
+            alignItems: 'center',
+            marginTop: 15,
           }}>
-          {/* <Image
-            style={GlobalStyle.facebookIcon}
-            source={{
-              uri: 'https://neilpatel.com/wp-content/uploads/2019/06/facebook.png',
-            }}
-          /> */}
+          {/* <AppleButton 
+        buttonStyle={AppleButton.Style.BLACK}
+        buttonType={AppleButton.Type.SIGN_IN}
+        style={{
+          height:45,
+          width:"80%"
+
+        }}
+        onPress={()=>onAppleButtonPress()}
+        /> */}
+
           <TouchableOpacity
             style={{
-              height: 30,
-              width: 90,
-              top: 5,
-              backgroundColor: 'royalblue',
+              height: 45,
+              width: '80%',
+              // top: 5,
+              // backgroundColor: COLORS.red,
               justifyContent: 'center',
               alignItems: 'center',
+              marginTop: 15,
             }}
-            // onPress={onFbLogin}
-          >
-            <Text style={[FONTS.h6, {color: COLORS.white}]}>facebook</Text>
+            onPress={() => {
+              fbSignIn();
+            }}>
+            {/* <Text style={[FONTS.h6, {color: COLORS.white}]}>Google +</Text>*/}
+            <Image
+              source={images.fb_logo}
+              style={{
+                width: '100%',
+
+                flex: 1,
+                resizeMode: 'cover',
+              }}
+            />
           </TouchableOpacity>
+
           <TouchableOpacity
             style={{
-              height: 30,
-              width: 90,
-              top: 5,
-              backgroundColor: COLORS.red,
+              height: 45,
+              width: '80%',
+              // top: 5,
+              // backgroundColor: COLORS.red,
               justifyContent: 'center',
               alignItems: 'center',
+              marginTop: 15,
             }}
             onPress={() => {
               onGoogleButtonPress()
@@ -593,7 +799,16 @@ const Login = ({navigation}) => {
                   console.log('response -> ' + JSON.stringify(error));
                 });
             }}>
-            <Text style={[FONTS.h6, {color: COLORS.white}]}>Google +</Text>
+            {/* <Text style={[FONTS.h6, {color: COLORS.white}]}>Google +</Text>*/}
+            <Image
+              source={images.google_btn}
+              style={{
+                width: '100%',
+
+                flex: 1,
+                resizeMode: 'cover',
+              }}
+            />
           </TouchableOpacity>
 
           {/* <GoogleSigninButton
@@ -645,7 +860,7 @@ const Login = ({navigation}) => {
         />
       </View>
       {renderFilterModal()}
-    </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 };
 

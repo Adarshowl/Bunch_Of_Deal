@@ -1,16 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {Rating, AirbnbRating} from 'react-native-elements';
-import {images, STRING} from '../../constants';
+import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {AirbnbRating} from 'react-native-elements';
+import TimeZone from 'react-native-timezone';
+import {STRING, images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS, SIZES} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
@@ -19,14 +13,11 @@ import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
-import {
-  ShowConsoleLogMessage,
-  ShowToastMessage,
-  Timezone,
-} from '../../utils/Utility';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+
 const StoreReview = props => {
   useEffect(() => {
-    Timezone.getTimeZone().then(result => {
+    TimeZone.getTimeZone().then(result => {
       setTimezone(result);
     });
     getReviewList('rest');
@@ -58,7 +49,7 @@ const StoreReview = props => {
   };
 
   useEffect(() => {
-    Timezone.getTimeZone().then(result => {
+    TimeZone.getTimeZone().then(result => {
       setTimezone(result);
     });
     getReviewList('rest');
