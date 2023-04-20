@@ -1,5 +1,7 @@
 package com.bunch.of.deals;
 
+// import com.smarkets.paypal.RNPaypalPackage;
+
 import android.app.Application;
 
 import com.bunchofdeals.ReactNativeFlipper;
@@ -28,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           // packages.add(new TimezonePackage());
+        //  packages.add(new RNPaypalPackage());
 
           return packages;
         }
@@ -63,4 +66,11 @@ public class MainApplication extends Application implements ReactApplication {
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
+
+// new method added for paypal
+// @Override    
+// public boolean canOverrideExistingModule() {        
+//   return true;    
+// }  
+
 }

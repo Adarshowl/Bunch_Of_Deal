@@ -215,6 +215,7 @@ const Login = ({navigation}) => {
   /** fb login start */
   async function fbSignIn() {
     try {
+      // LoginManager.logOut();
       // Login the User and get his public profile and email id.
       const result = await LoginManager.logInWithPermissions([
         'public_profile',
@@ -255,69 +256,84 @@ const Login = ({navigation}) => {
         })
         .catch(error => {
           console.log(error);
+          ShowToastMessage(
+            'Something went wrong. Please try different login option.',
+          );
         });
     } catch (error) {
-      alert(error);
+      ShowToastMessage(
+        'Something went wrong. Please try different login option.',
+      );
+      // alert(error);
     }
   }
 
   const handleFbLogin = response => {
-    let googleImage =
-      response?.additionalUserInfo?.profile?.picture?.data?.url + '';
-    let body = {
-      email: response?.additionalUserInfo?.profile?.email,
-      name: response?.additionalUserInfo?.profile?.name,
-      username: response?.additionalUserInfo?.profile?.name,
-      telephone: '',
-      social_type: 'Facebook',
-      guest_id: '1',
-      lng: '1234',
-      lat: '123',
-      mac_adr: '02.00:00:00:00',
-      images: response?.additionalUserInfo?.profile?.picture?.data?.url,
-      password: '',
-    };
+    try {
+      let googleImage =
+        response?.additionalUserInfo?.profile?.picture?.data?.url + '';
+      let body = {
+        email: response?.additionalUserInfo?.profile?.email,
+        name: response?.additionalUserInfo?.profile?.name,
+        username: response?.additionalUserInfo?.profile?.name,
+        telephone: '',
+        social_type: 'Facebook',
+        guest_id: '1',
+        lng: '1234',
+        lat: '123',
+        mac_adr: '02.00:00:00:00',
+        images: response?.additionalUserInfo?.profile?.picture?.data?.url,
+        password: '',
+      };
 
-    console.log('response -> ' + JSON.stringify(body));
+      console.log('response -> ' + JSON.stringify(body));
 
-    ApiCall('post', body, API_END_POINTS.API_FACEBOOK_SIGNUP, {
-      Accept: 'application/json',
-      'Content-Type': 'multipart/form-data',
-    })
-      .then(response => {
-        console.log(JSON.stringify(response), 'google ');
+      ApiCall('post', body, API_END_POINTS.API_FACEBOOK_SIGNUP, {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      })
+        .then(response => {
+          console.log(JSON.stringify(response), 'google ');
 
-        if (response?.data?.status == true) {
-          ShowToastMessage('Login successful');
-          setLoading(false);
-          let arr = [];
-          arr.push(response?.data?.data);
-          for (let i = 0; i < arr.length; i++) {
-            // console.log(arr[i]['0']?.images['0']['560_560']?.url);
-            AsyncStorage.setItem('userData', JSON.stringify(arr[i]));
-            // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
+          if (response?.data?.status == true) {
+            ShowToastMessage('Login successful');
+            setLoading(false);
+            let arr = [];
+            arr.push(response?.data?.data);
+            for (let i = 0; i < arr?.length; i++) {
+              // console.log(arr[i]['0']?.images['0']['560_560']?.url);
+              AsyncStorage.setItem('userData', JSON.stringify(arr[i]));
+              // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
 
-            AsyncStorage.setItem(STRING.userEmail, arr[i]?.email);
-            if (googleImage != null || '') {
-              AsyncStorage.setItem('userImage', googleImage || '');
+              AsyncStorage.setItem(STRING.userEmail, arr[i]?.email + '');
+              if (googleImage != null || '') {
+                AsyncStorage.setItem('userImage', googleImage + '' || '');
+              }
+              // console.log(googleImage + ' imatgwe profile  ');
+              uploadImage(arr[i]?.id_user, googleImage);
             }
-            // console.log(googleImage + ' imatgwe profile  ');
-            uploadImage(arr[i]?.id_user, googleImage);
+            // console.log(arr.length);
+            // console.log(JSON.stringify(response));
+            navigation.navigate('MainContainer');
+          } else {
+            ShowToastMessage('Login failed');
+            setLoading(false);
           }
-          // console.log(arr.length);
-          // console.log(JSON.stringify(response));
-          navigation.navigate('MainContainer');
-        } else {
-          ShowToastMessage('Login failed');
+        })
+        .catch(() => {
           setLoading(false);
-        }
-      })
-      .catch(() => {
-        setLoading(false);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+          ShowToastMessage(
+            'Something went wrong. Please try different login option.',
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      ShowToastMessage(
+        'Something went wrong. Please try different login option.',
+      );
+    }
   };
 
   /** fb login end */
@@ -439,7 +455,7 @@ const Login = ({navigation}) => {
                 // console.log(arr[i]['0']?.images['0']['560_560']?.url);
                 AsyncStorage.setItem('userData', JSON.stringify(arr[i]['0']));
 
-                AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email);
+                AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email + '');
                 if (arr[i]['0']?.images != null || undefined) {
                   AsyncStorage.setItem(
                     'userImage',
@@ -454,7 +470,7 @@ const Login = ({navigation}) => {
               navigation.replace('MainContainer');
             } catch (error) {
               AsyncStorage.setItem('userData', JSON.stringify(arr[0]['0']));
-              AsyncStorage.setItem(STRING.userEmail, arr[0]['0']?.email);
+              AsyncStorage.setItem(STRING.userEmail, arr[0]['0']?.email + '');
               navigation.replace('MainContainer');
             }
           } else {
@@ -768,7 +784,10 @@ const Login = ({navigation}) => {
                           );
                           // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
 
-                          AsyncStorage.setItem(STRING.userEmail, arr[i]?.email);
+                          AsyncStorage.setItem(
+                            STRING.userEmail,
+                            arr[i]?.email + '',
+                          );
                           if (googleImage != null || '') {
                             AsyncStorage.setItem(
                               'userImage',

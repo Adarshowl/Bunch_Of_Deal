@@ -42,6 +42,11 @@ const Account = ({navigation}) => {
             setUserId(JSON.parse(value).id_user);
             setName(JSON.parse(value).name);
             setEmail(JSON.parse(value).email);
+            if (JSON.parse(value).email != null || '') {
+              setEmailAvailable(false);
+            } else {
+              setEmailAvailable(true);
+            }
             setMobile(JSON.parse(value).telephone);
             setPassword(JSON.parse(value).password + '');
           } else {
@@ -66,6 +71,7 @@ const Account = ({navigation}) => {
   };
 
   const [email, setEmail] = useState('');
+  const [emailAvailable, setEmailAvailable] = useState(false);
   const [fullName, setFullName] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -147,7 +153,7 @@ const Account = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        ShowConsoleLogMessage(response);
+        // ShowConsoleLogMessage(response);
         if (response?.data?.status == true) {
         } else {
         }
@@ -166,13 +172,13 @@ const Account = ({navigation}) => {
       // password: password,
       username: fullName,
       email: email,
-      oldUsername: userData?.username,
+      oldUsername: userData?.username || fullName,
       name: name,
       mobile: mobile,
       phone: mobile,
       telephone: mobile,
       user_id: userId,
-      images: image,
+      // images: image,
       lng: '0',
       lat: '0',
       mac_adr: '02.00:00:00:00',
@@ -305,12 +311,15 @@ const Account = ({navigation}) => {
           <BunchDealEditText
             borderBottomWidth={1}
             placeholder={STRING.email}
-            style={[FONTS.body3, {color: COLORS.lightGrey}]}
-            value={userData?.email}
+            style={[
+              FONTS.body3,
+              {color: emailAvailable ? COLORS.black : COLORS.lightGrey},
+            ]}
+            value={email}
             onChangeText={val => {
               setEmail(val);
             }}
-            editable={false}
+            editable={emailAvailable}
             backgroundColor={COLORS.backgroundColor}
           />
           <BunchDealEditText

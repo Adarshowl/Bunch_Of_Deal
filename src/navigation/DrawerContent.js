@@ -27,6 +27,9 @@ import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import {LoginManager} from 'react-native-fbsdk';
+import Realm from 'realm';
+import {clearRealm} from '../utils/RealmUtility';
 const DrawerContent = ({navigation, props}) => {
   const [userData, setUserData] = useState({});
   const [image, setImage] = useState('');
@@ -80,7 +83,8 @@ const DrawerContent = ({navigation, props}) => {
   const signOut = async () => {
     try {
       await GoogleSignin.signOut();
-
+      await LoginManager.logOut();
+      await clearRealm();
       // Remember to remove the user from your app's state as well
       // navigation.replace('Auth', {
       //   screen: 'Login',
@@ -97,6 +101,15 @@ const DrawerContent = ({navigation, props}) => {
     AsyncStorage.clear().then(() => console.log('Cleared'));
     isSignedIn() ? signOut() : ShowToastMessage('Logout Failed');
   };
+
+  // const clearRealm = () => {
+  //   Realm.open(saveFormDatabaseOptions).then(realm => {
+  //     realm.write(() => {
+  //       const allEvents = realm.objects(SAVE_FORM_SCHEMA);
+  //       realm.delete(allEvents); // Deletes all records
+  //     });
+  //   });
+  // };
 
   return (
     <SafeAreaView

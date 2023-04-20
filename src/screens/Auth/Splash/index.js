@@ -9,6 +9,7 @@ import {API_END_POINTS} from '../../../network/ApiEndPoints';
 import GlobalStyle from '../../../styles/GlobalStyle';
 import {ShowConsoleLogMessage} from '../../../utils/Utility';
 import {COLORS} from '../../../constants/Colors';
+import {clearRealm} from '../../../utils/RealmUtility';
 const Splash = ({navigation}) => {
   useEffect(() => {
     // navigation.replace('MainContainer');
@@ -82,7 +83,7 @@ const Splash = ({navigation}) => {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
-      .then(response => {
+      .then(async response => {
         // console.log(
         //   'ERROR IN GET Notification List => ',
         //   JSON.stringify(response),
@@ -98,6 +99,9 @@ const Splash = ({navigation}) => {
           response.data?.success == 0 ||
           response.data?.success == -1
         ) {
+          AsyncStorage.clear();
+          await clearRealm();
+
           Alert.alert('Logout !', STRING.logoutMessage);
           navigation.replace('OnBoarding');
         }

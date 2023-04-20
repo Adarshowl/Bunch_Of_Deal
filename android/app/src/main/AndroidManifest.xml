@@ -35,6 +35,12 @@
 
         </intent-filter>
       </activity>
+
+      <!-- <activity 
+      android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
+      android:exported="false"
+      ></activity> -->
+
     <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCIcyfvlmMVSAxxvPTASWasIN8ncskIj0w" />

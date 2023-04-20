@@ -198,3 +198,25 @@ export let isStoreReviewSaved = async id => {
   });
   return isAvail;
 };
+
+export let clearRealm = async () => {
+  await Realm.open(saveOfferDatabaseOptions).then(realm => {
+    realm.write(() => {
+      const allEvents = realm.objects(SAVE_OFFER_SCHEMA);
+      realm.delete(allEvents);
+    });
+  });
+  await Realm.open(saveStoreDatabaseOptions).then(realm => {
+    realm.write(() => {
+      const allEvents = realm.objects(SAVE_STORE_SCHEMA);
+      realm.delete(allEvents);
+    });
+  });
+
+  await Realm.open(saveStoreReviewDatabaseOptions).then(realm => {
+    realm.write(() => {
+      const allEvents = realm.objects(SAVE_STORE_REVIEW_SCHEMA);
+      realm.delete(allEvents);
+    });
+  });
+};

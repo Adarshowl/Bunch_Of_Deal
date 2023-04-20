@@ -25,6 +25,19 @@ import moment from 'moment';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import {FONTS} from '../../constants/themes';
 
+// import PayPal from 'react-native-paypal-gateway';
+// PayPal.initialize(
+//   // PayPal.NO_NETWORK,
+//   PayPal.SANDBOX,
+//   'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM',
+// );
+import {requestOneTimePayment} from 'react-native-paypal';
+
+const TEST_PAYPAL_KEY =
+  'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM';
+const LIVE_PAYPAL_KEY =
+  'AQNVRTj2GQT-m_NITEuxE1rz35-QvsUwHlj2vHLdk35JU8rYhnYnQ5lJNRvDQMYiSq6DmFO3ibrnu7ls';
+
 const Order = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(false);
   const [showDone, setShowDone] = useState(false);
@@ -126,7 +139,8 @@ const Order = ({navigation, route}) => {
         style={{
           flexDirection: 'row',
           padding: 15,
-          margin: 15,
+          marginHorizontal: 15,
+          marginTop: 15,
           borderRadius: 6,
           borderWidth: 1,
           borderColor: item?.selected ? COLORS.lightGreen : COLORS.grey_20,
@@ -249,32 +263,144 @@ const Order = ({navigation, route}) => {
       .finally(() => {
         setLoading(false);
       });
-    // fetch(API_END_POINTS.API_ORDERS_CREATE_COD, {
-    //   method: 'POST',
-    //   body: body,
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //     // 'Content-Type': 'application/json',
-    //   },
+  };
+
+  const createPaypalOrderApi = paymentId => {
+    setLoading(true);
+    let c = [];
+    c.push();
+    let body = {
+      user_id: userData?.id_user,
+      seller_id: receivedData?.id_offer,
+      module: 'store',
+      module_id: receivedData?.store_id,
+      fcm_id: 'fcm_token',
+      req_cf_data: JSON.stringify({
+        'Full Name': userData?.name,
+        'Phone Number': userData?.telephone,
+      }),
+      payment_method: selectedPayment?.id,
+      user_token: userData?.token,
+      cart: [
+        {
+          module: 'offer',
+          module_id: parseInt(receivedData?.id_offer),
+          qty: parseInt(count),
+          amount: price + '.0',
+        },
+      ],
+    };
+
+    ShowConsoleLogMessage('createPaypalOrderApi => ' + JSON.stringify(body));
+
+    ApiCall('post', body, API_END_POINTS.API_ORDERS_CREATE, {
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        let da = response?.data?.split(':')[1];
+
+        ShowConsoleLogMessage(
+          'response -> ' + response?.data?.split(',')[1]?.split(':')[1],
+        );
+        // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
+        if (da.split(',')[0] == 1) {
+          setShowDone(true);
+          setOfferDateTime(moment().format('LLL'));
+          setOfferId(response?.data?.split(',')[1]?.split(':')[1] + '');
+          updatePaypalOrderApi(
+            response?.data?.split(',')[1]?.split(':')[1] + '',
+            paymentId,
+          );
+        } else {
+          ShowToastMessage('Something went wrong');
+          setSelectedPayment(null);
+          getPaymentGatewayList();
+        }
+      })
+      .catch(error => {
+        ShowToastMessage('Something went wrong');
+        setSelectedPayment(null);
+        getPaymentGatewayList();
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const updatePaypalOrderApi = (orderId, paymentId) => {
+    setLoading(true);
+
+    let body = {
+      order_id: orderId,
+      payment_token: paymentId,
+    };
+
+    ShowConsoleLogMessage('updatePaypalOrderApi => ' + JSON.stringify(body));
+
+    ApiCall('post', body, API_END_POINTS.UPDATE_STATUS_API, {
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        ShowConsoleLogMessage('response -> ' + JSON.stringify(response?.data));
+        // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
+        if (da.split(',')[0] == 1) {
+        } else {
+          ShowToastMessage('Something went wrong');
+          setSelectedPayment(null);
+          getPaymentGatewayList();
+        }
+      })
+      .catch(error => {
+        ShowToastMessage('Something went wrong');
+        setSelectedPayment(null);
+        getPaymentGatewayList();
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const submitPaypalPayment = async () => {
+    // PayPal.pay({
+    //   price: price + '.0',
+    //   currency: 'AUD',
+    //   description: receivedData?.name + '',
     // })
-    //   .then(response => {
-    //     ShowConsoleLogMessage('response -> ' + JSON.stringify(response));
-    //     if (response?.data?.success == 1) {
-    //       setShowDone(true);
-    //     } else {
-    //       ShowToastMessage('Something went wrong');
-    //       setSelectedPayment(null);
-    //       getPaymentGatewayList();
+    //   .then(confirm => {
+    //     console.log('confirm -> ', confirm?.response?.state);
+    //     if (confirm?.response?.state == 'approved') {
+    //       createPaypalOrderApi(confirm?.response?.id);
     //     }
     //   })
-    //   .catch(error => {
-    //     ShowToastMessage('Something went wrong');
-    //     setSelectedPayment(null);
-    //     getPaymentGatewayList();
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
+    //   .catch(error => console.log('error -> ' + error));
+
+    // For one time payments
+    const {nonce, payerId, email, firstName, lastName, phone} =
+      await requestOneTimePayment(TEST_PAYPAL_KEY, {
+        amount: '1', // required
+        // any PayPal supported currency (see here: https://developer.paypal.com/docs/integration/direct/rest/currency-codes/#paypal-account-payments)
+        currency: 'AUD',
+        // any PayPal supported locale (see here: https://braintree.github.io/braintree_ios/Classes/BTPayPalRequest.html#/c:objc(cs)BTPayPalRequest(py)localeCode)
+        localeCode: 'en_US',
+        shippingAddressRequired: false,
+        userAction: 'commit', // display 'Pay Now' on the PayPal review page
+        // one of 'authorize', 'sale', 'order'. defaults to 'authorize'. see details here: https://developer.paypal.com/docs/api/payments/v1/#payment-create-request-body
+        intent: 'authorize',
+      });
+    ShowConsoleLogMessage(
+      'paypal config -> nonce => ' +
+        nonce +
+        'payerId=> ' +
+        payerId +
+        'email=> ' +
+        email +
+        'firstName=> ' +
+        firstName +
+        'lastName => ' +
+        lastName +
+        'phone => ' +
+        phone,
+    );
   };
 
   return (
@@ -309,9 +435,7 @@ const Order = ({navigation, route}) => {
         </View>
         <View
           style={{
-            // backgroundColor: 'red',
             justifyContent: 'center',
-
             height: 56,
           }}>
           <View
@@ -813,10 +937,15 @@ const Order = ({navigation, route}) => {
           ) : null}
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => {
+            onPress={async () => {
               if (changeOne) {
                 if (selectedPayment != null) {
-                  submitOrderApi();
+                  ShowConsoleLogMessage(selectedPayment);
+                  if (selectedPayment?.id == 3) {
+                    submitOrderApi();
+                  } else if (selectedPayment?.id == 1) {
+                    await submitPaypalPayment();
+                  }
                 } else {
                   ShowToastMessage('Please choose your payment gateway!');
                 }
