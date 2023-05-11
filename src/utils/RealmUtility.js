@@ -1,11 +1,12 @@
+import crashlytics from '@react-native-firebase/crashlytics';
 import Realm from 'realm';
 import {
-  SAVE_STORE_SCHEMA,
   SAVE_OFFER_SCHEMA,
   SAVE_STORE_REVIEW_SCHEMA,
+  SAVE_STORE_SCHEMA,
   SaveOfferSchema,
-  SaveStoreSchema,
   SaveStoreReviewSchema,
+  SaveStoreSchema,
 } from '../realm/allSchemas';
 
 const saveOfferDatabaseOptions = {
@@ -41,6 +42,8 @@ export let doSaveOfferOffline = id => {
       });
     });
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log(err);
   }
 };
@@ -75,6 +78,8 @@ export let doDeleteOfferOffline = id => {
       });
     });
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log(err);
   }
 };
@@ -110,6 +115,8 @@ export let doSaveStoreOffline = id => {
       });
     });
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log(err);
   }
 };
@@ -144,6 +151,8 @@ export let doDeleteStoreOffline = id => {
       });
     });
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log(err);
   }
 };
@@ -179,6 +188,8 @@ export let doSaveStoreReview = id => {
       });
     });
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log(err);
   }
 };

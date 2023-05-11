@@ -1,26 +1,19 @@
 import React, {useEffect, useState} from 'react';
 
-import {
-  Animated,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Dimensions,
-} from 'react-native';
+import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {SIZES} from '../../constants';
 import {COLORS} from '../../constants/Colors';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+import GalleryFragment from './GalleryFragment';
 import StoreOffer from './StoreOffer';
 import StoreReview from './StoreReview';
-import GalleryFragment from './GalleryFragment';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
-import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
 const Tab = createMaterialTopTabNavigator();
 
 const CAMERA_TAB_ITEM_WIDTH = SIZES.width * 0.1;
@@ -50,6 +43,8 @@ const MyTabBar = ({state, descriptors, navigation, position}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };

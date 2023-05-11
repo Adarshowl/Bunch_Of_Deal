@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
@@ -17,9 +18,9 @@ import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+import NoResult from '../../utils/NoResult';
 import {NotificationSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
-import NoResult from '../../utils/NoResult';
 
 const Notification = ({navigation}) => {
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ const Notification = ({navigation}) => {
 
   const isFocused = useIsFocused();
 
-  ShowConsoleLogMessage(showError);
+  // ShowConsoleLogMessage(showError);
 
   useEffect(() => {
     getUserFromStorage();
@@ -49,6 +50,8 @@ const Notification = ({navigation}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -56,20 +59,20 @@ const Notification = ({navigation}) => {
   const getNotification = id => {
     setLoading(true);
     let body = {user_id: /*'578'*/ id, page: 1, limit: 30};
-
+    // ShowConsoleLogMessage(body);
     ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_GET, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        console.log(
-          'ERROR IN GET Notification List 4 res=> ',
-          JSON.stringify(response),
-        );
+        // console.log(
+        //   'ERROR IN GET Notification List 4 res=> ',
+        //   JSON.stringify(response),
+        // );
 
         if (response?.data?.status == 1) {
           let result = Object.values(response.data?.result);
-          console.log(JSON.stringify(result));
+          // console.log(JSON.stringify(result));
 
           setShowError(result.length <= 0);
 
@@ -82,6 +85,8 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET Notification List 5=> ', error);
         setShowError(true);
         setListData([]);
@@ -112,6 +117,8 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET Notification List 6=> ', error);
       })
       .finally(() => {
@@ -122,16 +129,16 @@ const Notification = ({navigation}) => {
   const editStatusNotification = async notification_id => {
     // setLoading(true);
     let body = {id: notification_id, status: '1'};
-    ShowConsoleLogMessage(JSON.stringify(body));
+    // ShowConsoleLogMessage(JSON.stringify(body));
     ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_EDIT_STATUS, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        console.log(
-          'ERROR IN GET Notification List 7=> ',
-          JSON.stringify(response),
-        );
+        // console.log(
+        //   'ERROR IN GET Notification List 7=> ',
+        //   JSON.stringify(response),
+        // );
         if (response?.data?.success == 1) {
           getEditNotification(userData?.id_user);
         } else if (response.data?.success == 0) {
@@ -139,6 +146,8 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET Notification List 8 => ', error);
       })
       .finally(() => {
@@ -155,10 +164,10 @@ const Notification = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        console.log(
-          'ERROR IN GET Notification List 9=> ',
-          JSON.stringify(response),
-        );
+        // console.log(
+        //   'ERROR IN GET Notification List 9=> ',
+        //   JSON.stringify(response),
+        // );
 
         if (response?.data?.success == 1) {
           getEditNotification(userData?.id_user);
@@ -167,6 +176,8 @@ const Notification = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET Notification List 10=> ', error);
       })
       .finally(() => {
@@ -225,7 +236,7 @@ const Notification = ({navigation}) => {
                 },
               });
             } else if (item?.module == 'nsorder') {
-              ShowConsoleLogMessage(item);
+              // ShowConsoleLogMessage(item);
               navigation.navigate('InvoiceList', {
                 item: {id: item?.module_id, intentFromNotification: true},
               });

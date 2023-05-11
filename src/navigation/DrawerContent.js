@@ -30,6 +30,8 @@ import {
 import {LoginManager} from 'react-native-fbsdk';
 import Realm from 'realm';
 import {clearRealm} from '../utils/RealmUtility';
+
+import crashlytics from '@react-native-firebase/crashlytics';
 const DrawerContent = ({navigation, props}) => {
   const [userData, setUserData] = useState({});
   const [image, setImage] = useState('');
@@ -72,6 +74,7 @@ const DrawerContent = ({navigation, props}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };

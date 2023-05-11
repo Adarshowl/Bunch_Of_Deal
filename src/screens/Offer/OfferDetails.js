@@ -42,15 +42,21 @@ import {
   isOfferSaved,
 } from '../../utils/RealmUtility';
 import {
+  getDateDiff,
   ShowConsoleLogMessage,
   ShowToastMessage,
-  getDateDiff,
 } from '../../utils/Utility';
 import {markAsRead} from '../CampaignController';
+import crashlytics from '@react-native-firebase/crashlytics';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 
 const OfferDetails = ({navigation, route}) => {
+  const [loading, setLoading] = useState(false);
+
   const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-    const paddingToBottom = 30;
+    // const paddingToBottom = 30;
+    const paddingToBottom = SIZES.width + 200;
+    // ShowConsoleLogMessage('paddingToBottom -> ' + paddingToBottom);
     return (
       layoutMeasurement.height + contentOffset.y >=
       contentSize.height - paddingToBottom
@@ -85,23 +91,50 @@ const OfferDetails = ({navigation, route}) => {
         navigation.navigate('Order', {
           item: receivedData,
           count: count,
+          originalPrice: originalPrice,
           price: price,
+          telephone: telephone,
         });
       }
     }
   };
 
   const [userData, setUserData] = useState({});
+  const [telephone, setTelephone] = useState('');
 
   useEffect(() => {
     let {item} = route?.params;
-
     getUserFromStorage(item);
   }, []);
 
   useEffect(() => {
     getisFocusedUserFromStorage();
   }, [isFocused]);
+
+  const getStoreByIdTelePhone = val => {
+    let body = {
+      limit: '1',
+      store_id: val,
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          let result = Object.values(response.data?.result);
+          setTelephone(result[0]?.telephone);
+          // ShowConsoleLogMessage(result[0]?.telephone + ' => telephone ');
+        } else {
+        }
+      })
+      .catch(err => {})
+      .finally(() => {});
+  };
 
   const getUserFromStorage = async item => {
     try {
@@ -120,6 +153,8 @@ const OfferDetails = ({navigation, route}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -135,6 +170,8 @@ const OfferDetails = ({navigation, route}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -169,7 +206,11 @@ const OfferDetails = ({navigation, route}) => {
       let {item} = route.params;
 
       if (item?.intentFromNotification) {
-        getSearchOfferList(item?.id_offer);
+        ShowConsoleLogMessage('insdie -> ' + JSON.stringify(item));
+
+        // getSearchOfferList(item?.id_offer);
+        getSearchOfferList(107);
+        // getSearchOfferList('107');
         let is_offer_save = await isOfferSaved(
           item?.id_offer || item?.offer_id,
         );
@@ -184,7 +225,7 @@ const OfferDetails = ({navigation, route}) => {
           setFavorite(is_offer_save);
         } else {
           setReceivedData(item);
-
+          // ShowConsoleLogMessage('item details ->? ' + JSON.stringify(item));
           var res = [];
 
           try {
@@ -195,7 +236,9 @@ const OfferDetails = ({navigation, route}) => {
               res.push(key['560_560' || 'full']?.url + '');
             });
             // console.log('image -> > \n\n\n => ', res);
-          } catch (err) {}
+          } catch (err) {
+            crashlytics().recordError(err);
+          }
 
           setImages(res);
           // img.map(x => {
@@ -238,11 +281,14 @@ const OfferDetails = ({navigation, route}) => {
 
           // let temp = await getSavedOfferAsString();
           // ShowConsoleLogMessage(temp);
+          getStoreByIdTelePhone(item?.store_id);
         }
       }
+      await AsyncStorage.setItem('notification', '');
     })();
   }, [isFocused]);
   const getSearchOfferList = offer_ids => {
+    setLoading(true);
     let body = {
       latitude: STRING.CURRENT_LAT + '',
       longitude: STRING.CURRENT_LONG + '',
@@ -260,7 +306,6 @@ const OfferDetails = ({navigation, route}) => {
 
     // ShowConsoleLogMessage(JSON.stringify(body));
 
-    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
@@ -282,7 +327,9 @@ const OfferDetails = ({navigation, route}) => {
               res.push(key['560_560' || 'full']?.url + '');
             });
             // console.log('image -> > \n\n\n => ', res);
-          } catch (err) {}
+          } catch (err) {
+            crashlytics().recordError(err);
+          }
 
           setImages(res);
           // setImageUrl(result[0]?.images);
@@ -312,17 +359,22 @@ const OfferDetails = ({navigation, route}) => {
 
           if (diff_Will_Start < 0 && diff_will_end < 0) {
           }
+          getStoreByIdTelePhone(result[0]?.store_id);
         } else {
           setReceivedData({});
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         // console.log('eorir < ', err);
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const bigPhotoRef = useRef();
@@ -433,7 +485,8 @@ const OfferDetails = ({navigation, route}) => {
                   marginTop: 60,
                   fontFamily: 'Montserrat-Medium',
                   marginHorizontal: 20,
-                }}></Text>
+                }}
+              />
             </View>
             <View
               style={{
@@ -521,7 +574,8 @@ const OfferDetails = ({navigation, route}) => {
               flex: 1,
               justifyContent: 'flex-end',
               alignItems: 'center',
-            }}></TouchableOpacity>
+            }}
+          />
           <View
             style={{
               maxHeight: SIZES.height * 0.7,
@@ -536,7 +590,6 @@ const OfferDetails = ({navigation, route}) => {
               ]}>
               <View
                 style={{
-                  borderRadius: 2,
                   backgroundColor: COLORS.white,
                   marginHorizontal: 15,
                   flexDirection: 'row',
@@ -659,6 +712,8 @@ const OfferDetails = ({navigation, route}) => {
                       item: receivedData,
                       count: count,
                       price: price,
+                      originalPrice: originalPrice,
+                      telephone: telephone,
                     });
                     // ShowToastMessage('Work in progress');
                   }}
@@ -698,10 +753,13 @@ const OfferDetails = ({navigation, route}) => {
         // dismissed
       }
     } catch (error) {
+      crashlytics().recordError(error);
+
       Alert.alert(error.message);
     }
   };
   const [favorite, setFavorite] = useState(false);
+  const [available, setAvailable] = useState(true);
 
   const doSaveOnline = () => {
     let body = {
@@ -720,15 +778,16 @@ const OfferDetails = ({navigation, route}) => {
         // ShowConsoleLogMessage(response);
         if (response?.data?.success == 1) {
           setFavorite(!favorite);
-          ShowToastMessage('Saved');
+          // ShowToastMessage('Saved');
+          ShowToastMessage('Added to favorite');
         } else {
           setFavorite(false);
         }
       })
       .catch(err => {
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {});
   };
@@ -749,15 +808,16 @@ const OfferDetails = ({navigation, route}) => {
         // ShowConsoleLogMessage(response);
         if (response?.data?.success == 1) {
           setFavorite(!favorite);
-          ShowToastMessage('Unsaved');
+          // ShowToastMessage('Unsaved');
+          ShowToastMessage('Removed from favorite');
         } else {
           setFavorite(false);
         }
       })
       .catch(err => {
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {});
   };
@@ -768,6 +828,7 @@ const OfferDetails = ({navigation, route}) => {
         flex: 1,
         backgroundColor: COLORS.white,
       }}>
+      <BunchDealProgressBar loading={loading} />
       <ScrollView
         onScroll={({nativeEvent}) => {
           if (isCloseToBottom(nativeEvent)) {
@@ -798,7 +859,7 @@ const OfferDetails = ({navigation, route}) => {
         backgroundColor: COLORS.transparent,
          padding: 10,
        position:'absolute'
-  
+
        }]}>
         <BunchDealVectorIcon
           title={Ionicons}
@@ -859,7 +920,7 @@ const OfferDetails = ({navigation, route}) => {
             }}
           />
         </View>
-      
+
           </LinearGradient>*/}
 
             {/* <View
@@ -901,7 +962,8 @@ const OfferDetails = ({navigation, route}) => {
                   alignSelf: 'flex-start',
                   flexDirection: 'row',
                   alignItems: 'center',
-                }}></View>
+                }}
+              />
               {images.length > 1 ? (
                 <Text
                   style={{
@@ -916,17 +978,58 @@ const OfferDetails = ({navigation, route}) => {
                   {images.length > 1 ? `  ${images.length}` : ''}
                 </Text>
               ) : null}
-              <Text
-                style={{
-                  paddingHorizontal: 15,
-                  fontFamily: 'Montserrat-Medium',
-                  paddingVertical: 6,
-                  color: COLORS.white,
-                  fontSize: 11,
-                  backgroundColor: COLORS.colorAccent,
-                }}>
-                +100km
-              </Text>
+              {receivedData?.purchase_counter > 0 ? (
+                <Text
+                  style={{
+                    backgroundColor: COLORS.colorAccent,
+                    paddingHorizontal: 15,
+                    fontFamily: 'Montserrat-Medium',
+                    paddingVertical: 6,
+                    color: COLORS.white,
+                    fontSize: 11,
+                  }}>
+                  +{receivedData?.purchase_counter} sold
+                </Text>
+              ) : null}
+              {/*<Text*/}
+              {/*  style={{*/}
+              {/*    paddingHorizontal: 15,*/}
+              {/*    fontFamily: 'Montserrat-Medium',*/}
+              {/*    paddingVertical: 6,*/}
+              {/*    color: COLORS.white,*/}
+              {/*    fontSize: 11,*/}
+              {/*    backgroundColor: COLORS.colorAccent,*/}
+              {/*  }}>*/}
+              {/*  +100km*/}
+              {/*</Text>*/}
+              {receivedData?.distance != null ? (
+                receivedData?.distance >= 100 ? (
+                  <Text
+                    style={{
+                      paddingHorizontal: 15,
+                      fontFamily: 'Montserrat-Medium',
+                      paddingVertical: 6,
+                      color: COLORS.white,
+                      fontSize: 11,
+                      backgroundColor: COLORS.colorAccent,
+                    }}>
+                    +100km
+                    {/*{receivedData?.distance}km*/}
+                  </Text>
+                ) : receivedData?.distance < 100 ? (
+                  <Text
+                    style={{
+                      paddingHorizontal: 15,
+                      fontFamily: 'Montserrat-Medium',
+                      paddingVertical: 6,
+                      color: COLORS.white,
+                      fontSize: 11,
+                      backgroundColor: COLORS.colorAccent,
+                    }}>
+                    {receivedData?.distance}km
+                  </Text>
+                ) : null
+              ) : null}
             </View>
           </TouchableOpacity>
 
@@ -938,8 +1041,12 @@ const OfferDetails = ({navigation, route}) => {
               },
             ]}>
             <Text style={[GlobalStyle1.amount_text]}>
-              {receivedData?.currency?.symbol + '' + receivedData?.offer_value}
-              .0
+              {receivedData?.currency
+                ? receivedData?.currency?.symbol +
+                  '' +
+                  receivedData?.offer_value +
+                  '.0'
+                : null}
             </Text>
           </View>
           <Text
@@ -1045,7 +1152,7 @@ const OfferDetails = ({navigation, route}) => {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                console.log(JSON.stringify(receivedData));
+                // console.log(JSON.stringify(receivedData));
                 navigation.navigate('StoreDetails', {item: receivedData});
               }}
               activeOpacity={0.8}

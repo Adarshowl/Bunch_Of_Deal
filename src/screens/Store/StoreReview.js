@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
@@ -14,7 +15,6 @@ import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
-
 const StoreReview = props => {
   useEffect(() => {
     TimeZone.getTimeZone().then(result => {
@@ -44,6 +44,8 @@ const StoreReview = props => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -91,6 +93,8 @@ const StoreReview = props => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -127,6 +131,8 @@ const StoreReview = props => {
           }
         })
         .catch(err => {
+          crashlytics().recordError(err);
+
           ShowConsoleLogMessage(
             'Error in get offer recent api call: ' + err.message,
           );

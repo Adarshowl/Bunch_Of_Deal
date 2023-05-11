@@ -1,8 +1,8 @@
-import {Platform, PermissionsAndroid} from 'react-native';
-import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import Geolocation from '@react-native-community/geolocation';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {PermissionsAndroid, Platform} from 'react-native';
+import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import {STRING} from '../constants';
-
 export const requestExternalWritePermission = async () => {
   if (Platform.OS === 'android') {
     try {
@@ -16,6 +16,8 @@ export const requestExternalWritePermission = async () => {
       // If WRITE_EXTERNAL_STORAGE Permission is granted
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.warn(err);
       alert('Write permission err', err);
     }
@@ -45,7 +47,9 @@ export const requestLocationPermission = async () => {
           fastInterval: 5000,
         })
           .then(data => {})
-          .catch(err => {});
+          .catch(err => {
+            crashlytics().recordError(err);
+          });
         getCurrentLatLong();
       } else if (granted === 'never_ask_again') {
         STRING.CAN_ACCESS_LOCATION = false;
@@ -54,10 +58,14 @@ export const requestLocationPermission = async () => {
           fastInterval: 5000,
         })
           .then(data => {})
-          .catch(err => {});
+          .catch(err => {
+            crashlytics().recordError(err);
+          });
       }
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.warn(err);
     }
   }
@@ -83,6 +91,8 @@ export const requestContactPermission = async () => {
       }
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.warn(err);
     }
   }

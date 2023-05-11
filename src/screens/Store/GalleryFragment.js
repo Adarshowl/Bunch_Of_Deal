@@ -1,12 +1,12 @@
+import crashlytics from '@react-native-firebase/crashlytics';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {images, SIZES} from '../../constants';
+import TimeZone from 'react-native-timezone';
+import {SIZES, images} from '../../constants';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
-
-import TimeZone from 'react-native-timezone';
 
 const GalleryFragment = props => {
   useEffect(() => {
@@ -51,9 +51,9 @@ const GalleryFragment = props => {
         }
       })
       .catch(err => {
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {});
   };

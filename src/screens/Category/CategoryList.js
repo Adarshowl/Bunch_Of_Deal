@@ -1,22 +1,23 @@
+import crashlytics from '@react-native-firebase/crashlytics';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View,SafeAreaView} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import TimeZone from 'react-native-timezone';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
-import StoreCardView from '../Store/StoreCardView';
-import SearchDialog from '../Search';
-import PlacePickerLocation from '../Search/PlacePickerLocation';
-import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 import {StoreSkeleton} from '../../utils/Skeleton';
-import TimeZone from 'react-native-timezone';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+import SearchDialog from '../Search';
+import PlaceChooseLocation from '../Search/PlaceChooseLocation';
+import PlacePickerLocation from '../Search/PlacePickerLocation';
+import StoreCardView from '../Store/StoreCardView';
+
 const CategoryList = ({navigation, route}) => {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,7 @@ const CategoryList = ({navigation, route}) => {
       .catch(err => {
         // console.log('eorir < ', err);
         setShowError(true);
+        crashlytics().recordError(err);
 
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
@@ -142,7 +144,10 @@ const CategoryList = ({navigation, route}) => {
           setListData([]);
         }
       })
+
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -186,8 +191,8 @@ const CategoryList = ({navigation, route}) => {
 
         <Fontisto
           onPress={() => {
-            // closeSearchModal();
-            navigation.navigate('UniversalSearch');
+            closeSearchModal();
+            // navigation.navigate('UniversalSearch');
           }}
           marginEnd={15}
           color={COLORS.colorPrimary}

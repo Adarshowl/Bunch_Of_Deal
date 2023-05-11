@@ -1,14 +1,21 @@
-import {StyleSheet, Text, View, FlatList, TouchableOpacity,SafeAreaView} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import crashlytics from '@react-native-firebase/crashlytics';
+import React, {useEffect, useState} from 'react';
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
 import ApiCall from '../../network/ApiCall';
-import {images} from '../../constants';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import NoResult from '../../utils/NoResult';
-
 const Category = ({navigation}) => {
   const [listData, setListData] = useState([]);
   const [showError, setShowError] = useState(false);
@@ -42,6 +49,8 @@ const Category = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET USer PROFILE => ', error);
         setShowError(true);
       })

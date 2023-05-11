@@ -1,29 +1,25 @@
+import crashlytics from '@react-native-firebase/crashlytics';
+import moment from 'moment';
+import React, {useState} from 'react';
 import {
+  ActivityIndicator,
+  FlatList,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  ScrollView,
-  SafeAreaView,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
 import ApiCall from '../../network/ApiCall';
-import {STRING, images} from '../../constants';
-import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
-import moment from 'moment';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import OfferCardView from '../Offer/OfferCardView';
 import StoreCardView from '../Store/StoreCardView';
-import {OfferSkeleton, StoreSkeleton} from '../../utils/Skeleton';
-
 const UniversalSearch = ({navigation}) => {
   const [offerData, setOfferData] = useState(0);
   const [listData, setListData] = useState([]);
@@ -76,10 +72,9 @@ const UniversalSearch = ({navigation}) => {
         }
       })
       .catch(err => {
-        // console.log('eorir < ', err);
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {
         setLoading(false);
@@ -121,9 +116,9 @@ const UniversalSearch = ({navigation}) => {
         }
       })
       .catch(err => {
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {
         setLoading(false);

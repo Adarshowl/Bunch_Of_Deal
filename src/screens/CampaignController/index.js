@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
-
+import crashlytics from '@react-native-firebase/crashlytics';
 export const markReceive = async cid => {
   let uID = '';
   try {
@@ -16,6 +16,8 @@ export const markReceive = async cid => {
       }
     });
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log('ERROR IN GETTING USER FROM STORAGE');
   }
 
@@ -36,6 +38,8 @@ export const markReceive = async cid => {
       ShowConsoleLogMessage(response);
     })
     .catch(err => {
+      crashlytics().recordError(err);
+
       ShowConsoleLogMessage(
         'Error in get offer recent api call: ' + err.message,
       );
@@ -60,6 +64,8 @@ export const markAsRead = (cid, user_id) => {
       //   ShowConsoleLogMessage(JSON.stringify(response) + ' -> api mark view');
     })
     .catch(err => {
+      crashlytics().recordError(err);
+
       ShowConsoleLogMessage(
         'Error in get offer recent api call: ' + err.message,
       );

@@ -17,9 +17,7 @@ import {
   View,
 } from 'react-native';
 import moment from 'moment';
-import {Rating, AirbnbRating} from 'react-native-elements';
-
-import {Image} from 'react-native-elements';
+import {AirbnbRating, Image} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import MapView, {Marker} from 'react-native-maps';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -621,9 +619,10 @@ const TestStoreDetail = ({navigation, route}) => {
     console.log('Rating is: ' + rating);
     setRate(rating);
   }
+
   const [password, setPassword] = useState('');
 
-  const [rate, setRate] = useState(3);
+  const [rate, setRate] = useState(0);
 
   const renderAddReviewModal = () => {
     return (
@@ -644,6 +643,7 @@ const TestStoreDetail = ({navigation, route}) => {
                 starContainerStyle={{
                   marginTop: 20,
                 }}
+                defaultRating={rate}
               />
             </View>
             <View
@@ -883,7 +883,8 @@ const TestStoreDetail = ({navigation, route}) => {
                   alignSelf: 'flex-start',
                   flexDirection: 'row',
                   alignItems: 'center',
-                }}></View>
+                }}
+              />
               {images.length > 1 ? (
                 <Text
                   style={{
@@ -1331,7 +1332,8 @@ const TestStoreDetail = ({navigation, route}) => {
           <View
             style={{
               padding: 10,
-            }}></View>
+            }}
+          />
         </View>
       </ScrollView>
 

@@ -1,12 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,7 +9,6 @@ import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
 
 const OfferCardView = ({item}) => {
   const navigation = useNavigation();
@@ -51,15 +44,19 @@ const OfferCardView = ({item}) => {
             right: 0,
             flexDirection: 'row',
           }}>
-          {/* <Text
-            style={{
-              backgroundColor: COLORS.colorAccent,
-              paddingHorizontal: 15,
-              fontFamily: 'Montserrat-Medium',
-              paddingVertical: 6,
-              color: COLORS.white,
-              fontSize: 11,
-            }}></Text> */}
+          {item?.purchase_counter > 0 ? (
+            <Text
+              style={{
+                backgroundColor: COLORS.colorAccent,
+                paddingHorizontal: 15,
+                fontFamily: 'Montserrat-Medium',
+                paddingVertical: 6,
+                color: COLORS.white,
+                fontSize: 11,
+              }}>
+              +{item?.purchase_counter} sold
+            </Text>
+          ) : null}
           {item?.distance != null ? (
             item?.distance >= 100 ? (
               <Text
@@ -72,6 +69,7 @@ const OfferCardView = ({item}) => {
                   backgroundColor: COLORS.colorPrimary,
                 }}>
                 +100km
+                {/*{item?.distance}km*/}
               </Text>
             ) : item?.distance < 100 ? (
               <Text
@@ -136,7 +134,8 @@ const OfferCardView = ({item}) => {
               },
             ]}
             numberOfLines={2}>
-            {item?.store_address || ''}
+            {/*{item?.address || ''}*/}
+            {item?.address?.split(',')[1] || item?.address?.split(',')[0] || ''}
           </Text>
         </View>
       </View>

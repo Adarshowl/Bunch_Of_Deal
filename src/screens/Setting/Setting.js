@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useState, useEffect} from 'react';
+import crashlytics from '@react-native-firebase/crashlytics';
+import React, {useEffect, useState} from 'react';
 import {
+  SafeAreaView,
   StyleSheet,
   Text,
-  View,
-  SafeAreaView,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -13,8 +14,6 @@ import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import GlobalStyle2 from '../../styles/GlobalStyle2';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
-
 const Setting = ({navigation}) => {
   const [offerNotification, setOfferNotification] = useState(false);
   const [storeNotification, setStoreNotification] = useState(false);
@@ -38,6 +37,8 @@ const Setting = ({navigation}) => {
         },
       );
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };

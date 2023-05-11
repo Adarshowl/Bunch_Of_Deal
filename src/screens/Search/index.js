@@ -20,6 +20,8 @@ import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
+import crashlytics from '@react-native-firebase/crashlytics';
+
 const SearchDialog = ({
   show,
   onPress,
@@ -57,9 +59,9 @@ const SearchDialog = ({
         }
       })
       .catch(err => {
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {});
   };
@@ -315,10 +317,10 @@ const styles = StyleSheet.create({
   activityIndicatorWrapper: {
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-    height: SIZES.width + 50,
+    minHeight: SIZES.width + 50,
     width: SIZES.width - 80,
     // paddingHorizontal: 20,
-
+    paddingBottom: 10,
     display: 'flex',
     // alignItems: 'center',
     // justifyContent: 'space-between',

@@ -1,14 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
+  BackHandler,
+  Modal,
+  SafeAreaView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  Modal,
-  BackHandler,SafeAreaView
+  View,
 } from 'react-native';
-
+import crashlytics from '@react-native-firebase/crashlytics';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -26,8 +27,61 @@ import SearchDialog from '../Search';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import Store from '../Store';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Home = ({navigation}) => {
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+      const fetchUser = async () => {
+        await AsyncStorage.getItem('notification', async (error, value) => {
+          if (error) {
+          } else {
+            if (value !== null) {
+              let temp = JSON.parse(value);
+              ShowConsoleLogMessage(
+                'notification home page -> ' +
+                  JSON.stringify(temp?.notification),
+              );
+
+              if (temp?.notification?.title == 'Crust Pizza, Richmond') {
+                //   4
+                ShowConsoleLogMessage('notification home page if -> ' + value);
+
+                navigation.navigate('StoreDetails', {
+                  item: {
+                    // store_id: temp?.module_id,
+                    store_id: 4 + '',
+                    intentFromNotification: true,
+                    cid: temp?.campaign_id || '',
+                  },
+                });
+              } else if (temp?.notification?.title == "aaa's") {
+                //   107
+                ShowConsoleLogMessage(
+                  'notification home page else if -> ' + value,
+                );
+                navigation.navigate('OfferDetails', {
+                  item: {
+                    // id_offer: temp?.module_id,
+                    id_offer: '107' + '',
+                    intentFromNotification: true,
+                    cid: temp?.campaign_id || '',
+                  },
+                });
+              }
+            } else {
+              ShowConsoleLogMessage('notification home page else -> ' + value);
+            }
+          }
+        });
+      };
+      fetchUser();
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
   const [toolbarTitle, setToolbarTitle] = useState('Offers');
 
   const [percent, setPercent] = useState(true);
@@ -102,6 +156,8 @@ const Home = ({navigation}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -118,20 +174,26 @@ const Home = ({navigation}) => {
     // ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_NOTIFICATIONS_COUNT_GET);
-    ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_COUNT_GET, {
+    ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_GET, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        if (response?.data?.success == 1) {
-          // ShowConsoleLogMessage(response.data);
-          // let result = Object.values(response.data?.result);
-          setNotificationCount(response?.data?.result);
+        if (response?.data?.status == 1) {
+          let count = 0;
+          let result = Object.values(response.data?.result);
+          result.forEach(item => {
+            if (item?.status == 0) {
+              count++;
+            }
+          });
+          setNotificationCount(count);
         } else {
           setNotificationCount(0);
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
         setNotificationCount(0);
 
         ShowConsoleLogMessage(
@@ -262,6 +324,7 @@ const Home = ({navigation}) => {
             navigation.toggleDrawer();
           }}
         />
+        {/* <Button title="Test Crash" onPress={() => crashlytics().crash()} /> */}
         <BunchDealCommonToolBar title={toolbarTitle} />
         <BunchDealVectorIcon
           title={Fontisto}
@@ -271,8 +334,8 @@ const Home = ({navigation}) => {
           style={GlobalStyle.marginHorizontal10}
           onPress={() => {
             // ShowToastMessage('Coming soon!');
-            // closeSearchModal();
-            navigation.navigate('UniversalSearch');
+            closeSearchModal();
+            // navigation.navigate('UniversalSearch');
           }}
         />
         <TouchableOpacity
@@ -318,62 +381,57 @@ const Home = ({navigation}) => {
             height: 45,
           },
         ]}>
-          <TouchableOpacity
+        <TouchableOpacity
           activeOpacity={0.8}
           style={{
-            flexGrow:1,
-            alignItems:'center'
+            flexGrow: 1,
+            alignItems: 'center',
           }}
-           onPress={() => {
+          onPress={() => {
             setPercent(true);
             setStoreFront(false);
             setToolbarTitle('Offers');
             setUpdate(false);
             setStoreUpdate(false);
-          }}
-          >
-        <Text
-          style={[
-            FONTS.h6,
-            {
-              color: percent
-                ? COLORS.colorAccent
-                : COLORS.shimmer_loading_color,
-              fontSize: 16,
-            },
-          ]}
-         >
-          Offers
-        </Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-activeOpacity={0.8}
-
+          }}>
+          <Text
+            style={[
+              FONTS.h6,
+              {
+                color: percent
+                  ? COLORS.colorAccent
+                  : COLORS.shimmer_loading_color,
+                fontSize: 16,
+              },
+            ]}>
+            Offers
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.8}
           style={{
-            flexGrow:1,
-            alignItems:'center',
+            flexGrow: 1,
+            alignItems: 'center',
           }}
-
           onPress={() => {
             setPercent(false);
             setStoreFront(true);
-            setToolbarTitle('Store');
+            setToolbarTitle('Stores');
             setStoreUpdate(false);
             setUpdate(false);
           }}>
-        <Text
-          style={[
-            FONTS.h6,
-            {
-              color: storeFront
-                ? COLORS.colorAccent
-                : COLORS.shimmer_loading_color,
-              fontSize: 16,
-            },
-          ]}
-        >
-          Store
-        </Text>
+          <Text
+            style={[
+              FONTS.h6,
+              {
+                color: storeFront
+                  ? COLORS.colorAccent
+                  : COLORS.shimmer_loading_color,
+                fontSize: 16,
+              },
+            ]}>
+            Store
+          </Text>
         </TouchableOpacity>
       </View>
       <View

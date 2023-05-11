@@ -2,7 +2,7 @@ import Toast from 'react-native-simple-toast';
 import DeviceInfo from 'react-native-device-info';
 import {Platform, NativeModules} from 'react-native';
 import moment from 'moment';
-
+import crashlytics from '@react-native-firebase/crashlytics';
 export const ShowToastMessage = msg => {
   Toast.showWithGravity(msg + '' || '', Toast.SHORT, Toast.BOTTOM);
 };
@@ -61,6 +61,8 @@ export const getDateDiff = date => {
       // return seconds * -1;
     }
   } catch (err) {
+    crashlytics().recordError(err);
+
     console.log(err);
   }
 };
@@ -73,13 +75,15 @@ const LINKING_ERROR =
 
 //const Timezone = NativeModules.Timezone
 //? NativeModules.Timezone
- // : new Proxy(
-   //   {},
-   //   {
-   //     get() {
-   //       throw new Error(LINKING_ERROR);
-   //     },
-   //   },
-   // );
+// : new Proxy(
+//   {},
+//   {
+//     get() {
+//       throw new Error(LINKING_ERROR);
+//     },
+//   },
+// );
 
 //export {Timezone};
+/**
+ */

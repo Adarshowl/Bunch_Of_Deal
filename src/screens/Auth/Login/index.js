@@ -1,168 +1,16 @@
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import React, {useState} from 'react';
-// import {Image, SafeAreaView, Text, View} from 'react-native';
-// import {COLORS} from '../../../constants/Colors';
-// import images from '../../../constants/images';
-// import {STRING} from '../../../constants/String';
-// import {FONTS} from '../../../constants/themes';
-// import ApiCall from '../../../network/ApiCall';
-// import {API_END_POINTS} from '../../../network/ApiEndPoints';
-// import GlobalStyle from '../../../styles/GlobalStyle';
-// import BunchDealCommonBtn from '../../../utils/BunchDealCommonBtn';
-// import BunchDealProgressBar from '../../../utils/BunchDealProgressBar';
-// import BunchDealEditText from '../../../utils/EditText/BunchDealEditText';
-// import {ShowToastMessage, validateFieldNotEmpty} from '../../../utils/Utility';
-// // import {ShowToastMessage} from '../../../utils/Utility';
-
-// const Login = ({navigation}) => {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-
-//   const [loading, setLoading] = useState(false);
-
-//   const onLoginClick = () => {
-//     navigation.replace('MainContainer');
-//   };
-
-//   // const onLoginClick = () => {
-//   //   if (validateFieldNotEmpty(email)) {
-//   //     ShowToastMessage('Email is required');
-//   //   } else if (validateFieldNotEmpty(password)) {
-//   //     ShowToastMessage('Password is required');
-//   //   } else {
-//   //     setLoading(true);
-//   //     let body = {
-//   //       login: email,
-//   //       password: password,
-//   //       social_type: 'Normal',
-//   //     };
-//   //     const params = new FormData();
-//   //     params.append('login', email);
-//   //     params.append('password', password);
-//   //     params.append('social_type', 'Normal');
-//   //     console.log(JSON.stringify(body));
-//   //     ApiCall('post', body, API_END_POINTS.signin, {
-//   //       Accept: 'application/json',
-//   //       'Content-Type': 'multipart/form-data',
-//   //     })
-//   //       .then(response => {
-//   //         console.log(response?.data);
-//   //         if (response?.data?.success == 1) {
-//   //           ShowToastMessage('Login successful');
-//   //           setLoading(false);
-//   //           AsyncStorage.setItem(STRING.userEmail, email);
-//   //           navigation.replace('MainContainer');
-//   //         } else {
-//   //           ShowToastMessage('Login failed');
-//   //           setLoading(false);
-//   //         }
-//   //       })
-//   //       .catch(() => {
-//   //         ShowToastMessage('Something went wrong.');
-//   //         setLoading(false);
-//   //       })
-//   //       .finally(() => {
-//   //         setLoading(false);
-//   //       });
-//   //   }
-//   // };
-
-//   const onCreateAccountClick = () => {
-//     navigation.navigate('SignUp');
-//   };
-
-//   return (
-//     <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
-//       <View style={GlobalStyle.nav_bg}>
-//         <Image
-//           source={images.navigation_icon_bg}
-//           style={GlobalStyle.nav_bg_image}
-//         />
-//         <Image
-//           source={images.splash_new_beta}
-//           style={GlobalStyle.loginAppIcon}
-//         />
-//       </View>
-//       <BunchDealProgressBar loading={loading} />
-//       <View style={GlobalStyle.loginCard}>
-//         <BunchDealEditText
-//           borderBottomWidth={1}
-//           placeholder={STRING.email_username}
-//           style={FONTS.body3}
-//           value={email}
-//           onChangeText={val => {
-//             setEmail(val);
-//           }}
-//         />
-//         <BunchDealEditText
-//           borderBottomWidth={1}
-//           placeholder={STRING.password}
-//           style={FONTS.body3}
-//           value={password}
-//           onChangeText={val => {
-//             setPassword(val);
-//           }}
-//         />
-//         <BunchDealCommonBtn
-//           height={40}
-//           backgroundColor={COLORS.colorAccent}
-//           marginHorizontal={5}
-//           text={STRING.log_in}
-//           textStyle={FONTS.body3}
-//           textColor={COLORS.white}
-//           onPress={onLoginClick}
-//           marginTop={20}
-//           borderRadius={1}
-//           textSize={18}
-//         />
-//         <View
-//           style={{
-//             marginTop: 20,
-//           }}
-//         />
-//         <Text style={[FONTS.h6, GlobalStyle.primaryColorTextUnderline]}>
-//           {STRING.forgot_password}
-//         </Text>
-//         <Text style={[FONTS.h6, GlobalStyle.primaryColorText]}>
-//           {STRING.or}
-//         </Text>
-//         <BunchDealCommonBtn
-//           height={40}
-//           backgroundColor={COLORS.colorAccent}
-//           marginHorizontal={5}
-//           text={STRING.create_an_account}
-//           textStyle={FONTS.body5}
-//           textColor={COLORS.white}
-//           onPress={onCreateAccountClick}
-//           marginTop={13}
-//           borderRadius={1}
-//           textSize={14}
-//         />
-//         <View
-//           style={{
-//             paddingBottom: 20,
-//           }}
-//         />
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default Login;
-
-//// code merged
-import React, {useEffect, useState} from 'react';
-import {
-  Image,
-  SafeAreaView,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import React, {useState} from 'react';
+import {Image, Modal, Text, TouchableOpacity, View} from 'react-native';
+import {AccessToken, LoginManager} from 'react-native-fbsdk';
+// import {AccessToken, LoginManager} from 'react-native-fbsdk-next';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../../constants/Colors';
-import images from '../../../constants/images';
 import {STRING} from '../../../constants/String';
+import images from '../../../constants/images';
 import {FONTS} from '../../../constants/themes';
 import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
@@ -175,15 +23,6 @@ import {
   ShowToastMessage,
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {
-  GoogleSignin,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {AccessToken, LoginManager} from 'react-native-fbsdk';
 //apple login
 
 // import appleAuth, {
@@ -255,12 +94,15 @@ const Login = ({navigation}) => {
           handleFbLogin(response);
         })
         .catch(error => {
-          console.log(error);
+          console.log('handleFbLogin => ' + error);
+          crashlytics().recordError(error);
           ShowToastMessage(
-            'Something went wrong. Please try different login option.',
+            'Something went wrong. Please try different login option.' +
+              JSON.stringify(error),
           );
         });
     } catch (error) {
+      crashlytics().recordError(error);
       ShowToastMessage(
         'Something went wrong. Please try different login option.',
       );
@@ -279,8 +121,8 @@ const Login = ({navigation}) => {
         telephone: '',
         social_type: 'Facebook',
         guest_id: '1',
-        lng: '1234',
-        lat: '123',
+        lng: STRING.CURRENT_LONG,
+        lat: STRING.CURRENT_LAT,
         mac_adr: '02.00:00:00:00',
         images: response?.additionalUserInfo?.profile?.picture?.data?.url,
         password: '',
@@ -320,7 +162,9 @@ const Login = ({navigation}) => {
             setLoading(false);
           }
         })
-        .catch(() => {
+        .catch(error => {
+          crashlytics().recordError(error);
+
           setLoading(false);
           ShowToastMessage(
             'Something went wrong. Please try different login option.',
@@ -330,6 +174,8 @@ const Login = ({navigation}) => {
           setLoading(false);
         });
     } catch (error) {
+      crashlytics().recordError(error);
+
       ShowToastMessage(
         'Something went wrong. Please try different login option.',
       );
@@ -433,8 +279,8 @@ const Login = ({navigation}) => {
         password: password,
         social_type: 'Normal',
         guest_id: '1',
-        lng: '1234',
-        lat: '123',
+        lng: STRING.CURRENT_LONG,
+        lat: STRING.CURRENT_LAT,
         mac_adr: '02.00:00:00:00',
       };
       ShowConsoleLogMessage(API_END_POINTS.signin);
@@ -444,6 +290,7 @@ const Login = ({navigation}) => {
       })
         .then(response => {
           console.log(JSON.stringify(body));
+          ShowConsoleLogMessage(JSON.stringify(response?.data));
 
           if (response?.data?.success == 1) {
             ShowToastMessage('Login successful');
@@ -469,6 +316,8 @@ const Login = ({navigation}) => {
 
               navigation.replace('MainContainer');
             } catch (error) {
+              crashlytics().recordError(error);
+
               AsyncStorage.setItem('userData', JSON.stringify(arr[0]['0']));
               AsyncStorage.setItem(STRING.userEmail, arr[0]['0']?.email + '');
               navigation.replace('MainContainer');
@@ -479,6 +328,8 @@ const Login = ({navigation}) => {
           }
         })
         .catch(error => {
+          crashlytics().recordError(error);
+
           ShowConsoleLogMessage('Something went wrong.' + error);
           ShowToastMessage('Something went wrong.' + error);
           setLoading(false);
@@ -569,6 +420,8 @@ const Login = ({navigation}) => {
         // });
       }
     } catch (error) {
+      crashlytics().recordError(error);
+
       ShowConsoleLogMessage('error in aple login -> ' + error);
     }
   };
@@ -610,6 +463,8 @@ const Login = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log(error, 'eroor------------>');
       })
       .finally(() => {
@@ -698,7 +553,7 @@ const Login = ({navigation}) => {
             alignItems: 'center',
             marginTop: 15,
           }}>
-          {/* <AppleButton 
+          {/* <AppleButton
         buttonStyle={AppleButton.Style.BLACK}
         buttonType={AppleButton.Type.SIGN_IN}
         style={{
@@ -756,8 +611,8 @@ const Login = ({navigation}) => {
                     telephone: response?.additionalUserInfo?.providerData?.name,
                     social_type: 'Google',
                     guest_id: '1',
-                    lng: '1234',
-                    lat: '123',
+                    lng: STRING.CURRENT_LONG,
+                    lat: STRING.CURRENT_LAT,
                     mac_adr: '02.00:00:00:00',
                     images: response?.additionalUserInfo?.profile?.picture,
                   };
@@ -770,7 +625,6 @@ const Login = ({navigation}) => {
                   })
                     .then(response => {
                       console.log(JSON.stringify(response), 'google ');
-
                       if (response?.data?.status == true) {
                         ShowToastMessage('Login successful');
                         setLoading(false);
@@ -806,7 +660,9 @@ const Login = ({navigation}) => {
                         setLoading(false);
                       }
                     })
-                    .catch(() => {
+                    .catch(error => {
+                      crashlytics().recordError(error);
+
                       setLoading(false);
                     })
                     .finally(() => {
@@ -815,6 +671,8 @@ const Login = ({navigation}) => {
                 })
 
                 .catch(error => {
+                  crashlytics().recordError(error);
+
                   console.log('response -> ' + JSON.stringify(error));
                 });
             }}>

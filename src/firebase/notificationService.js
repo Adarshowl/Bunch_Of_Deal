@@ -6,6 +6,7 @@ import {ShowConsoleLogMessage} from '../utils/Utility';
 import ApiCall from '../network/ApiCall';
 import {Platform} from 'react-native';
 import {API_END_POINTS} from '../network/ApiEndPoints';
+
 export async function requestUserPermission() {
   const authStatus = await messaging().requestPermission();
   const enabled =
@@ -18,9 +19,10 @@ export async function requestUserPermission() {
     getFcmToken();
   }
 }
+
 const getFcmToken = async () => {
   let fcmToken = await AsyncStorage.getItem('fcmToken');
-  // console.log(fcmToken, 'the old token');
+  console.log(fcmToken, 'the old token');
   if (!fcmToken) {
     try {
       const fcmToken = await messaging().getToken();
@@ -43,7 +45,7 @@ const getFcmToken = async () => {
 export const notificationListener = async () => {
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log(
-      'Notification caused app to open from background state: ',
+      'Notification caused app to open from background state notificationListener:  ',
       remoteMessage.notification,
     );
   });
@@ -53,9 +55,9 @@ export const notificationListener = async () => {
 
     PushNotification.createChannel(
       {
-        channelId: 'Club_Xtreme', // (required)
-        channelName: 'Club_xtreme_Channel', // (required)
-        channelDescription: 'Basket app', // (optional) default: undefined.
+        channelId: 'Bunch_of_deals', // (required)
+        channelName: 'Bunch_of_deals_Channel', // (required)
+        channelDescription: 'Shopping app', // (optional) default: undefined.
         playSound: true, // (optional) default: true
         soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
@@ -78,7 +80,12 @@ export const notificationListener = async () => {
     .then(remoteMessage => {
       if (remoteMessage) {
         console.log(
-          'Notification caused app to open from quit state:',
+          'Notification caused app to open from quit state getInitialNotification not service:',
+          remoteMessage.notification,
+        );
+      } else {
+        console.log(
+          'Notification caused app to open from quit state getInitialNotification not service:',
           remoteMessage.notification,
         );
       }

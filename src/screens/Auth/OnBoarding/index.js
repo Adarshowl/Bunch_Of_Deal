@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, Image, StyleSheet, Text, View} from 'react-native';
-import {images, SIZES, STRING} from '../../../constants';
+import {SIZES, STRING, images} from '../../../constants';
 import {COLORS} from '../../../constants/Colors';
 import {FONTS} from '../../../constants/themes';
 import GlobalStyle from '../../../styles/GlobalStyle';
@@ -128,7 +128,11 @@ const OnBoarding = ({navigation}) => {
     let arr = data.map((item, idx) => {
       let temp = Object.assign({}, item);
       if (index == idx) {
-        temp.selected = !temp?.selected;
+        if (index == 0) {
+          temp.selected = true;
+        } else {
+          temp.selected = !temp?.selected;
+        }
       } else {
         temp.selected = false;
       }

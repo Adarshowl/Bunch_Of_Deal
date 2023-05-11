@@ -1,12 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Image, SafeAreaView, Text, TextInput, View} from 'react-native';
 import ImgToBase64 from 'react-native-image-base64';
 import ImagePicker from 'react-native-image-crop-picker';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
-import images from '../../constants/images';
 import {STRING} from '../../constants/String';
+import images from '../../constants/images';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
@@ -16,7 +18,6 @@ import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {requestExternalWritePermission} from '../../utils/RequestUserPermission';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const Account = ({navigation}) => {
   const [userData, setUserData] = useState({});
@@ -81,6 +82,7 @@ const Account = ({navigation}) => {
   const [loading, setLoading] = useState(false);
 
   const [update, setUpdate] = useState(false);
+  const [updateImage, setUpdateImage] = useState(false);
 
   useEffect(() => {
     let permission = requestExternalWritePermission();
@@ -90,13 +92,32 @@ const Account = ({navigation}) => {
   const onLoginClick = async () => {
     // ShowToastMessage('login success');
     if (update) {
-      AsyncStorage.setItem(
+      await updateProfile();
+      if (!updateImage) {
+        setTimeout(() => {
+          navigation.replace('MainContainer');
+        }, 1500);
+      }
+
+      if (updateImage) {
+        await AsyncStorage.setItem(
+          'userImage',
+          'data:image/jpeg;base64,' +
+            imageBase64.replace('data:image/jpeg;base64,', ''),
+        );
+        uploadImage('uId');
+
+        setTimeout(() => {
+          navigation.replace('MainContainer');
+        }, 1500);
+      }
+    } else if (updateImage) {
+      await AsyncStorage.setItem(
         'userImage',
         'data:image/jpeg;base64,' +
           imageBase64.replace('data:image/jpeg;base64,', ''),
       );
       uploadImage('uId');
-      await updateProfile();
 
       setTimeout(() => {
         navigation.replace('MainContainer');
@@ -131,7 +152,7 @@ const Account = ({navigation}) => {
           })
           .catch(err => {});
 
-        setUpdate(true);
+        setUpdateImage(true);
       });
     } catch (error) {
       ShowConsoleLogMessage('Image picker error => ' + JSON.stringify(error));
@@ -160,6 +181,7 @@ const Account = ({navigation}) => {
       })
       .catch(error => {
         console.log(error, 'eroor------------>');
+        crashlytics().recordError(error);
       })
       .finally(() => {
         setLoading(false);
@@ -208,6 +230,7 @@ const Account = ({navigation}) => {
       })
       .catch(error => {
         console.log('ERROR IN GET USer PROFILE => ', error);
+        crashlytics().recordError(error);
       })
       .finally(() => {
         setLoading(false);
@@ -252,7 +275,8 @@ const Account = ({navigation}) => {
             flexDirection: 'row',
             alignItems: 'center',
             flex: 1,
-          }}></View>
+          }}
+        />
       </View>
       <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
         <View
@@ -307,7 +331,17 @@ const Account = ({navigation}) => {
               textSize={14}
             />
           </View>
-
+          <Text
+            style={{
+              color: COLORS.black,
+              fontFamily: 'Montserrat-Light',
+              fontSize: 14,
+              marginTop: 10,
+              marginBottom: -10,
+              marginStart: 10,
+            }}>
+            {STRING.email}
+          </Text>
           <BunchDealEditText
             borderBottomWidth={1}
             placeholder={STRING.email}
@@ -322,6 +356,18 @@ const Account = ({navigation}) => {
             editable={emailAvailable}
             backgroundColor={COLORS.backgroundColor}
           />
+
+          <Text
+            style={{
+              color: COLORS.black,
+              fontFamily: 'Montserrat-Light',
+              fontSize: 14,
+              marginTop: 10,
+              marginBottom: -10,
+              marginStart: 10,
+            }}>
+            {STRING.pseudo}
+          </Text>
           <BunchDealEditText
             borderBottomWidth={1}
             placeholder={STRING.pseudo}
@@ -333,6 +379,17 @@ const Account = ({navigation}) => {
               setUpdate(true);
             }}
           />
+          <Text
+            style={{
+              color: COLORS.black,
+              fontFamily: 'Montserrat-Light',
+              fontSize: 14,
+              marginTop: 10,
+              marginBottom: -10,
+              marginStart: 10,
+            }}>
+            {STRING.fullName}
+          </Text>
           <BunchDealEditText
             borderBottomWidth={1}
             placeholder={STRING.fullName}
@@ -344,7 +401,17 @@ const Account = ({navigation}) => {
               setUpdate(true);
             }}
           />
-
+          <Text
+            style={{
+              color: COLORS.black,
+              fontFamily: 'Montserrat-Light',
+              fontSize: 14,
+              marginTop: 10,
+              marginBottom: -10,
+              marginStart: 10,
+            }}>
+            {STRING.phone}
+          </Text>
           <BunchDealEditText
             borderBottomWidth={1}
             placeholder={STRING.phoneHint}
@@ -357,7 +424,20 @@ const Account = ({navigation}) => {
               setUpdate(true);
             }}
           />
+          <Text
+            style={{
+              color: COLORS.black,
+              fontFamily: 'Montserrat-Light',
+              fontSize: 14,
+              marginTop: 10,
+              marginBottom: -10,
+              marginStart: 10,
+            }}>
+            FCM TOKEN
+          </Text>
+          <TextInput value={STRING.FCM_TOKEN} multiline={true} />
           {/* <BunchDealEditText
+
           borderBottomWidth={1}
           placeholder={STRING.password}
           style={FONTS.body3}
@@ -381,6 +461,7 @@ const Account = ({navigation}) => {
             borderRadius={1}
             textSize={16}
           />
+
           <View
             style={{
               paddingBottom: 30,

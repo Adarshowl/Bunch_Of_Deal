@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 import React, {useEffect} from 'react';
 import {Alert, Image, StyleSheet, View} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import {STRING} from '../../../constants';
+import {COLORS} from '../../../constants/Colors';
 import images from '../../../constants/images';
 import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
 import GlobalStyle from '../../../styles/GlobalStyle';
-import {ShowConsoleLogMessage} from '../../../utils/Utility';
-import {COLORS} from '../../../constants/Colors';
 import {clearRealm} from '../../../utils/RealmUtility';
 const Splash = ({navigation}) => {
   useEffect(() => {
@@ -67,6 +67,8 @@ const Splash = ({navigation}) => {
         },
       );
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -107,6 +109,8 @@ const Splash = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET Notification List 1=> ', error);
       })
       .finally(() => {});
@@ -146,6 +150,8 @@ const Splash = ({navigation}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log('ERROR IN GET Notification List 3 => ', error);
       })
       .finally(() => {});

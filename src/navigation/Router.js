@@ -18,7 +18,6 @@ import OfferDetails from '../screens/Offer/OfferDetails';
 import Order from '../screens/Order';
 import Setting from '../screens/Setting/Setting';
 import StoreDetails from '../screens/Store/StoreDetails';
-import TestStoreDetail from '../screens/Store/TestStoreDetail';
 import UniversalSearch from '../screens/UniversalSearch';
 
 const Stack = createNativeStackNavigator();
@@ -33,7 +32,6 @@ const Router = () => {
       }}>
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="StoreDetails" component={StoreDetails} />
-      <Stack.Screen name="TestStoreDetail" component={TestStoreDetail} />
       <Stack.Screen name="OfferDetails" component={OfferDetails} />
       <Stack.Screen name="Invoice" component={InvoiceList} />
       <Stack.Screen name="About" component={About} />

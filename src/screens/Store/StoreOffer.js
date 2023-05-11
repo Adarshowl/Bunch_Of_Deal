@@ -10,7 +10,7 @@ import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import {useIsFocused} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-
+import crashlytics from '@react-native-firebase/crashlytics';
 import TimeZone from 'react-native-timezone';
 
 const StoreOffer = props => {
@@ -71,6 +71,8 @@ const StoreOffer = props => {
           }
         })
         .catch(err => {
+          crashlytics().recordError(err);
+
           ShowConsoleLogMessage(
             'Error in get offer recent api call: ' + err.message,
           );

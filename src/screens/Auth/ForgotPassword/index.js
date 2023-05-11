@@ -3,7 +3,6 @@ import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {WebView} from 'react-native-webview';
 import {COLORS} from '../../../constants/Colors';
-import {FONTS} from '../../../constants/themes';
 import {CLONE_BASE_URL} from '../../../network/ApiEndPoints';
 import BunchDealProgressBar from '../../../utils/BunchDealProgressBar';
 

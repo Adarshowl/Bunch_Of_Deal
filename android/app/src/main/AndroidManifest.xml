@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
    package="com.bunch.of.deals">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -9,6 +10,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+  <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
     <application
       android:name=".MainApplication"
@@ -36,23 +38,24 @@
         </intent-filter>
       </activity>
 
-      <!-- <activity 
-      android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
-      android:exported="false"
-      ></activity> -->
-
+    
     <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCIcyfvlmMVSAxxvPTASWasIN8ncskIj0w" />
-            <!-- android:value="AIzaSyB0grIoEL2gHeYeEYL_gg6cru-6_7veqQs" /> -->
     
     <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
      android:resource="@mipmap/ic_launcher_full_latest" />
 
 
-<meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+<!--<meta-data-->
+<!--            android:name="com.facebook.sdk.ApplicationId"-->
+<!--            android:value="@string/facebook_app_id" />-->
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+                   android:value="@string/facebook_app_id"/>
+
+        <meta-data android:name="com.facebook.sdk.ClientToken"
+                   android:value="@string/facebook_client_token"/>
+
 
     </application>
 </manifest>

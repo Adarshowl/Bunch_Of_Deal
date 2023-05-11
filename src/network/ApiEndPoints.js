@@ -158,7 +158,7 @@ export const API_END_POINTS = {
   API_AVAILABLE_MODULES:
     CLONE_BASE_URL + API + 'modules_manager/availableModules',
   UPDATE_STATUS_API:
-    'https://bunchofdeals.com.au/APP/API/Update_Order_Status.php',
+    'https://bunchofdeals.com.au/APP_CLONE/API/Update_Order_Status.php',
 
   //payment
   API_PAYMENT_GATEWAY: CLONE_BASE_URL + API + 'order_payment/getPayments',

@@ -66,6 +66,13 @@ def enableSeparateBuildPerCPUArchitecture = false
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
 def enableProguardInReleaseBuilds = false
+def useIntlJsc = false
+
+project.ext.react = [
+    // enableHermes: true,  // clean and rebuild if changing
+    enableHermes: false,  // clean and rebuild if changing
+]
+
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -104,7 +111,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
+   packagingOptions {
+       pickFirst '**/libjsc.so'
+       pickFirst '**/libc++_shared.so'
+   }
     splits {
         abi {
             reset()
@@ -131,6 +141,11 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+
+            // firebaseCrashlytics {
+            //     nativeSymbolUploadEnabled true
+            //     unstrippedNativeLibsDir 'build/intermediates/merged_native_libs/release/out/lib'
+            // }
         }
     }
 
@@ -150,11 +165,22 @@ android {
         }
     }
 }
-
+//configurations.all {
+//    resolutionStrategy {
+//        force "com.facebook.soloader:soloader:0.10.4"
+//    }
+//}
+//configurations.all {
+//    resolutionStrategy {
+//        force 'com.facebook.react:react-native:0.68.2'
+//        // 0.71.3 pack json
+//    }
+//}
 dependencies {
+    implementation "org.webkit:android-jsc:+"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
+    implementation("com.facebook.soloader:soloader:0.10.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
@@ -174,8 +200,15 @@ dependencies {
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
-        implementation jscFlavor
+//        implementation jscFlavor
+        if (useIntlJsc) {
+            implementation 'org.webkit:android-jsc-intl:+'
+        } else {
+            implementation 'org.webkit:android-jsc:+'
+        }
     }
+//    implementation jscFlavor
+
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

@@ -15,8 +15,19 @@ import OtpVerification from './src/screens/Auth/OtpVerification';
 import SignUp from './src/screens/Auth/SignUp';
 import Splash from './src/screens/Auth/Splash';
 import NoInternetConnection from './src/utils/NoInternetConnection';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {requestLocationPermission} from './src/utils/RequestUserPermission';
+import {ShowConsoleLogMessage} from './src/utils/Utility';
+import {navigationRef} from './src/navigation/RootNavigation';
+import PushNotification from 'react-native-push-notification';
 
-
+PushNotification.configure({
+  onNotifications: notification => {
+    ShowConsoleLogMessage(
+      'PushNotification.configure -> ' + JSON.stringify(notification),
+    );
+  },
+});
 LogBox.ignoreAllLogs();
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.',
@@ -46,7 +57,27 @@ const App = () => {
   const [isOffline, setOfflineStatus] = useState(false);
 
   useEffect(() => {
+    crashlytics().log('App Mounted');
+    messaging().getInitialNotification(remoteMessage => {
+      console.log(
+        'Notification caused app to open from background state getInitialNotification app js:',
+        remoteMessage.notification,
+      );
+      // navigation.navigate(remoteMessage.data.type);
+    });
+
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log(
+        'Notification caused app to open from background state app js:',
+        remoteMessage.notification,
+      );
+      // navigation.navigate(remoteMessage.data.type);
+    });
+    notifee.onBackgroundEvent(event => {
+      ShowConsoleLogMessage(JSON.stringify(event) + ' -> event');
+    });
     requestUserPermission();
+    requestLocationPermission();
     const removeNetInfoSubscription = NetInfo.addEventListener(state => {
       const offline = !(state.isConnected && state.isInternetReachable);
       setOfflineStatus(offline);
@@ -92,7 +123,7 @@ const App = () => {
   return isOffline ? (
     <NoInternetConnection show={isOffline} />
   ) : (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
           animation: 'slide_from_right',

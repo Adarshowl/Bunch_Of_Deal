@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
+  FlatList,
+  Image,
+  Linking,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Image,
-  FlatList,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -24,14 +24,18 @@ import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import moment from 'moment';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import {FONTS} from '../../constants/themes';
-
+import crashlytics from '@react-native-firebase/crashlytics';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 // import PayPal from 'react-native-paypal-gateway';
 // PayPal.initialize(
 //   // PayPal.NO_NETWORK,
 //   PayPal.SANDBOX,
 //   'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM',
 // );
-import {requestOneTimePayment} from 'react-native-paypal';
+import {
+  requestOneTimePayment,
+  requestBillingAgreement,
+} from 'react-native-paypal';
 
 const TEST_PAYPAL_KEY =
   'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM';
@@ -41,6 +45,7 @@ const LIVE_PAYPAL_KEY =
 const Order = ({navigation, route}) => {
   const [changeOne, setChangeOne] = useState(false);
   const [showDone, setShowDone] = useState(false);
+  const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({});
 
@@ -49,16 +54,23 @@ const Order = ({navigation, route}) => {
   const [orderDateTime, setOfferDateTime] = useState('');
   const [count, setCount] = useState('');
   const [price, setPrice] = useState('');
+  const [originalPrice, setOriginalPrice] = useState(0);
+  const [telephone, setTelephone] = useState('');
 
   useEffect(() => {
     let {item} = route.params;
     let {count} = route.params;
     let {price} = route.params;
+    let {originalPrice} = route.params;
+    let {telephone} = route.params;
     getPaymentGatewayList();
     setReceivedData(item);
-    // ShowConsoleLogMessage(JSON.stringify(item));
+    ShowConsoleLogMessage('originalPrice => ' + JSON.stringify(originalPrice));
+    ShowConsoleLogMessage('price ' + JSON.stringify(price));
     setCount(count + '');
     setPrice(price + '');
+    setOriginalPrice(originalPrice + '');
+    setTelephone(telephone + '');
     setTimeout(async () => {
       await getUserFromStorage();
     }, 0);
@@ -77,6 +89,8 @@ const Order = ({navigation, route}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -104,6 +118,8 @@ const Order = ({navigation, route}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -159,7 +175,8 @@ const Order = ({navigation, route}) => {
           style={{
             width: 10,
             height: 0,
-          }}></View>
+          }}
+        />
 
         <View
           style={{
@@ -204,6 +221,19 @@ const Order = ({navigation, route}) => {
     );
   };
 
+  const triggerCall = () => {
+    let m = telephone + '';
+    if (m != '') {
+      try {
+        Linking.openURL(`tel:${m}`);
+      } catch (error) {
+        crashlytics().recordError(error);
+      }
+    } else {
+      ShowToastMessage('Contact Number not available');
+    }
+  };
+
   const submitOrderApi = () => {
     setLoading(true);
     let c = [];
@@ -225,7 +255,7 @@ const Order = ({navigation, route}) => {
           module: 'offer',
           module_id: parseInt(receivedData?.id_offer),
           qty: parseInt(count),
-          amount: price + '.0',
+          amount: originalPrice + '.0',
         },
       ],
     };
@@ -233,7 +263,8 @@ const Order = ({navigation, route}) => {
     //  user_id=565, module=store, user_token=76558d292d03a265e91054a2cb33b0d3, seller_id=98,
     // fcm_id=fG, cart=[{"module":"offer","module_id":98,"qty":1,"amount":"15.0"}], payment_method=3}
 
-    ShowConsoleLogMessage(body);
+    ShowConsoleLogMessage('API_URl -> ' + API_END_POINTS.API_ORDERS_CREATE_COD);
+    ShowConsoleLogMessage('req body \n ' + JSON.stringify(body));
 
     ApiCall('post', body, API_END_POINTS.API_ORDERS_CREATE_COD, {
       'Content-Type': 'multipart/form-data',
@@ -242,20 +273,29 @@ const Order = ({navigation, route}) => {
         let da = response?.data?.split(':')[1];
 
         ShowConsoleLogMessage(
-          'response -> ' + response?.data?.split(',')[1]?.split(':')[1],
+          'response of create order cod api \n -> ' + response?.data,
         );
         // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
         if (da.split(',')[0] == 1) {
           setShowDone(true);
           setOfferDateTime(moment().format('LLL'));
-          setOfferId(response?.data?.split(',')[1]?.split(':')[1] + '');
+          setOfferId(
+            response?.data
+              ?.split(',')[1]
+              ?.split(':')[1]
+              ?.split('}')[1]
+              ?.replaceAll('"', '') + '',
+          );
         } else {
           ShowToastMessage('Something went wrong');
           setSelectedPayment(null);
           getPaymentGatewayList();
+          setShowError(true);
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         ShowToastMessage('Something went wrong');
         setSelectedPayment(null);
         getPaymentGatewayList();
@@ -286,7 +326,7 @@ const Order = ({navigation, route}) => {
           module: 'offer',
           module_id: parseInt(receivedData?.id_offer),
           qty: parseInt(count),
-          amount: price + '.0',
+          amount: originalPrice + '.0',
         },
       ],
     };
@@ -300,25 +340,41 @@ const Order = ({navigation, route}) => {
         let da = response?.data?.split(':')[1];
 
         ShowConsoleLogMessage(
-          'response -> ' + response?.data?.split(',')[1]?.split(':')[1],
+          'response -> ' +
+            response?.data
+              ?.split(',')[1]
+              ?.split(':')[1]
+              ?.split('}')[0]
+              ?.replaceAll('"', '') +
+            '',
         );
         // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
         if (da.split(',')[0] == 1) {
           setShowDone(true);
           setOfferDateTime(moment().format('LLL'));
-          setOfferId(response?.data?.split(',')[1]?.split(':')[1] + '');
+          // setOfferId(response?.data?.split(',')[1]?.split(':')[1] + '');
+          setOfferId(
+            response?.data
+              ?.split(',')[1]
+              ?.split(':')[1]
+              ?.split('}')[0]
+              ?.replaceAll('"', '') + '',
+          );
           updatePaypalOrderApi(
             response?.data?.split(',')[1]?.split(':')[1] + '',
             paymentId,
           );
         } else {
-          ShowToastMessage('Something went wrong');
+          ShowToastMessage('Something went wrong.');
           setSelectedPayment(null);
           getPaymentGatewayList();
+          setShowError(true);
         }
       })
       .catch(error => {
-        ShowToastMessage('Something went wrong');
+        crashlytics().recordError(error);
+
+        ShowToastMessage('Something went wrong.');
         setSelectedPayment(null);
         getPaymentGatewayList();
       })
@@ -341,17 +397,21 @@ const Order = ({navigation, route}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        ShowConsoleLogMessage('response -> ' + JSON.stringify(response?.data));
+        ShowConsoleLogMessage(
+          'response UPDATE_STATUS_API -> ' + JSON.stringify(response?.data),
+        );
         // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
-        if (da.split(',')[0] == 1) {
+        if (response?.data?.result == '1') {
+          ShowToastMessage('Payment Successful');
         } else {
-          ShowToastMessage('Something went wrong');
+          ShowToastMessage('Something went wrong.');
           setSelectedPayment(null);
           getPaymentGatewayList();
         }
       })
       .catch(error => {
-        ShowToastMessage('Something went wrong');
+        crashlytics().recordError(error);
+        ShowToastMessage('Something went wrong.');
         setSelectedPayment(null);
         getPaymentGatewayList();
       })
@@ -369,38 +429,47 @@ const Order = ({navigation, route}) => {
     //   .then(confirm => {
     //     console.log('confirm -> ', confirm?.response?.state);
     //     if (confirm?.response?.state == 'approved') {
-    //       createPaypalOrderApi(confirm?.response?.id);
+    // createPaypalOrderApi('326re13ddhwgdgashddsa23d');
     //     }
     //   })
     //   .catch(error => console.log('error -> ' + error));
+    // new commented
+    try {
+      // For one time payments
+      const {nonce, payerId, email, firstName, lastName, phone} =
+        await requestOneTimePayment('sandbox_q7r32b9d_sm49psk825368ztf', {
+          amount: '1', // required
+          // any PayPal supported currency (see here: https://developer.paypal.com/docs/integration/direct/rest/currency-codes/#paypal-account-payments)
+          currency: 'AUD',
+          // any PayPal supported locale (see here: https://braintree.github.io/braintree_ios/Classes/BTPayPalRequest.html#/c:objc(cs)BTPayPalRequest(py)localeCode)
+          localeCode: 'en_AU',
+          shippingAddressRequired: false,
+          userAction: 'commit', // display 'Pay Now' on the PayPal review page
+          // one of 'authorize', 'sale', 'order'. defaults to 'authorize'. see details here: https://developer.paypal.com/docs/api/payments/v1/#payment-create-request-body
+          intent: 'authorize',
+          // intent: 'sale',
+        });
+      ShowConsoleLogMessage(
+        'paypal config -> nonce => ' +
+          nonce +
+          'payerId=> ' +
+          payerId +
+          'email=> ' +
+          email +
+          'firstName=> ' +
+          firstName +
+          'lastName => ' +
+          lastName +
+          'phone => ' +
+          phone,
+      );
+      createPaypalOrderApi(nonce + '' || '326re13ddhwgdgashddsa23d');
+    } catch (err) {
+      crashlytics().recordError(err);
+    }
+    /**
 
-    // For one time payments
-    const {nonce, payerId, email, firstName, lastName, phone} =
-      await requestOneTimePayment(TEST_PAYPAL_KEY, {
-        amount: '1', // required
-        // any PayPal supported currency (see here: https://developer.paypal.com/docs/integration/direct/rest/currency-codes/#paypal-account-payments)
-        currency: 'AUD',
-        // any PayPal supported locale (see here: https://braintree.github.io/braintree_ios/Classes/BTPayPalRequest.html#/c:objc(cs)BTPayPalRequest(py)localeCode)
-        localeCode: 'en_US',
-        shippingAddressRequired: false,
-        userAction: 'commit', // display 'Pay Now' on the PayPal review page
-        // one of 'authorize', 'sale', 'order'. defaults to 'authorize'. see details here: https://developer.paypal.com/docs/api/payments/v1/#payment-create-request-body
-        intent: 'authorize',
-      });
-    ShowConsoleLogMessage(
-      'paypal config -> nonce => ' +
-        nonce +
-        'payerId=> ' +
-        payerId +
-        'email=> ' +
-        email +
-        'firstName=> ' +
-        firstName +
-        'lastName => ' +
-        lastName +
-        'phone => ' +
-        phone,
-    );
+     */
   };
 
   return (
@@ -476,7 +545,8 @@ const Order = ({navigation, route}) => {
                 backgroundColor: changeOne
                   ? COLORS.colorPrimary
                   : COLORS.shimmer_loading_color_darker,
-              }}></View>
+              }}
+            />
             <View
               style={{
                 alignItems: 'center',
@@ -563,18 +633,9 @@ const Order = ({navigation, route}) => {
             }}>
             Your order has been sent successfully!
           </Text>
-          {/* <View
-            style={{
-              height: 1,
-              backgroundColor: COLORS.shimmer_loading_color,
-              width: '100%',
-              marginTop: 20,
-            }}
-          /> */}
+
           <View
             style={{
-              // borderWidth: 1,
-              // borderRadius: 3,
               borderColor: COLORS.grey_20,
               paddingVertical: 5,
               paddingHorizontal: 8,
@@ -627,8 +688,7 @@ const Order = ({navigation, route}) => {
                 marginStart: 5,
               }}
               numberOfLines={2}>
-              Order Total:{' '}
-              {receivedData?.currency?.symbol + '' + receivedData?.offer_value}
+              Order Total: {receivedData?.currency?.symbol + '' + price}
               .0
             </Text>
             <Text
@@ -644,28 +704,54 @@ const Order = ({navigation, route}) => {
               Order Date & Time: {orderDateTime}
             </Text>
           </View>
-          {/* <View
+
+          <Text
             style={{
-              height: 1,
-              backgroundColor: COLORS.shimmer_loading_color,
-              width: '100%',
+              fontSize: 14,
+              fontFamily: 'Montserrat-Regular',
+              color: COLORS.shimmer_loading_color_darker,
+              textAlign: 'left',
             }}
-          /> */}
-          <BunchDealCommonBtn
-            height={40}
-            width={'90%'}
-            backgroundColor={COLORS.colorAccent}
-            marginHorizontal={0}
-            text={'CONTACT VENDOR TO CLAIM THIS OFFER'}
-            textStyle={FONTS.body4}
-            onPress={() => {
-              ShowToastMessage('Coming soon!');
-            }}
-            textColor={COLORS.white}
-            borderRadius={2}
-            textSize={14}
-            marginTop={20}
-          />
+            numberOfLines={2}>
+            {/**CONTACT VENDOR TO CLAIM THIS OFFER*/}
+            *Contact vendor to claim this offer
+          </Text>
+          {/*<BunchDealCommonBtn*/}
+          {/*  height={40}*/}
+          {/*  width={'90%'}*/}
+          {/*  backgroundColor={COLORS.colorAccent}*/}
+          {/*  marginHorizontal={0}*/}
+          {/*  text={'CONTACT VENDOR TO CLAIM THIS OFFER'}*/}
+          {/*  textStyle={FONTS.body4}*/}
+          {/*  onPress={() => {*/}
+          {/*    // ShowToastMessage('Coming soon!');*/}
+          {/*    triggerCall();*/}
+          {/*  }}*/}
+          {/*  textColor={COLORS.white}*/}
+          {/*  borderRadius={2}*/}
+          {/*  textSize={14}*/}
+          {/*  marginTop={20}*/}
+          {/*/>*/}
+        </View>
+      ) : showError ? (
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: COLORS.white,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Fontisto name={'close-a'} color={COLORS.red} size={80} />
+          <Text
+            style={{
+              fontFamily: 'Montserrat-Medium',
+              marginTop: 15,
+              color: COLORS.shimmer_loading_color_darker,
+              textAlign: 'center',
+              // flex: 1,
+            }}>
+            Your order has been failed!
+          </Text>
         </View>
       ) : !changeOne ? (
         <>
@@ -889,7 +975,43 @@ const Order = ({navigation, route}) => {
             style={{
               height: 56,
               width: '100%',
-              backgroundColor: COLORS.done_green,
+              backgroundColor: showDone ? COLORS.done_green : COLORS.red,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignContent: 'center',
+              flexDirection: 'row',
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Montserrat-SemiBold',
+                color: COLORS.white,
+                marginEnd: 5,
+                fontSize: 16,
+                letterSpacing: 0.5,
+              }}>
+              DONE
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : showError ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            left: 0,
+          }}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{
+              height: 56,
+              width: '100%',
+              backgroundColor: COLORS.red,
               justifyContent: 'center',
               alignItems: 'center',
               alignContent: 'center',
@@ -941,6 +1063,8 @@ const Order = ({navigation, route}) => {
               if (changeOne) {
                 if (selectedPayment != null) {
                   ShowConsoleLogMessage(selectedPayment);
+                  // await submitPaypalPayment();
+
                   if (selectedPayment?.id == 3) {
                     submitOrderApi();
                   } else if (selectedPayment?.id == 1) {

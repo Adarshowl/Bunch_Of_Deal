@@ -13,15 +13,13 @@ import {
   SafeAreaView,
   ScrollView,
   Share,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {AirbnbRating} from 'react-native-elements';
-
-import {Image} from 'react-native-elements';
+import {AirbnbRating, Image} from 'react-native-elements';
+import crashlytics from '@react-native-firebase/crashlytics';
 import LinearGradient from 'react-native-linear-gradient';
 import MapView, {Marker} from 'react-native-maps';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -55,12 +53,14 @@ import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import RenderOfferItem from './RenderOfferItem';
 import RenderReviewItem from './RenderReviewItem';
 import RenderGalleryItem from './RenderGalleryItem';
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 
 const StoreDetails = ({navigation, route}) => {
   const isFocused = useIsFocused();
 
   const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-    const paddingToBottom = 30;
+    const paddingToBottom = SIZES.width + 100;
+
     return (
       layoutMeasurement.height + contentOffset.y >=
       contentSize.height - paddingToBottom
@@ -98,6 +98,8 @@ const StoreDetails = ({navigation, route}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -118,6 +120,8 @@ const StoreDetails = ({navigation, route}) => {
         }
       });
     } catch (err) {
+      crashlytics().recordError(err);
+
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
@@ -127,7 +131,9 @@ const StoreDetails = ({navigation, route}) => {
 
     try {
       Linking.openURL(`tel:${m}`);
-    } catch (error) {}
+    } catch (error) {
+      crashlytics().recordError(error);
+    }
   };
 
   const onShare = async () => {
@@ -147,11 +153,14 @@ const StoreDetails = ({navigation, route}) => {
         // dismissed
       }
     } catch (error) {
+      crashlytics().recordError(error);
+
       Alert.alert(error.message);
     }
   };
 
   const getStoreList = val => {
+    setLoading(true);
     let body = {
       limit: '1',
       store_id: val,
@@ -177,7 +186,9 @@ const StoreDetails = ({navigation, route}) => {
             Object.values(result[0]?.images).forEach((key, index) => {
               res.push(key['560_560' || 'full']?.url + '');
             });
-          } catch (err) {}
+          } catch (err) {
+            crashlytics().recordError(err);
+          }
 
           setImages(res);
 
@@ -186,11 +197,15 @@ const StoreDetails = ({navigation, route}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
   const [favorite, setFavorite] = useState(false);
   const [reviewAdded, setReviewAdded] = useState(false);
@@ -212,12 +227,14 @@ const StoreDetails = ({navigation, route}) => {
         // ShowConsoleLogMessage(response);
         if (response?.data?.success == 1) {
           setFavorite(!favorite);
-          ShowToastMessage('Saved');
+          ShowToastMessage('Added to favorite');
         } else {
           setFavorite(false);
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -241,12 +258,15 @@ const StoreDetails = ({navigation, route}) => {
         // ShowConsoleLogMessage(response);
         if (response?.data?.success == 1) {
           setFavorite(!favorite);
-          ShowToastMessage('Unsaved');
+          // ShowToastMessage('Unsaved');
+          ShowToastMessage('Removed from favorite');
         } else {
           setFavorite(false);
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -288,7 +308,7 @@ const StoreDetails = ({navigation, route}) => {
           setReviewAdded(is_store_review);
         } else {
           setReceivedData(item);
-          // ShowConsoleLogMessage(item);
+          ShowConsoleLogMessage(item);
           getOfferList(item?.id_store);
           getReviewList(item?.id_store);
           getGalleryList(item?.id_store);
@@ -299,7 +319,9 @@ const StoreDetails = ({navigation, route}) => {
             Object.values(item?.images).forEach((key, index) => {
               res.push(key['560_560' || 'full']?.url + '');
             });
-          } catch (err) {}
+          } catch (err) {
+            crashlytics().recordError(err);
+          }
           setImages(res);
 
           setImageUrl(item?.images['0']['560_560'].url);
@@ -317,6 +339,7 @@ const StoreDetails = ({navigation, route}) => {
           setReviewAdded(is_store_review);
         }
       }
+      await AsyncStorage.setItem('notification', '');
     })();
   }, []);
 
@@ -501,7 +524,8 @@ const StoreDetails = ({navigation, route}) => {
                   marginTop: 60,
                   fontFamily: 'Montserrat-Medium',
                   marginHorizontal: 20,
-                }}></Text>
+                }}
+              />
             </View>
             <View
               style={{
@@ -586,7 +610,8 @@ const StoreDetails = ({navigation, route}) => {
                 textAlign: 'center',
                 marginTop: 30,
                 fontFamily: 'Montserrat-Medium',
-              }}></Text>
+              }}
+            />
             <View
               style={{
                 marginBottom: 'auto',
@@ -617,7 +642,7 @@ const StoreDetails = ({navigation, route}) => {
     );
   };
   const openMap = () => {
-    const scheme = Platform.select({ios: `maps:0,0?q=`, android: 'geo:0,0?q='});
+    const scheme = Platform.select({ios: 'maps:0,0?q=', android: 'geo:0,0?q='});
     const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
     const label = receivedData?.name;
     // const label = 'Open Google Map';
@@ -668,6 +693,8 @@ const StoreDetails = ({navigation, route}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -780,6 +807,8 @@ const StoreDetails = ({navigation, route}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -788,13 +817,14 @@ const StoreDetails = ({navigation, route}) => {
   };
 
   const [showAddReviewModal, setShowAddReviewModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const closeAddReviewModal = () => {
     setShowAddReviewModal(!showAddReviewModal);
   };
 
   const addReview = async () => {
-    if (parseInt(rate) > 0) {
+    if (parseInt(rate) > 0 && password != '') {
       let body = {
         store_id: receivedData?.id_store + '',
         rate: rate.toString() + '',
@@ -818,12 +848,14 @@ const StoreDetails = ({navigation, route}) => {
         .then(async response => {
           ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.success == 1) {
+            closeAddReviewModal();
             ShowToastMessage(STRING.thank_you);
             getReviewList(receivedData?.id_store);
             doSaveStoreReview(receivedData?.id_store);
             setPassword('');
-            setRate(3);
+            setRate(0);
           } else {
+            closeAddReviewModal();
             doSaveStoreReview(receivedData?.id_store);
             let is_store_review = await isStoreReviewSaved(
               receivedData?.id_store,
@@ -834,11 +866,15 @@ const StoreDetails = ({navigation, route}) => {
           }
         })
         .catch(err => {
+          crashlytics().recordError(err);
+
           ShowConsoleLogMessage(
             'Error in get offer recent api call: ' + err.message,
           );
         })
         .finally(() => {});
+    } else if (password == '') {
+      ShowToastMessage('Please write your review');
     } else {
       ShowToastMessage('Please select from 1 star to 5 star');
     }
@@ -851,9 +887,10 @@ const StoreDetails = ({navigation, route}) => {
     // console.log('Rating is: ' + rating);
     setRate(rating);
   }
+
   const [password, setPassword] = useState('');
 
-  const [rate, setRate] = useState(3);
+  const [rate, setRate] = useState(0);
 
   const renderAddReviewModal = () => {
     return (
@@ -874,6 +911,7 @@ const StoreDetails = ({navigation, route}) => {
                 starContainerStyle={{
                   marginTop: 20,
                 }}
+                defaultRating={rate}
               />
             </View>
             <View
@@ -918,14 +956,14 @@ const StoreDetails = ({navigation, route}) => {
                   ShowToastMessage(STRING.you_ve_already_reviewd);
                 } else {
                   addReview();
-                  closeAddReviewModal();
+                  // closeAddReviewModal();
                   let is_store_review = await isStoreReviewSaved(
                     receivedData?.store_id || receivedData?.id_store,
                   );
                   setReviewAdded(is_store_review);
                 }
               }}
-              marginTop={40}
+              marginTop={25}
               borderRadius={1}
               textSize={14}
             />
@@ -964,6 +1002,8 @@ const StoreDetails = ({navigation, route}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -979,6 +1019,8 @@ const StoreDetails = ({navigation, route}) => {
     <SafeAreaView
       style={GlobalStyle1.mainContainerBgColor}
       showsVerticalScrollIndicator={false}>
+      <BunchDealProgressBar loading={loading} />
+
       <ScrollView
         nestedScrollEnabled={true}
         onScroll={({nativeEvent}) => {
@@ -1013,7 +1055,7 @@ const StoreDetails = ({navigation, route}) => {
          backgroundColor: COLORS.transparent,
           padding: 10,
         position:'absolute'
-   
+
         }]}>
         <BunchDealVectorIcon
           title={Ionicons}
@@ -1031,7 +1073,7 @@ const StoreDetails = ({navigation, route}) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'flex-end',
-          
+
           }}>
           <Entypofrom
             name="share"
@@ -1039,15 +1081,15 @@ const StoreDetails = ({navigation, route}) => {
             color={COLORS.colorAccent}
             style={{
               marginHorizontal: 5,
-             
+
             }}
             onPress={() => {
               onShare();
             }}
           />
-         
+
         </View>
-       
+
       </LinearGradient>
           */}
 
@@ -1091,7 +1133,8 @@ const StoreDetails = ({navigation, route}) => {
                   alignSelf: 'flex-start',
                   flexDirection: 'row',
                   alignItems: 'center',
-                }}></View>
+                }}
+              />
               {images.length > 1 ? (
                 <Text
                   style={{
@@ -1106,17 +1149,45 @@ const StoreDetails = ({navigation, route}) => {
                   {images.length > 1 ? `  ${images.length}` : ''}
                 </Text>
               ) : null}
-              <Text
-                style={{
-                  paddingHorizontal: 15,
-                  fontFamily: 'Montserrat-Medium',
-                  paddingVertical: 6,
-                  color: COLORS.white,
-                  fontSize: 11,
-                  backgroundColor: COLORS.colorAccent,
-                }}>
-                +100km
-              </Text>
+              {/*<Text*/}
+              {/*  style={{*/}
+              {/*    paddingHorizontal: 15,*/}
+              {/*    fontFamily: 'Montserrat-Medium',*/}
+              {/*    paddingVertical: 6,*/}
+              {/*    color: COLORS.white,*/}
+              {/*    fontSize: 11,*/}
+              {/*    backgroundColor: COLORS.colorAccent,*/}
+              {/*  }}>*/}
+              {/*  +100km*/}
+              {/*</Text>*/}
+              {receivedData?.distance != null ? (
+                receivedData?.distance >= 100 ? (
+                  <Text
+                    style={{
+                      paddingHorizontal: 15,
+                      fontFamily: 'Montserrat-Medium',
+                      paddingVertical: 6,
+                      color: COLORS.white,
+                      fontSize: 11,
+                      backgroundColor: COLORS.colorAccent,
+                    }}>
+                    +100km
+                    {/*{receivedData?.distance}km*/}
+                  </Text>
+                ) : receivedData?.distance < 100 ? (
+                  <Text
+                    style={{
+                      paddingHorizontal: 15,
+                      fontFamily: 'Montserrat-Medium',
+                      paddingVertical: 6,
+                      color: COLORS.white,
+                      fontSize: 11,
+                      backgroundColor: COLORS.colorAccent,
+                    }}>
+                    {receivedData?.distance}km
+                  </Text>
+                ) : null
+              ) : null}
             </View>
           </TouchableOpacity>
           <View style={{}}>
@@ -1225,18 +1296,18 @@ const StoreDetails = ({navigation, route}) => {
             <TouchableOpacity
               key={'Reviews'}
               onPress={onPress => {
-                if (userData?.id_user == null) {
-                  navigation.navigate('Auth', {
-                    screen: 'Login',
-                    params: {
-                      screen: 'Login',
-                    },
-                  });
-                } else {
-                  setChangeTwo(true);
-                  setChangeThree(false);
-                  setChangeOne(false);
-                }
+                // if (userData?.id_user == null) {
+                //   navigation.navigate('Auth', {
+                //     screen: 'Login',
+                //     params: {
+                //       screen: 'Login',
+                //     },
+                //   });
+                // } else {
+                setChangeTwo(true);
+                setChangeThree(false);
+                setChangeOne(false);
+                // }
               }}
               style={{
                 flex: 1,
@@ -1383,14 +1454,23 @@ const StoreDetails = ({navigation, route}) => {
                 textStyle={FONTS.body3}
                 textColor={COLORS.white}
                 onPress={async () => {
-                  let is_store_review = await isStoreReviewSaved(
-                    receivedData?.store_id || receivedData?.id_store,
-                  );
-                  setReviewAdded(is_store_review);
-                  if (is_store_review) {
-                    ShowToastMessage(STRING.you_ve_already_reviewd);
+                  if (userData?.id_user == null) {
+                    navigation.navigate('Auth', {
+                      screen: 'Login',
+                      params: {
+                        screen: 'Login',
+                      },
+                    });
                   } else {
-                    closeAddReviewModal();
+                    let is_store_review = await isStoreReviewSaved(
+                      receivedData?.store_id || receivedData?.id_store,
+                    );
+                    setReviewAdded(is_store_review);
+                    if (is_store_review) {
+                      ShowToastMessage(STRING.you_ve_already_reviewd);
+                    } else {
+                      closeAddReviewModal();
+                    }
                   }
                 }}
                 marginTop={25}
@@ -1653,7 +1733,8 @@ const StoreDetails = ({navigation, route}) => {
           <View
             style={{
               padding: 10,
-            }}></View>
+            }}
+          />
         </View>
       </ScrollView>
 
@@ -1792,7 +1873,9 @@ const styles = StyleSheet.create({
   activityIndicatorWrapper: {
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-    height: SIZES.width - 120,
+    minHeight: SIZES.width - 120,
+    paddingBottom: 10,
+    paddingHorizontal: 5,
     width: SIZES.width - 80,
     // paddingHorizontal: 20,
     display: 'flex',

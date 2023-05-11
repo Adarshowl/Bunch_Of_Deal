@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {COLORS} from '../constants/Colors';
 import {SIZES} from '../constants/themes';
 
@@ -107,12 +107,7 @@ export default StyleSheet.create({
   marginHorizontal15: {
     marginHorizontal: 15,
   },
-  marginHorizontal15: {
-    marginHorizontal: 15,
-  },
-  marginVertical15: {
-    marginVertical: 15,
-  },
+
   marginVertical15: {
     marginVertical: 15,
   },
@@ -139,12 +134,7 @@ export default StyleSheet.create({
   paddingHorizontal15: {
     paddingHorizontal: 15,
   },
-  paddingHorizontal15: {
-    paddingHorizontal: 15,
-  },
-  paddingVertical15: {
-    paddingVertical: 15,
-  },
+
   paddingVertical15: {
     paddingVertical: 15,
   },

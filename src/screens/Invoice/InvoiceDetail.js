@@ -2,24 +2,24 @@
 /**
  package com.christopherdro.htmltopdf;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.WritableMap;
-import android.os.Build;
+ import com.facebook.react.bridge.Arguments;
+ import com.facebook.react.bridge.ReactApplicationContext;
+ import com.facebook.react.bridge.ReactContextBaseJavaModule;
+ import com.facebook.react.bridge.ReactMethod;
+ import com.facebook.react.bridge.ReadableMap;
+ import com.facebook.react.bridge.Promise;
+ import com.facebook.react.bridge.WritableMap;
+ import android.os.Build;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
+ import java.io.File;
+ import java.io.IOException;
+ import java.util.UUID;
 
-import android.os.Environment;
-import android.print.PdfConverter;
-import android.print.PrintAttributes;
+ import android.os.Environment;
+ import android.print.PdfConverter;
+ import android.print.PrintAttributes;
 
-public class RNHTMLtoPDFModule extends ReactContextBaseJavaModule {
+ public class RNHTMLtoPDFModule extends ReactContextBaseJavaModule {
 
     private static final String HTML = "html";
     private static final String FILE_NAME = "fileName";
@@ -140,7 +140,7 @@ public class RNHTMLtoPDFModule extends ReactContextBaseJavaModule {
  */
 // new merge code - 12 April 2023
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -157,9 +157,11 @@ import {FONTS} from '../../constants/themes';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import RNFetchBlob from 'rn-fetch-blob';
+import crashlytics from '@react-native-firebase/crashlytics';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+
 const InvoiceDetail = ({navigation, route}) => {
   const [webViewLoading, setWebViewLoading] = useState(true);
   const [downloaded, setisdownloaded] = useState(true);
@@ -183,6 +185,8 @@ const InvoiceDetail = ({navigation, route}) => {
             );
           }
         } catch (err) {
+          crashlytics().recordError(err);
+
           console.warn(err);
         }
       } else {
@@ -199,6 +203,24 @@ const InvoiceDetail = ({navigation, route}) => {
 
   const [htmlData, setHtmlData] = useState('');
 
+  function makeid(length) {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
+
+  const [number, setNumber] = useState('');
+  useEffect(() => {
+    setNumber(makeid(5));
+  }, []);
+
   // console.log(url);
 
   const createPDF = async () => {
@@ -208,7 +230,7 @@ const InvoiceDetail = ({navigation, route}) => {
         Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
       let options = {
         html: htmlData,
-        fileName: 'BOD_OrderID_' + order_id,
+        fileName: 'BOD_OrderID_' + number + '_' + order_id,
         directory: dirToSave,
       };
 
@@ -219,10 +241,14 @@ const InvoiceDetail = ({navigation, route}) => {
       Alert.alert(
         'File Downloaded Successfully',
         'File saved to : Documents/BOD_INVOICES/BOD_OrderID_' +
+          number +
+          '_' +
           order_id +
           '.pdf',
       );
     } catch (err) {
+      crashlytics().recordError(err);
+
       ShowToastMessage('Failed to download invoice');
     }
   };
@@ -241,7 +267,6 @@ const InvoiceDetail = ({navigation, route}) => {
             alignItems: 'center',
             flexDirection: 'row',
             backgroundColor: COLORS.white,
-            elevation: 10,
           },
         ]}>
         <Ionicons

@@ -1,26 +1,17 @@
+import crashlytics from '@react-native-firebase/crashlytics';
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, View} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {icons, STRING} from '../../constants';
-import {COLORS} from '../../constants/Colors';
-import {FONTS} from '../../constants/themes';
-import GlobalStyle from '../../styles/GlobalStyle';
-import BunchDealImageText from '../../utils/BunchDealImageText';
-import BunchDealVectorIconText from '../../utils/BunchDealVectorIconText';
-import {requestLocationPermission} from '../../utils/RequestUserPermission';
-import {
-  getMacAddress,
-  ShowConsoleLogMessage,
-
-} from '../../utils/Utility';
-import moment from 'moment';
-import StoreCardView from './StoreCardView';
+import TimeZone from 'react-native-timezone';
+import {STRING} from '../../constants';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
+import GlobalStyle from '../../styles/GlobalStyle';
 import NoResult from '../../utils/NoResult';
+import {requestLocationPermission} from '../../utils/RequestUserPermission';
 import {StoreSkeleton} from '../../utils/Skeleton';
-
-import TimeZone from 'react-native-timezone';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+import StoreCardView from './StoreCardView';
 
 const Store = ({
   navigation,
@@ -94,9 +85,9 @@ const Store = ({
         }
       })
       .catch(err => {
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {
         setLoading(false);
@@ -137,6 +128,8 @@ const Store = ({
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );

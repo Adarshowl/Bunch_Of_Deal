@@ -132,7 +132,8 @@ const StoreCardView = ({item}) => {
             onPress={() => {}}
           />
           <Text style={[FONTS.body5, styles.dealName]} numberOfLines={1}>
-            {item?.address}
+            {/*{item?.address}*/}
+            {item?.address?.split(',')[1] || item?.address?.split(',')[0] || ''}
           </Text>
         </View>
       </View>
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     paddingEnd: 8,
     fontFamily: 'Montserrat-Regular',
     fontSize: 11,
-    color: COLORS.black, 
+    color: COLORS.black,
   },
   dealPriceText: {
     marginEnd: 5,

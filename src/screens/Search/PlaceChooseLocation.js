@@ -1,10 +1,11 @@
 import React from 'react';
 import {Modal, StyleSheet, View, Text} from 'react-native';
-import {SIZES} from '../../constants';
+import {SIZES, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {requestLocationPermission} from '../../utils/RequestUserPermission';
 
 const PlaceChooseLocation = ({
   navigation,
@@ -66,6 +67,8 @@ const PlaceChooseLocation = ({
             textStyle={FONTS.body3}
             textColor={COLORS.white}
             onPress={() => {
+              requestLocationPermission().then(r => {});
+              STRING.SEARCH_LOCATION = 'Current Location';
               onRequestClose();
             }}
             marginTop={25}
@@ -106,10 +109,10 @@ const styles = StyleSheet.create({
   activityIndicatorWrapper: {
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-    height: SIZES.width - 35,
+    minHeight: SIZES.width - 35,
     width: SIZES.width - 120,
     // paddingHorizontal: 20,
-
+    paddingBottom: 10,
     display: 'flex',
     alignItems: 'center',
     // justifyContent: 'space-between',

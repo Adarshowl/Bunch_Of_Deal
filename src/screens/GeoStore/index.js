@@ -1,36 +1,36 @@
 import Geolocation from '@react-native-community/geolocation';
+import crashlytics from '@react-native-firebase/crashlytics';
 import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
+  FlatList,
   PermissionsAndroid,
   Platform,
+  SafeAreaView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  SafeAreaView,
+  View,
 } from 'react-native';
-import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
 import {AirbnbRating} from 'react-native-elements';
+import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import TimeZone from 'react-native-timezone';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {images, STRING} from '../../constants';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {STRING, images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
-import {ShowConsoleLogMessage,} from '../../utils/Utility';
-import {FlatList} from 'react-native';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
 import SearchDialog from '../Search';
-import PlacePickerLocation from '../Search/PlacePickerLocation';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
-import TimeZone from 'react-native-timezone';
-
+import PlacePickerLocation from '../Search/PlacePickerLocation';
 
 var {width, height} = Dimensions.get('window');
 const windowWidth = Dimensions.get('window').width;
@@ -40,8 +40,6 @@ const LATITUDE_DELTA = 0.9222;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const apiKey = 'AIzaSyCIcyfvlmMVSAxxvPTASWasIN8ncskIj0w';
 
-
-
 const GeoStore = ({navigation}) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -50,7 +48,7 @@ const GeoStore = ({navigation}) => {
   const [categoryId, setCategoryId] = useState('');
   const [categoryName, setCategoryName] = useState('');
   const [showPlaceChooseModal, setShowPlaceChooseModal] = useState(false);
-
+  const [location, setLocation] = useState(null);
   const closeSearchModal = () => {
     setShowSearchModal(!showSearchModal);
   };
@@ -83,7 +81,7 @@ const GeoStore = ({navigation}) => {
       radius: radius,
     };
 
-    ShowConsoleLogMessage(JSON.stringify(body));
+    // ShowConsoleLogMessage(JSON.stringify(body));
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
@@ -99,6 +97,8 @@ const GeoStore = ({navigation}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -118,8 +118,8 @@ const GeoStore = ({navigation}) => {
   });
   const [coordinate, setCoordinate] = useState(
     new AnimatedRegion({
-      latitude: 0,
-      longitude: 0,
+      latitude: 0.0,
+      longitude: 0.0,
       latitudeDelta: LATITUDE_DELTA,
       longitudeDelta: LONGITUDE_DELTA,
     }),
@@ -145,6 +145,8 @@ const GeoStore = ({navigation}) => {
             getOneTimeLocation();
           }
         } catch (err) {
+          crashlytics().recordError(err);
+
           console.warn(err);
         }
       }
@@ -159,20 +161,25 @@ const GeoStore = ({navigation}) => {
     const newCoord = {
       latitude,
       longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
     };
+
     if (latitude && longitude) {
       setTimeout(() => {
         // markerRef.current.animateMarkerToCoordinate(newCoord, 7000);
         if (Platform.OS == 'android') {
-        markerRef?.current?.animateMarkerToCoordinate(newCoord, 7000);
+          markerRef?.current?.animateMarkerToCoordinate(newCoord, 7000);
+          // markerRef?.current?.animateToRegion(newCoord, 7000);
         }
-      }, 2000);
+      }, 200);
     }
 
     //place platform check
     if (Platform.OS == 'android') {
       if (markerRef.current) {
         markerRef?.current?.animateMarkerToCoordinate(newCoord, 7000);
+        // markerRef?.current?.animateToRegion(newCoord, 7000);
       }
     } else {
     }
@@ -185,10 +192,11 @@ const GeoStore = ({navigation}) => {
     Geolocation.getCurrentPosition(
       position => {
         let coords = position.coords;
-        animate(position.coords.latitude, position.coords.longitude);
+        // animate(position.coords.latitude, position.coords.longitude);
         // const currentLongitude = JSON.stringify(position.coords.longitude);
         // const currentLatitude = JSON.stringify(position.coords.latitude);
         if (coords) {
+          setLocation(coords);
           let {longitude, latitude} = coords;
 
           setMapRegion({
@@ -255,6 +263,8 @@ const GeoStore = ({navigation}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
         );
@@ -295,6 +305,8 @@ const GeoStore = ({navigation}) => {
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         // console.log('error < ', err);
         ShowConsoleLogMessage(
           'Error in get offer recent api call: ' + err.message,
@@ -465,8 +477,8 @@ const GeoStore = ({navigation}) => {
           }}>
           <Ionicons
             onPress={() => {
-              // closeSearchModal();
-              navigation.navigate('UniversalSearch');
+              closeSearchModal();
+              // navigation.navigate('UniversalSearch');
             }}
             marginStart={15}
             color={COLORS.colorPrimary}
@@ -476,7 +488,13 @@ const GeoStore = ({navigation}) => {
 
           <MaterialIcons
             onPress={() => {
-              console.log('search');
+              setLocation({
+                latitude: 0.0,
+                longitude: 0.0,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              });
+
               getOneTimeLocation();
             }}
             marginEnd={10}
@@ -560,15 +578,53 @@ const GeoStore = ({navigation}) => {
           region={mapRegion}></MapView>
       </View> */}
       <View>
-      <MapView
+        <MapView
           ref={mapRef}
           style={{
-                        width: Dimensions.get('screen').width,
+            width: Dimensions.get('screen').width,
             height: Dimensions.get('screen').height - 100,
-                      }}
-        
-          
-         >
+          }}>
+          <MapViewDirections
+            origin={{
+              latitude: location?.latitude,
+              longitude: location?.longitude,
+            }}
+            destination={{
+              // latitude: parseFloat(location?.latitude) + 1.0,
+              // longitude: parseFloat(location?.longitude) + 1.0,
+              latitude: location?.latitude,
+              longitude: location?.longitude,
+            }}
+            apikey={apiKey}
+            strokeWidth={5}
+            strokeColor={COLORS.transparent}
+            optimizeWaypoints={true}
+            onReady={result => {
+              // ShowConsoleLogMessage(result);
+              mapRef.current.fitToCoordinates(result.coordinates, {
+                edgePadding: {
+                  right: 100,
+                  bottom: 200,
+                  left: 0,
+                  top: 200,
+                },
+              });
+              // mapRef.current.fitToCoordinates(result.coordinates, {
+              //   edgePadding: {
+              //     right: 0,
+              //     bottom: 200,
+              //     left: 0,
+              //     top: 200,
+              //   },
+              //   animated: true,
+              // });
+              // animate(
+              //   result?.coordinates[0]?.latitude,
+              //   result?.coordinates[0]?.longitude,
+              // );
+              // sendLatLong(location?.['latitude'], location?.['longitude']);
+            }}
+          />
           {recentData &&
             recentData.map(item => (
               <Marker
@@ -617,12 +673,21 @@ const GeoStore = ({navigation}) => {
                 </View>
               </Marker>
             ))}
-          <Marker.Animated
-            ref={markerRef}
-            coordinate={coordinate}
-            title={'Your current location'}
-            description="Current Location"
-          />
+          {/*<Marker.Animated*/}
+          {/*  ref={markerRef}*/}
+          {/*  coordinate={coordinate}*/}
+          {/*  title={'Your current location'}*/}
+          {/*  description="Current Location"*/}
+          {/*/>*/}
+          {location != null ? (
+            <Marker
+              coordinate={{
+                latitude: location?.latitude,
+                longitude: location?.longitude,
+              }}
+              // image={require("../../../assets/icons/pickup.png")}
+            />
+          ) : null}
         </MapView>
       </View>
       {selectedItem != null ? renderOfferModal() : null}

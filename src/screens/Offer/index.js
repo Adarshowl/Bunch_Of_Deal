@@ -1,25 +1,23 @@
+import crashlytics from '@react-native-firebase/crashlytics';
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View, Modal, SafeAreaView} from 'react-native';
+import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import TimeZone from 'react-native-timezone';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {icons, STRING} from '../../constants';
+import {STRING, icons} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
+import ApiCall from '../../network/ApiCall';
+import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealImageText from '../../utils/BunchDealImageText';
 import BunchDealVectorIconText from '../../utils/BunchDealVectorIconText';
-import {requestLocationPermission} from '../../utils/RequestUserPermission';
-import {
-  getMacAddress,
-  ShowConsoleLogMessage,
-
-} from '../../utils/Utility';
-import moment from 'moment';
-import OfferCardView from './OfferCardView';
-import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
 import NoResult from '../../utils/NoResult';
+import {requestLocationPermission} from '../../utils/RequestUserPermission';
 import {OfferSkeleton} from '../../utils/Skeleton';
-import TimeZone from 'react-native-timezone';
+import {ShowConsoleLogMessage} from '../../utils/Utility';
+import OfferCardView from './OfferCardView';
+
 const Offer = ({
   navigation,
   searchText,
@@ -95,10 +93,10 @@ const Offer = ({
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         // console.log('eorir < ', err);
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {
         setLoading(false);
@@ -137,6 +135,9 @@ const Offer = ({
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
           // ShowConsoleLogMessage(JSON.stringify(result));
+          // let r = result?.forEach(item => {
+          //   ShowConsoleLogMessage(JSON.stringify(item?.id_offer));
+          // });
           setShowError(result.length <= 0);
           setRecentData(result);
         } else {
@@ -145,10 +146,10 @@ const Offer = ({
         }
       })
       .catch(err => {
+        crashlytics().recordError(err);
+
         // console.log('error < ', err);
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {});
   };
@@ -190,10 +191,9 @@ const Offer = ({
       })
       .catch(err => {
         // console.log('Erro -> ', err);
+        crashlytics().recordError(err);
 
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
       .finally(() => {
         setLoading(false);

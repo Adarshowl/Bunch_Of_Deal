@@ -228,24 +228,21 @@
 ////  code merged
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 import React, {useEffect, useRef, useState} from 'react';
 import {Image, SafeAreaView, Text, View} from 'react-native';
+import CountDown from 'react-native-countdown-component';
 import OtpInputs from 'react-native-otp-inputs';
 import {COLORS} from '../../../constants/Colors';
-import images from '../../../constants/images';
 import {STRING} from '../../../constants/String';
+import images from '../../../constants/images';
 import {FONTS} from '../../../constants/themes';
 import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
 import GlobalStyle2 from '../../../styles/GlobalStyle2';
 import BunchDealCommonBtn from '../../../utils/BunchDealCommonBtn';
 import BunchDealProgressBar from '../../../utils/BunchDealProgressBar';
-import {
-  ShowConsoleLogMessage,
-  ShowToastMessage,
-  validateFieldNotEmpty,
-} from '../../../utils/Utility';
-import CountDown from 'react-native-countdown-component';
+import {ShowToastMessage, validateFieldNotEmpty} from '../../../utils/Utility';
 
 const OtpVerification = ({navigation, route}) => {
   const [loading, setLoading] = useState(false);
@@ -253,6 +250,7 @@ const OtpVerification = ({navigation, route}) => {
   const [code, setCode] = useState('');
   const [focused, setFocused] = React.useState(false);
 
+  // const [secondLeft, setSecondLeft] = useState(300);
   const [secondLeft, setSecondLeft] = useState(300);
   const [enable, setEnable] = useState(false);
 
@@ -335,6 +333,8 @@ const OtpVerification = ({navigation, route}) => {
           }
         })
         .catch(error => {
+          crashlytics().recordError(error);
+
           console.log(error, 'eroor------------>');
         })
         .finally(() => {
@@ -364,6 +364,8 @@ const OtpVerification = ({navigation, route}) => {
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log(error, 'eroor------------>');
       })
       .finally(() => {
@@ -383,13 +385,15 @@ const OtpVerification = ({navigation, route}) => {
         console.log(response, '$$$$$');
         if (response?.data?.status === true) {
           ShowToastMessage('Successfully resend OTP to your mail');
-          // setSecondLeft(300);
-          // setEnable(false);
+          setSecondLeft(300);
+          setEnable(false);
         } else {
           ShowToastMessage('Failed');
         }
       })
       .catch(error => {
+        crashlytics().recordError(error);
+
         console.log(error, 'eroor------------>');
       })
       .finally(() => {});
