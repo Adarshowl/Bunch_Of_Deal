@@ -345,9 +345,15 @@ const Notification = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
+    <SafeAreaView style={GlobalStyle1.mainContainerBgColor}>
       {/* <BunchDealProgressBar loading={loading} /> */}
-      <View style={GlobalStyle1.Header}>
+      <View
+        style={[
+          GlobalStyle1.Header,
+          {
+            backgroundColor: COLORS.white,
+          },
+        ]}>
         <Ionicons
           onPress={() => {
             navigation.goBack();

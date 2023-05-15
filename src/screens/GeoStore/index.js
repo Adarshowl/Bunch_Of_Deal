@@ -207,14 +207,23 @@ const GeoStore = ({navigation}) => {
           });
 
           getStoreList(latitude, longitude);
-          setCoordinate(
-            new AnimatedRegion({
+          mapRef.current?.animateToRegion(
+            {
               latitude: latitude,
               longitude: longitude,
               latitudeDelta: LATITUDE_DELTA,
               longitudeDelta: LONGITUDE_DELTA,
-            }),
+            },
+            2000,
           );
+          // setCoordinate(
+          //   new AnimatedRegion({
+          //     latitude: latitude,
+          //     longitude: longitude,
+          //     latitudeDelta: LATITUDE_DELTA,
+          //     longitudeDelta: LONGITUDE_DELTA,
+          //   }),
+          // );
         }
       },
       error => {
@@ -583,48 +592,49 @@ const GeoStore = ({navigation}) => {
           style={{
             width: Dimensions.get('screen').width,
             height: Dimensions.get('screen').height - 100,
-          }}>
-          <MapViewDirections
-            origin={{
-              latitude: location?.latitude,
-              longitude: location?.longitude,
-            }}
-            destination={{
-              // latitude: parseFloat(location?.latitude) + 1.0,
-              // longitude: parseFloat(location?.longitude) + 1.0,
-              latitude: location?.latitude,
-              longitude: location?.longitude,
-            }}
-            apikey={apiKey}
-            strokeWidth={5}
-            strokeColor={COLORS.transparent}
-            optimizeWaypoints={true}
-            onReady={result => {
-              // ShowConsoleLogMessage(result);
-              mapRef.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {
-                  right: 100,
-                  bottom: 200,
-                  left: 0,
-                  top: 200,
-                },
-              });
-              // mapRef.current.fitToCoordinates(result.coordinates, {
-              //   edgePadding: {
-              //     right: 0,
-              //     bottom: 200,
-              //     left: 0,
-              //     top: 200,
-              //   },
-              //   animated: true,
-              // });
-              // animate(
-              //   result?.coordinates[0]?.latitude,
-              //   result?.coordinates[0]?.longitude,
-              // );
-              // sendLatLong(location?.['latitude'], location?.['longitude']);
-            }}
-          />
+          }}
+          zoomEnabled={true}>
+          {/*<MapViewDirections*/}
+          {/*  origin={{*/}
+          {/*    latitude: location?.latitude,*/}
+          {/*    longitude: location?.longitude,*/}
+          {/*  }}*/}
+          {/*  destination={{*/}
+          {/*    // latitude: parseFloat(location?.latitude) + 1.0,*/}
+          {/*    // longitude: parseFloat(location?.longitude) + 1.0,*/}
+          {/*    latitude: location?.latitude,*/}
+          {/*    longitude: location?.longitude,*/}
+          {/*  }}*/}
+          {/*  apikey={apiKey}*/}
+          {/*  strokeWidth={5}*/}
+          {/*  strokeColor={COLORS.transparent}*/}
+          {/*  optimizeWaypoints={true}*/}
+          {/*  onReady={result => {*/}
+          {/*    // ShowConsoleLogMessage(result);*/}
+          {/*    mapRef.current.fitToCoordinates(result.coordinates, {*/}
+          {/*      edgePadding: {*/}
+          {/*        right: 100,*/}
+          {/*        bottom: 200,*/}
+          {/*        left: 0,*/}
+          {/*        top: 200,*/}
+          {/*      },*/}
+          {/*    });*/}
+          {/*    // mapRef.current.fitToCoordinates(result.coordinates, {*/}
+          {/*    //   edgePadding: {*/}
+          {/*    //     right: 0,*/}
+          {/*    //     bottom: 200,*/}
+          {/*    //     left: 0,*/}
+          {/*    //     top: 200,*/}
+          {/*    //   },*/}
+          {/*    //   animated: true,*/}
+          {/*    // });*/}
+          {/*    // animate(*/}
+          {/*    //   result?.coordinates[0]?.latitude,*/}
+          {/*    //   result?.coordinates[0]?.longitude,*/}
+          {/*    // );*/}
+          {/*    // sendLatLong(location?.['latitude'], location?.['longitude']);*/}
+          {/*  }}*/}
+          {/*/>*/}
           {recentData &&
             recentData.map(item => (
               <Marker
@@ -685,7 +695,7 @@ const GeoStore = ({navigation}) => {
                 latitude: location?.latitude,
                 longitude: location?.longitude,
               }}
-              // image={require("../../../assets/icons/pickup.png")}
+              position={'center'}
             />
           ) : null}
         </MapView>
