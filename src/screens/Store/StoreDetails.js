@@ -54,6 +54,7 @@ import RenderOfferItem from './RenderOfferItem';
 import RenderReviewItem from './RenderReviewItem';
 import RenderGalleryItem from './RenderGalleryItem';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import {markAsRead} from '../CampaignController';
 
 const StoreDetails = ({navigation, route}) => {
   const isFocused = useIsFocused();
@@ -82,10 +83,11 @@ const StoreDetails = ({navigation, route}) => {
   const [userData, setUserData] = useState({});
 
   useEffect(() => {
-    getUserFromStorage();
+    let {item} = route?.params;
+    getUserFromStorage(item);
   }, []);
 
-  const getUserFromStorage = async () => {
+  const getUserFromStorage = async item => {
     try {
       await AsyncStorage.getItem('userData', (error, value) => {
         if (error) {
@@ -93,6 +95,10 @@ const StoreDetails = ({navigation, route}) => {
           if (value !== null) {
             // ShowConsoleLogMessage(value);
             setUserData(JSON.parse(value));
+
+            if (item?.cid != undefined || null) {
+              markAsRead(item?.cid, JSON.parse(value)?.id_user);
+            }
           } else {
           }
         }
@@ -279,6 +285,8 @@ const StoreDetails = ({navigation, route}) => {
       let {item} = route.params;
       // ShowConsoleLogMessage(item);
       if (item?.intentFromNotification) {
+        ShowConsoleLogMessage('insdie -> ' + JSON.stringify(item));
+
         getStoreList(item?.store_id);
         getOfferList(item?.store_id);
         getReviewList(item?.store_id);

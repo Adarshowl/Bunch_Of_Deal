@@ -243,6 +243,7 @@ import GlobalStyle2 from '../../../styles/GlobalStyle2';
 import BunchDealCommonBtn from '../../../utils/BunchDealCommonBtn';
 import BunchDealProgressBar from '../../../utils/BunchDealProgressBar';
 import {ShowToastMessage, validateFieldNotEmpty} from '../../../utils/Utility';
+import {requestUserPermission} from '../../../firebase/notificationService';
 
 const OtpVerification = ({navigation, route}) => {
   const [loading, setLoading] = useState(false);
@@ -327,6 +328,8 @@ const OtpVerification = ({navigation, route}) => {
             }
             AsyncStorage.setItem(STRING.userEmail, email);
             uploadImage(response?.data?.data?.id_user);
+            requestUserPermission();
+
             navigation.navigate('MainContainer');
           } else {
             ShowToastMessage(response?.data?.message);

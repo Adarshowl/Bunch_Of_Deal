@@ -39,34 +39,37 @@ const Home = ({navigation}) => {
           } else {
             if (value !== null) {
               let temp = JSON.parse(value);
+              // let temp = JSON.parse(value);
               ShowConsoleLogMessage(
                 'notification home page -> ' +
-                  JSON.stringify(temp?.notification),
+                  JSON.stringify(temp?.data?.module_name),
               );
-
-              if (temp?.notification?.title == 'Crust Pizza, Richmond') {
+              // "data":{"module_name":"offer","cam_id":"199","module_id":"111"}
+              if (temp?.data?.module_name == 'store') {
                 //   4
                 ShowConsoleLogMessage('notification home page if -> ' + value);
 
                 navigation.navigate('StoreDetails', {
                   item: {
-                    // store_id: temp?.module_id,
-                    store_id: 4 + '',
+                    store_id: temp?.data?.module_id,
+                    // store_id: 4 + '',
                     intentFromNotification: true,
-                    cid: temp?.campaign_id || '',
+                    cid: temp?.data?.cam_id || '',
                   },
                 });
-              } else if (temp?.notification?.title == "aaa's") {
+              } else if (temp?.data?.module_name == 'offer') {
                 //   107
                 ShowConsoleLogMessage(
-                  'notification home page else if -> ' + value,
+                  'notification home page else if -> ' +
+                    temp?.data?.module_id +
+                    ' *** ' +
+                    temp?.data?.cam_id,
                 );
                 navigation.navigate('OfferDetails', {
                   item: {
-                    // id_offer: temp?.module_id,
-                    id_offer: '107' + '',
+                    id_offer: temp?.data?.module_id,
                     intentFromNotification: true,
-                    cid: temp?.campaign_id || '',
+                    cid: temp?.data?.cam_id || '',
                   },
                 });
               }

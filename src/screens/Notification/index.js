@@ -203,13 +203,155 @@ const Notification = ({navigation}) => {
     getNotification(userData?.id_user);
   };
 
+  // const renderItem = ({item, index}) => {
+  //   return (
+  //     <View
+  //       activeOpacity={0.8}
+  //       style={{
+  //         backgroundColor: item?.status == 1 ? COLORS.white : '#AAE4FA',
+  //         // alignItems: 'flex-start',
+  //         flexDirection: 'row',
+  //         paddingHorizontal: 5,
+  //       }}>
+  //       <TouchableOpacity
+  //         onPress={async () => {
+  //           // navigation.navigate('StoreDetails')
+  //           ShowConsoleLogMessage(item);
+  //           if (item?.status != 1) {
+  //             await editStatusNotification(item?.id);
+  //           }
+  //           if (item?.module == 'store') {
+  //             navigation.navigate('StoreDetails', {
+  //               item: {
+  //                 store_id: item?.module_id,
+  //                 intentFromNotification: true,
+  //                 cid: item?.campaign_id,
+  //               },
+  //             });
+  //           } else if (item?.module == 'offer') {
+  //             navigation.navigate('OfferDetails', {
+  //               item: {
+  //                 id_offer: item?.module_id,
+  //                 intentFromNotification: true,
+  //                 cid: item?.campaign_id,
+  //               },
+  //             });
+  //           } else if (item?.module == 'nsorder') {
+  //             // ShowConsoleLogMessage(item);
+  //             navigation.navigate('InvoiceList', {
+  //               item: {id: item?.module_id, intentFromNotification: true},
+  //             });
+  //           } else if (item?.module == 'event') {
+  //             ShowToastMessage('Work in progress');
+  //
+  //             // ShowConsoleLogMessage(item);
+  //             // navigation.navigate('InvoiceList', {
+  //             //   item: {id: item?.module_id, intentFromNotification: true},
+  //             // });
+  //           }
+  //         }}
+  //         activeOpacity={0.9}
+  //         style={{
+  //           flexDirection: 'row',
+  //           alignItems: 'center',
+  //           paddingHorizontal: 10,
+  //           marginVertical: 5,
+  //           flex: 1,
+  //           backgroundColor: 'red',
+  //         }}>
+  //         {/* {item?.image ? (
+  //           <Image source={{uri: item?.image}} style={[GlobalStyle1.images]} />
+  //         ) : (
+  //           <Image style={[GlobalStyle1.images]} source={images.def_logo} />
+  //         )} */}
+  //         <BunchDealImageLoader
+  //           defaultImg={images.def_logo}
+  //           source={item?.image}
+  //           styles={GlobalStyle1.images}
+  //         />
+  //
+  //         <View
+  //           style={{
+  //             flexDirection: 'column',
+  //             marginStart: 5,
+  //           }}>
+  //           <View style={{flex: 1, flexDirection: 'row'}}>
+  //             <Text
+  //               style={{
+  //                 flexGrow: 1,
+  //               }}>
+  //               You miss fdddddd dddddddd You miss fddYou miss fdddddd dddddddd
+  //               You miss fddYou miss fdddddd dddddddd You miss fdd
+  //             </Text>
+  //           </View>
+  //           <Text
+  //             style={[
+  //               {
+  //                 fontFamily: 'Montserrat-Regular',
+  //                 color: 'grey',
+  //                 marginHorizontal: 5,
+  //                 fontSize: 13,
+  //               },
+  //             ]}
+  //             numberOfLines={2}>
+  //             {item.label}
+  //           </Text>
+  //         </View>
+  //       </TouchableOpacity>
+  //
+  //       {item?.selected ? (
+  //         <TouchableOpacity
+  //           activeOpacity={0.9}
+  //           onPress={() => {
+  //             archiveNotification(item?.id);
+  //           }}
+  //           style={{
+  //             backgroundColor: COLORS.white,
+  //             elevation: 10,
+  //             borderRadius: 4,
+  //             position: 'absolute',
+  //             padding: 10,
+  //             top: 10,
+  //             right: 25,
+  //           }}>
+  //           <Text
+  //             style={[
+  //               {
+  //                 fontFamily: 'Montserrat-Regular',
+  //                 color: COLORS.black,
+  //                 marginHorizontal: 5,
+  //                 fontSize: 13,
+  //               },
+  //             ]}>
+  //             Archive
+  //           </Text>
+  //         </TouchableOpacity>
+  //       ) : null}
+  //       <Entypo
+  //         color={COLORS.black}
+  //         name="dots-three-vertical"
+  //         size={15}
+  //         style={{
+  //           marginTop: 5,
+  //           marginEnd: 5,
+  //           paddingBottom: 10,
+  //           paddingStart: 5,
+  //         }}
+  //         onPress={() => {
+  //           onItemClick(index);
+  //         }}
+  //       />
+  //     </View>
+  //   );
+  // };
+
   const renderItem = ({item, index}) => {
     return (
       <View
-        activeOpacity={0.8}
         style={{
+          paddingHorizontal: 10,
+          marginVertical: 3,
           backgroundColor: item?.status == 1 ? COLORS.white : '#AAE4FA',
-          alignItems: 'flex-start',
           flexDirection: 'row',
         }}>
         <TouchableOpacity
@@ -252,52 +394,47 @@ const Notification = ({navigation}) => {
           activeOpacity={0.9}
           style={{
             flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 10,
-            marginVertical: 5,
             flex: 1,
           }}>
-          {/* {item?.image ? (
-            <Image source={{uri: item?.image}} style={[GlobalStyle1.images]} />
-          ) : (
-            <Image style={[GlobalStyle1.images]} source={images.def_logo} />
-          )} */}
           <BunchDealImageLoader
             defaultImg={images.def_logo}
             source={item?.image}
-            styles={GlobalStyle1.images}
+            styles={[
+              GlobalStyle1.images,
+              {
+                alignSelf: 'flex-start',
+                marginTop: 5,
+              },
+            ]}
           />
-
           <View
             style={{
-              flexDirection: 'column',
-              marginStart: 15,
+              flex: 1,
+              marginStart: 10,
             }}>
             <Text
-              style={[
-                FONTS.h6,
-                {
-                  color: COLORS.black,
-                  marginHorizontal: 5,
-                },
-              ]}>
+              style={{
+                fontSize: 15,
+                fontFamily: 'Montserrat-SemiBold',
+                color: COLORS.black,
+                flex: 1,
+              }}
+              numberOfLines={3}>
               {item.label_description}
             </Text>
             <Text
-              style={[
-                {
-                  fontFamily: 'Montserrat-Regular',
-                  color: 'grey',
-                  marginHorizontal: 5,
-                  fontSize: 13,
-                  maxWidth: 230,
-                },
-              ]}>
+              style={{
+                fontSize: 13,
+                marginTop: 5,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+              }}
+              numberOfLines={2}>
               {item.label}
             </Text>
+            <Text />
           </View>
         </TouchableOpacity>
-
         {item?.selected ? (
           <TouchableOpacity
             activeOpacity={0.9}
@@ -332,7 +469,6 @@ const Notification = ({navigation}) => {
           size={15}
           style={{
             marginTop: 5,
-            marginEnd: 10,
             paddingBottom: 10,
             paddingStart: 5,
           }}

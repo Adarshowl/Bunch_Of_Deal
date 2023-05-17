@@ -131,6 +131,7 @@ const OfferCardView = ({item}) => {
               styles.dealName,
               {
                 fontFamily: 'Montserrat-Regular',
+                marginEnd: 8,
               },
             ]}
             numberOfLines={2}>

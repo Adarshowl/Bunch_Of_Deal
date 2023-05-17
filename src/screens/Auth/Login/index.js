@@ -23,6 +23,7 @@ import {
   ShowToastMessage,
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
+import {requestUserPermission} from '../../../firebase/notificationService';
 //apple login
 
 // import appleAuth, {
@@ -153,6 +154,7 @@ const Login = ({navigation}) => {
               }
               // console.log(googleImage + ' imatgwe profile  ');
               uploadImage(arr[i]?.id_user, googleImage);
+              requestUserPermission();
             }
             // console.log(arr.length);
             // console.log(JSON.stringify(response));

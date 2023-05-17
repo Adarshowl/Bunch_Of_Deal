@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   // Your code to handle notifications in killed state. For example
   console.log('Killed state notification.', JSON.stringify(remoteMessage));
+  // await AsyncStorage.setItem('notification', JSON.stringify(remoteMessage));
   await AsyncStorage.setItem('notification', JSON.stringify(remoteMessage));
 });
 

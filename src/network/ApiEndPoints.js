@@ -81,7 +81,8 @@
 //   GET_PAYMENT_LINK: `${BASE_URL}/order_payment/get_payment_link`,
 //   LINK_CALL: `${BASE_URL}/order_payment/link_call`,
 // };
-export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP_CLONE/index.php';
+// export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP_CLONE/index.php';
+export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP/index.php';
 export const BASE_URL = 'https://bunchofdeals.com.au/APP/index.php';
 
 export const API = '/api/';

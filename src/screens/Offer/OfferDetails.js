@@ -208,8 +208,8 @@ const OfferDetails = ({navigation, route}) => {
       if (item?.intentFromNotification) {
         ShowConsoleLogMessage('insdie -> ' + JSON.stringify(item));
 
-        // getSearchOfferList(item?.id_offer);
-        getSearchOfferList(107);
+        getSearchOfferList(item?.id_offer);
+        // getSearchOfferList(107);
         // getSearchOfferList('107');
         let is_offer_save = await isOfferSaved(
           item?.id_offer || item?.offer_id,
