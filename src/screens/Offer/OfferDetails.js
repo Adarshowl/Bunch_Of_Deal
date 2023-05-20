@@ -1038,6 +1038,7 @@ const OfferDetails = ({navigation, route}) => {
               GlobalStyle1.product_amount,
               {
                 justifyContent: 'center',
+                flexDirection: 'row',
               },
             ]}>
             <Text style={[GlobalStyle1.amount_text]}>
@@ -1045,9 +1046,26 @@ const OfferDetails = ({navigation, route}) => {
                 ? receivedData?.currency?.symbol +
                   '' +
                   receivedData?.offer_value +
-                  '.0'
+                  '.0 '
                 : null}
             </Text>
+            {receivedData?.original_price != null ? (
+              <Text
+                style={[
+                  GlobalStyle1.amount_text,
+                  {
+                    fontSize: 14,
+                    color: COLORS.grey_20,
+                    textDecorationLine: 'line-through',
+                  },
+                ]}>
+                {' ' +
+                  receivedData?.currency?.symbol +
+                  '' +
+                  receivedData?.original_price +
+                  '.0 '}
+              </Text>
+            ) : null}
           </View>
           <Text
             style={[
@@ -1656,26 +1674,60 @@ const OfferDetails = ({navigation, route}) => {
               width: '100%',
               flexDirection: 'row',
             }}>
-            <BunchDealCommonBtn
-              height={50}
-              width={'50%'}
-              backgroundColor={COLORS.colorPromo}
-              marginHorizontal={0}
-              text={
-                receivedData?.currency?.symbol +
-                '' +
-                receivedData?.offer_value +
-                '.0'
-              }
-              textStyle={{
-                fontFamily: 'Montserrat-SemiBold',
-              }}
-              onPress={() => {}}
-              textColor={COLORS.white}
-              borderRadius={1}
-              textSize={16}
-            />
-
+            {/*<BunchDealCommonBtn*/}
+            {/*  height={50}*/}
+            {/*  width={'50%'}*/}
+            {/*  backgroundColor={COLORS.colorPromo}*/}
+            {/*  marginHorizontal={0}*/}
+            {/*  text={*/}
+            {/*    receivedData?.currency?.symbol +*/}
+            {/*    '' +*/}
+            {/*    receivedData?.offer_value +*/}
+            {/*    '.0'*/}
+            {/*  }*/}
+            {/*  textStyle={{*/}
+            {/*    fontFamily: 'Montserrat-SemiBold',*/}
+            {/*  }}*/}
+            {/*  onPress={() => {}}*/}
+            {/*  textColor={COLORS.white}*/}
+            {/*  borderRadius={1}*/}
+            {/*  textSize={16}*/}
+            {/*/>*/}
+            <TouchableOpacity
+              style={{
+                height: 50,
+                width: '50%',
+                backgroundColor: COLORS.colorPromo,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={[GlobalStyle1.amount_text]}>
+                {receivedData?.currency
+                  ? receivedData?.currency?.symbol +
+                    '' +
+                    receivedData?.offer_value +
+                    '.0 '
+                  : null}
+              </Text>
+              {receivedData?.original_price != null ? (
+                <Text
+                  style={[
+                    GlobalStyle1.amount_text,
+                    {
+                      fontSize: 14,
+                      color: COLORS.grey_20,
+                      textDecorationLine: 'line-through',
+                    },
+                  ]}>
+                  {' ' +
+                    receivedData?.currency?.symbol +
+                    '' +
+                    receivedData?.original_price +
+                    '.0 '}
+                </Text>
+              ) : null}
+            </TouchableOpacity>
             <BunchDealCommonBtn
               width={'50%'}
               height={50}

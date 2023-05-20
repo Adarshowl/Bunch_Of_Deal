@@ -10,9 +10,12 @@ import ApiCall from '../../../network/ApiCall';
 import {API_END_POINTS} from '../../../network/ApiEndPoints';
 import GlobalStyle from '../../../styles/GlobalStyle';
 import {clearRealm} from '../../../utils/RealmUtility';
+import {requestNotiPermission} from '../../../utils/RequestUserPermission';
+
 const Splash = ({navigation}) => {
   useEffect(() => {
     // navigation.replace('MainContainer');
+    requestNotiPermission();
     setTimeout(async () => {
       await getUserFromStorage();
     }, 2000);

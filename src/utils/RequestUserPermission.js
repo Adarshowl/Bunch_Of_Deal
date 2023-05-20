@@ -3,6 +3,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import {PermissionsAndroid, Platform} from 'react-native';
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import {STRING} from '../constants';
+
 export const requestExternalWritePermission = async () => {
   if (Platform.OS === 'android') {
     try {
@@ -22,7 +23,9 @@ export const requestExternalWritePermission = async () => {
       alert('Write permission err', err);
     }
     return false;
-  } else return true;
+  } else {
+    return true;
+  }
 };
 
 export const requestLocationPermission = async () => {
@@ -81,6 +84,33 @@ export const requestContactPermission = async () => {
         {
           title: 'Location Access Required',
           message: 'This App needs to Access your location',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      } else if (granted === 'never_ask_again') {
+      }
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      crashlytics().recordError(err);
+
+      console.warn(err);
+    }
+  }
+};
+
+export const requestNotiPermission = async () => {
+  if (Platform.OS === 'ios') {
+    return true;
+  } else {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        {
+          title: 'Notification Access Required',
+          message: 'This App needs to enable notification permission',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',

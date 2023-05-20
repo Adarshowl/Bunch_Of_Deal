@@ -176,7 +176,7 @@ export default StyleSheet.create({
     backgroundColor: COLORS.colorPromo,
   },
   amount_text: {
-    position: 'absolute',
+    // position: 'absolute',
     justifyContent: 'center',
     alignSelf: 'center',
     color: COLORS.white,
