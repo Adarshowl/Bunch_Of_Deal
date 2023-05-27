@@ -122,7 +122,8 @@ const Offer = ({
       timezone: timeZone,
     };
 
-    // ShowConsoleLogMessage(JSON.stringify(body));
+    ShowConsoleLogMessage('getOfferList ->>>>' + JSON.stringify(body));
+    ShowConsoleLogMessage('getOfferList ->>>>' + API_END_POINTS.API_GET_OFFERS);
 
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {

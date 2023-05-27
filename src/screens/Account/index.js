@@ -424,18 +424,18 @@ const Account = ({navigation}) => {
               setUpdate(true);
             }}
           />
-          <Text
-            style={{
-              color: COLORS.black,
-              fontFamily: 'Montserrat-Light',
-              fontSize: 14,
-              marginTop: 10,
-              marginBottom: -10,
-              marginStart: 10,
-            }}>
-            FCM TOKEN
-          </Text>
-          <TextInput value={STRING.FCM_TOKEN} multiline={true} />
+          {/*<Text*/}
+          {/*  style={{*/}
+          {/*    color: COLORS.black,*/}
+          {/*    fontFamily: 'Montserrat-Light',*/}
+          {/*    fontSize: 14,*/}
+          {/*    marginTop: 10,*/}
+          {/*    marginBottom: -10,*/}
+          {/*    marginStart: 10,*/}
+          {/*  }}>*/}
+          {/*  FCM TOKEN*/}
+          {/*</Text>*/}
+          {/*<TextInput value={STRING.FCM_TOKEN} multiline={true} />*/}
           {/* <BunchDealEditText
 
           borderBottomWidth={1}

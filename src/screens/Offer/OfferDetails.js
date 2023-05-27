@@ -387,27 +387,30 @@ const OfferDetails = ({navigation, route}) => {
 
   const renderBigPhotoItems = ({item, index}) => {
     return (
-      <View
-        key={item}
-        activeOpacity={1.0}
-        onPress={() => {}}
+      // <View
+      //   key={item}
+      //   activeOpacity={1.0}
+      //   onPress={() => {}}
+      //   style={{
+      //     height: '100%',
+      //     // height: 300,
+      //     width: Dimensions.get('window').width,
+      //     alignItems: 'center',
+      //   }}>
+      <Image
         style={{
-          height: 300,
+          // height: 300,
+          height: '100%',
           width: Dimensions.get('window').width,
-          alignItems: 'center',
-        }}>
-        <Image
-          style={{
-            height: 300,
-            width: Dimensions.get('window').width,
-            resizeMode: 'stretch',
-          }}
-          source={{uri: item}}
-          PlaceholderContent={
-            <ActivityIndicator color={COLORS.white} size="large" />
-          }
-        />
-      </View>
+        }}
+        resizeMode={'contain'}
+        source={{uri: item}}
+        PlaceholderContent={
+          <ActivityIndicator color={COLORS.white} size="large" />
+        }
+      />
+
+      // </View>
     );
   };
 
@@ -490,8 +493,9 @@ const OfferDetails = ({navigation, route}) => {
             </View>
             <View
               style={{
-                marginBottom: 'auto',
                 marginTop: 'auto',
+                marginBottom: 'auto',
+                flex: 1,
               }}>
               <FlatList
                 data={images}
@@ -500,25 +504,6 @@ const OfferDetails = ({navigation, route}) => {
                 showsHorizontalScrollIndicator={false}
                 pagingEnabled
                 initialScrollIndex={activeIndex}
-                // onMomentumScrollBegin={ev => {
-                //   scrollToActiveIndex(
-                //     Math.floor(ev.nativeEvent.contentOffset.x / SIZES.width),
-                //   );
-                // }}
-                // onMomentumScrollEnd={ev => {
-                //   scrollToActiveIndex(
-                //     Math.floor(ev.nativeEvent.contentOffset.x / 2),
-                //   );
-                // }}
-                // onScrollEndDrag={ev => {
-                //   scrollToActiveIndex(
-                //     Math.floor(ev.nativeEvent.contentOffset.x / SIZES.width),
-                //   );
-                // }}
-                // remove the following statement
-                // onViewableItemsChanged={(info) =>console.log(info)}
-
-                // 3. add the following statement, instead of the one above
                 viewabilityConfigCallbackPairs={
                   viewabilityConfigCallbackPairs.current
                 }

@@ -56,7 +56,7 @@ const About = ({navigation}) => {
         </Text>
         <Text style={[FONTS.body4, {marginStart: 10}]}>
           Bunch of Deals is an innovative iPhone{'\n'}
-          and Android Phobe search app with an{'\n'}
+          and Android Phone search app with an{'\n'}
           intelligent search functionality that can{'\n'}
           help you find different exclusive deals and{'\n'}
           offers from a variety of merchants in your{'\n'}

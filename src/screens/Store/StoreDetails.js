@@ -393,50 +393,74 @@ const StoreDetails = ({navigation, route}) => {
 
       let imageUrl = item['560_560'].url;
       return (
-        <View
-          key={imageUrl}
-          activeOpacity={1.0}
-          onPress={() => {}}
+        // <View
+        //   key={imageUrl}
+        //   activeOpacity={1.0}
+        //   onPress={() => {}}
+        //   style={{
+        //     height: 300,
+        //     width: Dimensions.get('window').width,
+        //     alignItems: 'center',
+        //   }}>
+        //   <Image
+        //     style={{
+        //       height: 300,
+        //       width: Dimensions.get('window').width,
+        //       resizeMode: 'stretch',
+        //     }}
+        //     source={{uri: imageUrl}}
+        //     PlaceholderContent={
+        //       <ActivityIndicator color={COLORS.white} size="large" />
+        //     }
+        //   />
+        // </View>
+        <Image
           style={{
-            height: 300,
+            // height: 300,
+            height: '100%',
             width: Dimensions.get('window').width,
-            alignItems: 'center',
-          }}>
-          <Image
-            style={{
-              height: 300,
-              width: Dimensions.get('window').width,
-              resizeMode: 'stretch',
-            }}
-            source={{uri: imageUrl}}
-            PlaceholderContent={
-              <ActivityIndicator color={COLORS.white} size="large" />
-            }
-          />
-        </View>
+          }}
+          resizeMode={'contain'}
+          source={{uri: imageUrl}}
+          PlaceholderContent={
+            <ActivityIndicator color={COLORS.white} size="large" />
+          }
+        />
       );
     } else {
       return (
-        <View
-          activeOpacity={1.0}
-          key={item}
+        // <View
+        //   activeOpacity={1.0}
+        //   key={item}
+        //   style={{
+        //     height: 300,
+        //     width: Dimensions.get('window').width,
+        //     alignItems: 'center',
+        //   }}>
+        //   <Image
+        //     style={{
+        //       height: 300,
+        //       width: Dimensions.get('window').width,
+        //       resizeMode: 'stretch',
+        //     }}
+        //     source={{uri: item}}
+        //     PlaceholderContent={
+        //       <ActivityIndicator color={COLORS.white} size="large" />
+        //     }
+        //   />
+        // </View>
+        <Image
           style={{
-            height: 300,
+            // height: 300,
+            height: '100%',
             width: Dimensions.get('window').width,
-            alignItems: 'center',
-          }}>
-          <Image
-            style={{
-              height: 300,
-              width: Dimensions.get('window').width,
-              resizeMode: 'stretch',
-            }}
-            source={{uri: item}}
-            PlaceholderContent={
-              <ActivityIndicator color={COLORS.white} size="large" />
-            }
-          />
-        </View>
+          }}
+          resizeMode={'contain'}
+          source={{uri: item}}
+          PlaceholderContent={
+            <ActivityIndicator color={COLORS.white} size="large" />
+          }
+        />
       );
     }
   };
@@ -508,6 +532,9 @@ const StoreDetails = ({navigation, route}) => {
                   name="close"
                   size={25}
                   color={COLORS.white}
+                  onPress={() => {
+                    closeImageModal();
+                  }}
                   style={{
                     marginTop: 60,
                     //   opacity: 0.0,
@@ -538,6 +565,7 @@ const StoreDetails = ({navigation, route}) => {
             <View
               style={{
                 marginBottom: 'auto',
+                flex: 1,
                 marginTop: 'auto',
               }}>
               <FlatList
@@ -608,6 +636,9 @@ const StoreDetails = ({navigation, route}) => {
                   marginHorizontal: 20,
                   paddingTop: 60,
                   //opacity: 0.0,
+                }}
+                onPress={() => {
+                  closeGalleryImageModal();
                 }}
               />
             </TouchableOpacity>
