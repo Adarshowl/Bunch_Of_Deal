@@ -164,3 +164,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+/*
+13 JUNE 2023 MOM -
+1. Notification count not updating on runtime
+2. Distance showing always 100km up
+3. Order invoice not opening api - backend issue
+4. Search not working - check every matching combination
+5. Keyboard open button not working in app side (login and add review)
+6. Image not properly fixed in the image fit
+7. Image stretch issue sometimes work fine
+8. Price text font size increase karna hai
+9. Timer countdown alignment issue on detail page
+10. Map not locating to pointer on first time
+11. Pseudo replace to Username - everywhere UI
+12. No feed yet  - make it plain and related to page like favorite page par no fav offer found something like this
+13. Special character issue - order list
+14. Share all the email list of every email sending to user
+
+* */

@@ -282,7 +282,6 @@ const Account = ({navigation}) => {
         <View
           style={[
             {
-              paddingHorizontal: 15,
               width: '77%',
               paddingTop: 10,
               paddingHorizontal: 10,
