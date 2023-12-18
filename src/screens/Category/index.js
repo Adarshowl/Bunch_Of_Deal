@@ -1,5 +1,5 @@
 import crashlytics from '@react-native-firebase/crashlytics';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -9,14 +9,17 @@ import {
   View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {images} from '../../constants';
-import {COLORS} from '../../constants/Colors';
-import {FONTS} from '../../constants/themes';
+import { images } from '../../constants';
+import { COLORS } from '../../constants/Colors';
+import { FONTS } from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
+import { API_END_POINTS } from '../../network/ApiEndPoints';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import NoResult from '../../utils/NoResult';
-const Category = ({navigation}) => {
+import LinearGradient from 'react-native-linear-gradient';
+
+
+const Category = ({ navigation }) => {
   const [listData, setListData] = useState([]);
   const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -59,7 +62,7 @@ const Category = ({navigation}) => {
       });
   };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
         onPress={() => {
@@ -72,18 +75,32 @@ const Category = ({navigation}) => {
           width: '100%',
           height: 150,
           marginVertical: 3,
+          elevation: 10,
+          height: 150,
+          elevation: 10,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
+          // marginHorizontal:3
         }}>
         <BunchDealImageLoader
           defaultImg={images.def_logo}
-          source={item?.image['560_560'].url + ''}
+          source={item?.image['560_560']?.url + ''}
           styles={{
             // flex: 1,
             width: '100%',
             height: 150,
+            elevation: 10,
+          // blurRadius:2
           }}
-          // blurRadius={1.5}
+        blurRadius={1.5}
         />
-        <View
+        {/* <View
           style={{
             position: 'absolute',
             right: 0,
@@ -93,13 +110,25 @@ const Category = ({navigation}) => {
             flexGrow: 1,
             justifyContent: 'center',
             alignItems: 'center',
+          }}
+        > */}
+          <LinearGradient
+          colors={[COLORS.transparent, '#00000080', '#00000090']}
+          style={{
+            width: '100%',
+            height: 150,
+            position: 'absolute',
+            bottom: 0,
+            // borderRadius: 15,
+            alignItems: 'center',
+            justifyContent: 'center',
           }}>
           <Text
-            style={styles.name}
-            onPress={() => {
-              navigation.navigate('CategoryList', {
-                item: item,
-              });
+            style={{
+              fontSize: 15,
+              fontFamily: 'Montserrat-SemiBold',
+              color: COLORS.white,
+              textAlign: 'center',
             }}>
             {item?.name}
           </Text>
@@ -135,13 +164,15 @@ const Category = ({navigation}) => {
               {item?.nbr_stores} {item?.nbr_stores > 1 ? 'Stores' : 'Store'}
             </Text>
           </View>
-        </View>
+        </LinearGradient>
+         
+        {/* </View> */}
       </TouchableOpacity>
     );
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundColor }}>
       <View
         style={[
           {

@@ -1,10 +1,10 @@
 import crashlytics from '@react-native-firebase/crashlytics';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {FlatList, SafeAreaView, StyleSheet, View} from 'react-native';
 import TimeZone from 'react-native-timezone';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {STRING, icons} from '../../constants';
+import {icons, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
@@ -13,19 +13,23 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import BunchDealImageText from '../../utils/BunchDealImageText';
 import BunchDealVectorIconText from '../../utils/BunchDealVectorIconText';
 import NoResult from '../../utils/NoResult';
-import {requestLocationPermission} from '../../utils/RequestUserPermission';
 import {OfferSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import OfferCardView from './OfferCardView';
+import {useDispatch, useSelector} from 'react-redux';
 
 const Offer = ({
   navigation,
   searchText,
   catId,
   radius,
+  changeRadius,
   location,
   dataChange,
 }) => {
+  let userLat = useSelector(state => state?.state?.latitude);
+  let userLong = useSelector(state => state?.state?.longitude);
+
   const [percent, setPercent] = useState(true);
   const [storeFront, setStoreFront] = useState(false);
   const [timeZone, setTimezone] = useState('');
@@ -36,43 +40,132 @@ const Offer = ({
   const [nearByData, setNearByData] = useState([]);
   const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentLocation, setCurrentLocation] = useState(null);
 
+  // useEffect(() => {
+  //   requestLocationPermission(); // Ask for location permission
+  // }, []);
+
+  // const requestLocationPermission = async () => {
+  //   try {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+  //     );
+
+  //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //       getCurrentLocation();
+  //     } else {
+  //       // Location permission denied
+  //       console.log('Location permission denied');
+  //     }
+  //   } catch (error) {
+  //     console.warn(error);
+  //   }
+  // };
+
+  // const getCurrentLocation = () => {
+  //   Geolocation.getCurrentPosition(
+  //     position => {
+  //       const { latitude, longitude } = position.coords;
+  //       setRecentData({ latitude, longitude });
+  //       // Now you have the current location
+  //       // Use this location for your API calls
+  //     },
+  //     error => {
+  //       console.log('Error getting location:', error.message);
+  //     },
+  //     // { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  //   );
+  // };
+
+  // console.log("check lat long",recentData)
+  const dispatch = useDispatch();
   useEffect(() => {
-    const permission = requestLocationPermission();
-    setHaveLocationPermission(permission);
+    // const permission = requestLocationPermission(dispatch);
+    // setHaveLocationPermission(permission);
     TimeZone?.getTimeZone().then(result => {
       setTimezone(result);
     });
-    getOfferList('recent');
+    getOfferList('nearby');
   }, []);
 
   useEffect(() => {
     if (dataChange) {
-      getSearchOfferList(searchText, catId, radius, location);
+      setShowError(false);
+      setCurrentRadius(radius);
+
+      if (percent) {
+        getSearchOfferList(
+          searchText,
+          catId,
+          radius,
+          location,
+          0.0,
+          0.0,
+          changeRadius,
+        );
+      }
+      if (storeFront) {
+        getSearchNerbyList(
+          searchText,
+          catId,
+          radius,
+          location,
+          0.0,
+          0.0,
+          changeRadius,
+        );
+      }
     }
   }, [dataChange]);
 
-  const getSearchOfferList = (search, catId, radius, location) => {
+  const preprocessSearchTerm = search => {
+    // Replace common special characters or words with spaces or remove them
+    return search
+      .replace("'", '') // Remove apostrophes
+      .trim(); // Trim leading and trailing spaces
+  };
+
+  const [isNearby, setIsNearby] = useState(false);
+  const [currentRadius, setCurrentRadius] = useState(radius);
+
+  const getSearchOfferList = (
+    search,
+    catId,
+    radius,
+    location,
+    latitude,
+    longitude,
+    changeRadius,
+  ) => {
     setLoading(true);
 
+    // Clear the existing store data
+    setRecentData([]);
+    const preprocessedSearch = preprocessSearchTerm(search);
+
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
-      order_by: 'recent',
+      latitude: userLat + '',
+      longitude: userLong + '',
+      // order_by: isNearby ? "nearby" : 'recent',
+      order_by: 'nearby',
       offer_ids: '0',
       token: STRING.FCM_TOKEN,
       mac_adr: STRING.MAC_ADR,
       limit: '30',
       page: '1',
-      search: search,
+      search: preprocessedSearch,
+      // location: location,
+      location: '',
       category_id: catId,
-      radius: radius,
+      //radius: changeRadius ? radius + '' : '',
+      radius: radius + '' ,
       date: moment().format('yyyy-MM-dd H:m:s'),
       timezone: timeZone,
     };
 
-    // ShowConsoleLogMessage(JSON.stringify(body));
-
+    // ShowConsoleLogMessage("search data recent", JSON.stringify(body));
+    console.log('search data', body);
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
       Accept: 'application/json',
@@ -80,15 +173,95 @@ const Offer = ({
     })
       .then(response => {
         // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+        // console.log("ofereeeerrrrrrrr",response.data)
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage('search result -> ' + JSON.stringify(result));
+          setShowError(result.length <= 0);
+          setRecentData(result);
+        } else {
+          setRecentData([]);
+          setShowError(true);
+        }
+      })
+      .catch(err => {
+        crashlytics().recordError(err);
 
+        // console.log('eorir < ', err);
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const updateRadiusAndSearch = newRadius => {
+    // Update the radius value
+    setRadius(newRadius);
+
+    // Perform a new search with the updated radius
+    getSearchOfferList(
+      searchTerm,
+      categoryId,
+      newRadius,
+      location,
+      latitude,
+      longitude,
+    );
+  };
+
+  const getSearchNerbyList = (
+    search,
+    catId,
+    radius,
+    location,
+    latitude,
+    longitude,
+  ) => {
+    setNearByData([]);
+    setLoading(true);
+    const preprocessedSearch = preprocessSearchTerm(search);
+    // console.warn("called method get nerby")
+
+    let body = {
+      latitude: userLat + '',
+      longitude: userLong + '',
+      // order_by: isNearby ? "nearby" : 'recent',
+      order_by: 'nearby',
+
+      offer_ids: '0',
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
+      limit: '30',
+      page: '1',
+      // location: location,
+      location: '',
+      search: preprocessedSearch,
+      category_id: catId,
+      radius: radius,
+      date: moment().format('yyyy-MM-dd H:m:s'),
+      timezone: timeZone,
+    };
+
+    // ShowConsoleLogMessage("search data nerby", JSON.stringify(body));
+    console.log(' data nerby', body);
+    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+    ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+        // console.log("ofereeeerrrrrrrr",response.data)
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
           // ShowConsoleLogMessage(JSON.stringify(result));
           setShowError(result.length <= 0);
-          setRecentData(result);
+          setNearByData(result);
         } else {
-          setRecentData([]);
+          setNearByData([]);
           setShowError(true);
         }
       })
@@ -109,9 +282,9 @@ const Offer = ({
 
   const getOfferList = val => {
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
-      order_by: 'recent',
+      latitude: userLat,
+      longitude: userLong,
+      order_by: 'nearby',
       offer_ids: '0',
       token: STRING.FCM_TOKEN,
       mac_adr: STRING.MAC_ADR,
@@ -122,10 +295,7 @@ const Offer = ({
       timezone: timeZone,
     };
 
-    ShowConsoleLogMessage('getOfferList ->>>>' + JSON.stringify(body));
-    ShowConsoleLogMessage('getOfferList ->>>>' + API_END_POINTS.API_GET_OFFERS);
-
-    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+     ShowConsoleLogMessage('normal request -> ' + JSON.stringify(body));
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
@@ -155,17 +325,116 @@ const Offer = ({
       .finally(() => {});
   };
 
+  // const getNearbyList = val => {
+  //   setLoading(true);
+  //   let body = {
+  //     latitude: STRING.CURRENT_LAT + '',
+  //     longitude: STRING.CURRENT_LONG + '',
+  //     order_by: 'nearby',
+  //     offer_ids: '0',
+  //     token: STRING.FCM_TOKEN,
+  //     mac_adr: STRING.MAC_ADR,
+  //     limit: '30',
+  //     page: '1',
+  //     search: '',
+  //     date: moment().format('yyyy-MM-dd H:m:s'),
+  //     timezone: timeZone,
+  //   };
+
+  //   ShowConsoleLogMessage(JSON.stringify(body), '5555555555');
+
+  //   // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+  //   ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
+  //     Accept: 'application/json',
+  //     'Content-Type': 'multipart/form-data',
+  //   })
+  //     .then(response => {
+  //       // ShowConsoleLogMessage('response 1> ' + JSON.stringify(response?.data));
+  //       if (response?.data?.success == 1) {
+  //         let result = Object.values(response.data?.result);
+  //         // ShowConsoleLogMessage(JSON.stringify(result));
+  //         setShowError(result.length <= 0);
+  //         setNearByData(result);
+  //       } else {
+  //         setNearByData([]);
+  //         setShowError(true);
+  //       }
+  //     })
+  //     .catch(err => {
+  //       // console.log('Erro -> ', err);
+  //       crashlytics().recordError(err);
+
+  //       ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // };
+
+  // const calculateDistance = (distance) => {
+
+  //   const { latitude: lat1, longitude: lon1 } = location1;
+  //   const { latitude: lat2, longitude: lon2 } = location2;
+  //   const earthRadius = 6371; // Earth's radius in km
+
+  //   const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  //   const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  //   const a =
+  //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+  //     Math.cos((lat1 * Math.PI) / 180) *
+  //     Math.cos((lat2 * Math.PI) / 180) *
+  //     Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  //   const distance = earthRadius * c;
+
+  //   return distance;
+  // };
+
+  const formatDistance = distance => {
+    if (distance >= 1000) {
+      return `${(distance / 1000).toFixed(0)} km`;
+    } else {
+      return `${distance.toFixed(0)} m`;
+    }
+  };
+
+  const calculateDistance = (location1, location2) => {
+    const earthRadius = 6371; // Earth's radius in km
+    const {latitude: lat1, longitude: lon1} = location1;
+    const {latitude: lat2, longitude: lon2} = location2;
+
+    const toRadians = degrees => {
+      return (degrees * Math.PI) / 180;
+    };
+
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(lat1)) *
+        Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadius * c;
+
+    return distance;
+  };
+
   const getNearbyList = val => {
     setLoading(true);
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
+      latitude: userLat + '',
+      longitude: userLong + '',
       order_by: 'nearby',
       offer_ids: '0',
       token: STRING.FCM_TOKEN,
       mac_adr: STRING.MAC_ADR,
       limit: '30',
       page: '1',
+
       search: '',
       date: moment().format('yyyy-MM-dd H:m:s'),
       timezone: timeZone,
@@ -173,28 +442,40 @@ const Offer = ({
 
     ShowConsoleLogMessage(JSON.stringify(body), '5555555555');
 
-    // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // ShowConsoleLogMessage('response 1> ' + JSON.stringify(response?.data));
-        if (response?.data?.success == 1) {
+        console.log('Offer Response Arun' + JSON.stringify(response));
+        if (response?.data?.success === 1) {
           let result = Object.values(response.data?.result);
-          // ShowConsoleLogMessage(JSON.stringify(result));
-          setShowError(result.length <= 0);
-          setNearByData(result);
+
+          // Calculate distance for each item and add it as a property to the item
+          const itemsWithDistance = result.map(item => {
+            const distance = calculateDistance(
+              {latitude: item.latitude, longitude: item.longitude},
+              // {latitude: STRING.CURRENT_LAT, longitude: STRING.CURRENT_LONG},
+              {latitude: userLat, longitude: userLong},
+            );
+            return {...item, distanceFormatted: formatDistance(distance)};
+          });
+
+          // Sort the items based on their distances in ascending order (closest to farthest)
+          const sortedItems = itemsWithDistance.sort(
+            (a, b) => a.distance - b.distance,
+          );
+
+          setShowError(sortedItems.length <= 0);
+          setNearByData(sortedItems);
         } else {
           setNearByData([]);
           setShowError(true);
         }
       })
       .catch(err => {
-        // console.log('Erro -> ', err);
         crashlytics().recordError(err);
-
-        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
+        ShowConsoleLogMessage('Error in nearby offer api call: ' + err);
       })
       .finally(() => {
         setLoading(false);
@@ -202,8 +483,9 @@ const Offer = ({
   };
 
   return (
-    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
-      <View
+    <View style={GlobalStyle.mainContainerBgColor}>
+   
+      {/* <View
         style={[
           GlobalStyle.commonToolbarBG,
           {
@@ -235,6 +517,7 @@ const Offer = ({
           onPress={() => {
             setPercent(true);
             setStoreFront(false);
+            setIsNearby(false);
             getOfferList('recent');
           }}
         />
@@ -257,11 +540,12 @@ const Offer = ({
           wrapperStyle={styles.wrapperStyle}
           onPress={() => {
             setPercent(false);
+            setIsNearby(true);
             setStoreFront(true);
             getNearbyList('nearby');
           }}
         />
-      </View>
+      </View> */}
       {percent ? (
         <View
           style={{
@@ -271,22 +555,25 @@ const Offer = ({
             <FlatList
               data={recentData}
               ListEmptyComponent={() => {
-                return loading ? (
-                  <OfferSkeleton />
-                ) : (
-                  <Text
-                    style={{
-                      flex: 1,
-                      alignSelf: 'center',
-                      textAlign: 'center',
-                      marginTop: 200,
-                      fontSize: 18,
-                      fontFamily: 'Quicksand-Medium',
-                    }}>
-                    No data Found
-                  </Text>
-                );
+                return <OfferSkeleton />;
               }}
+              // ListEmptyComponent={() => {
+              //   return /*loading ? (*/
+              //   <OfferSkeleton />
+              //   // ) : (
+              //   //   <Text
+              //   //     style={{
+              //   //       flex: 1,
+              //   //       alignSelf: 'center',
+              //   //       textAlign: 'center',
+              //   //       marginTop: 200,
+              //   //       fontSize: 18,
+              //   //       fontFamily: 'Quicksand-Medium',
+              //   //     }}>
+              //   //     No data Found
+              //   //   </Text>
+              //   // );
+              // }}
               style={{
                 backgroundColor: COLORS.lightGrey,
                 marginBottom: 15,
@@ -310,22 +597,25 @@ const Offer = ({
             <FlatList
               data={nearByData}
               ListEmptyComponent={() => {
-                return loading ? (
-                  <OfferSkeleton />
-                ) : (
-                  <Text
-                    style={{
-                      flex: 1,
-                      alignSelf: 'center',
-                      textAlign: 'center',
-                      marginTop: 200,
-                      fontSize: 18,
-                      fontFamily: 'Quicksand-Medium',
-                    }}>
-                    No data Found
-                  </Text>
-                );
+                return <OfferSkeleton />;
               }}
+              // ListEmptyComponent={() => {
+              //   return /*loading ? (*/
+              //   <OfferSkeleton />
+              //   // ) : (
+              //   //   <Text
+              //   //     style={{
+              //   //       flex: 1,
+              //   //       alignSelf: 'center',
+              //   //       textAlign: 'center',
+              //   //       marginTop: 200,
+              //   //       fontSize: 18,
+              //   //       fontFamily: 'Quicksand-Medium',
+              //   //     }}>
+              //   //     No data Found
+              //   //   </Text>
+              //   // );
+              // }}
               style={{
                 backgroundColor: COLORS.lightGrey,
                 marginBottom: 15,
@@ -339,7 +629,7 @@ const Offer = ({
           )}
         </View>
       ) : null}
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -129,7 +129,7 @@ const TestStoreDetail = ({navigation, route}) => {
           ShowConsoleLogMessage(JSON.stringify(response?.data));
           let result = Object.values(response.data?.result);
           setReceivedData(result[0]);
-          setImageUrl(result[0]?.images['0']['560_560'].url);
+          setImageUrl(result[0]?.images['0']['560_560']?.url);
 
           var res = [];
 
@@ -141,7 +141,7 @@ const TestStoreDetail = ({navigation, route}) => {
 
           setImages(res);
 
-          setCatImageUrl(result[0]?.images['0']['560_560'].url);
+          setCatImageUrl(result[0]?.images['0']['560_560']?.url);
         } else {
         }
       })
@@ -243,8 +243,8 @@ const TestStoreDetail = ({navigation, route}) => {
         // console.log(res, ' -> res');
         setImages(res);
 
-        setImageUrl(item?.images['0']['560_560'].url);
-        setCatImageUrl(item?.images['0']['200_200'].url);
+        setImageUrl(item?.images['0']['560_560']?.url);
+        setCatImageUrl(item?.images['0']['200_200']?.url);
       }
     }
   }, []);
@@ -801,7 +801,7 @@ const TestStoreDetail = ({navigation, route}) => {
 
   const renderGalleryItem = ({item}) => {
     // ShowConsoleLogMessage(item);
-    let imageUrl = item['200_200'].url;
+    let imageUrl = item['200_200']?.url;
     return (
       <TouchableOpacity activeOpacity={0.8}>
         <BunchDealImageLoader
@@ -824,7 +824,7 @@ const TestStoreDetail = ({navigation, route}) => {
   /** gallery end */
 
   return (
-    <SafeAreaView
+    <View
       style={GlobalStyle1.mainContainerBgColor}
       showsVerticalScrollIndicator={false}>
       <ScrollView
@@ -1386,7 +1386,7 @@ const TestStoreDetail = ({navigation, route}) => {
 
       {renderImageModal()}
       {renderAddReviewModal()}
-    </SafeAreaView>
+    </View>
   );
 };
 

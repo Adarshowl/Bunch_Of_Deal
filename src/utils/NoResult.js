@@ -24,7 +24,7 @@ const NoResult = ({onReloadBtn}) => {
           marginTop: 60,
           color: '#666666',
         }}>
-        No Feed, yet
+        No Data Found 
       </Text>
       <Text
         style={{

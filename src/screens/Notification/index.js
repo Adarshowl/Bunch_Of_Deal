@@ -23,6 +23,8 @@ import {NotificationSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 
 const Notification = ({navigation}) => {
+
+
   const [loading, setLoading] = useState(false);
   const [showError, setShowError] = useState(false);
   const [listData, setListData] = useState([]);
@@ -58,6 +60,7 @@ const Notification = ({navigation}) => {
 
   const getNotification = id => {
     setLoading(true);
+    
     let body = {user_id: /*'578'*/ id, page: 1, limit: 30};
     // ShowConsoleLogMessage(body);
     ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_GET, {
@@ -72,7 +75,7 @@ const Notification = ({navigation}) => {
 
         if (response?.data?.status == 1) {
           let result = Object.values(response.data?.result);
-          // console.log(JSON.stringify(result));
+          // console.log("kkkkkkkkkkkkkkkk",JSON.stringify(result));
 
           setShowError(result.length <= 0);
 
@@ -357,7 +360,7 @@ const Notification = ({navigation}) => {
         <TouchableOpacity
           onPress={async () => {
             // navigation.navigate('StoreDetails')
-            ShowConsoleLogMessage(item);
+            // ShowConsoleLogMessage("qqqqqqqqqqqqqqqqqqq",item);
             if (item?.status != 1) {
               await editStatusNotification(item?.id);
             }
@@ -418,6 +421,7 @@ const Notification = ({navigation}) => {
                 fontFamily: 'Montserrat-SemiBold',
                 color: COLORS.black,
                 flex: 1,
+                marginTop:11
               }}
               numberOfLines={3}>
               {item.label_description}
@@ -481,7 +485,7 @@ const Notification = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle1.mainContainerBgColor}>
+    <View style={GlobalStyle1.mainContainerBgColor}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -543,7 +547,7 @@ const Notification = ({navigation}) => {
       ) : (
         <NoResult onReloadBtn={onReloadBtn} />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

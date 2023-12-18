@@ -9,7 +9,7 @@ import GlobalStyle2 from '../../styles/GlobalStyle2';
 
 const About = ({navigation}) => {
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <View style={{flex: 1}}>
       <View style={GlobalStyle2.headerFooterAbout}>
         <View
           style={{
@@ -39,9 +39,9 @@ const About = ({navigation}) => {
           </Text>
         </View>
         <Image source={images.splash_new_beta} style={GlobalStyle2.AboutIcon} />
-        <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+        <View style={{flexDirection: 'row', alignSelf: 'center',alignItems:'center'}}>
           <Text style={{fontSize: 14}}>version : </Text>
-          <Text style={[FONTS.h4, {fontSize: 14, color: COLORS.colorPrimary}]}>
+          <Text style={[FONTS.h4, {fontSize: 14, color: COLORS.colorPrimary,textAlign:'center'}]}>
             2.0.2
           </Text>
         </View>
@@ -71,7 +71,7 @@ const About = ({navigation}) => {
           contact@bunchofdeals.com.au
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

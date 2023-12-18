@@ -403,7 +403,7 @@ const OtpVerification = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle2.mainContainerBgColor}>
+    <View style={GlobalStyle2.mainContainerBgColor}>
       <BunchDealProgressBar loading={loading} />
 
       <Image source={images.splash_new_beta} style={GlobalStyle2.otpAppIcon} />
@@ -522,7 +522,7 @@ const OtpVerification = ({navigation, route}) => {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

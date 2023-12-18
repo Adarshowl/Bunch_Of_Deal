@@ -20,6 +20,8 @@ import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import OfferCardView from '../Offer/OfferCardView';
 import StoreCardView from '../Store/StoreCardView';
+import {useSelector} from 'react-redux';
+
 const UniversalSearch = ({navigation}) => {
   const [offerData, setOfferData] = useState(0);
   const [listData, setListData] = useState([]);
@@ -28,13 +30,14 @@ const UniversalSearch = ({navigation}) => {
   const [showError, setShowError] = useState(false);
 
   const [searchText, setSearchText] = useState('');
-
+  let userLat = useSelector(state => state?.state?.latitude);
+  let userLong = useSelector(state => state?.state?.longitude);
   const getSearchOfferList = () => {
     setLoading(true);
 
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
+      latitude: userLat + '',
+      longitude: userLong + '',
       order_by: 'recent',
       offer_ids: '0',
       token: STRING.FCM_TOKEN,
@@ -84,9 +87,9 @@ const UniversalSearch = ({navigation}) => {
   const getSearchStoreList = () => {
     setLoading(true);
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
-      order_by: 'nearby',
+      latitude: STRING.latitude + '',
+      longitude: STRING.longitude + '',
+      order_by: 'recent',
       current_date: moment().format('yyyy-MM-dd H:m:s'),
       current_tz: 'Asia/Kolkata',
       limit: '30',
@@ -111,8 +114,8 @@ const UniversalSearch = ({navigation}) => {
           setShowError(result.length <= 0);
           setListStoreData(result);
         } else {
-          // setListData([]);
-          // setShowError(true);
+          setListData([]);
+          setShowError(true);
         }
       })
       .catch(err => {
@@ -134,7 +137,7 @@ const UniversalSearch = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+    <View style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -277,7 +280,7 @@ const UniversalSearch = ({navigation}) => {
           ) : null
         ) : null}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

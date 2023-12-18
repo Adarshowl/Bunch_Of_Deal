@@ -16,6 +16,24 @@ export default StyleSheet.create({
     height: '100%',
     tintColor: COLORS.lightGrey,
   },
+  flexAlignJustifyCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  flexRowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  alignJustifyCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flexRowJustifyBtwn: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
   nav_bg: {
     height: 300,
     backgroundColor: COLORS.colorPrimary,
@@ -97,6 +115,12 @@ export default StyleSheet.create({
   },
   marginHorizontal10: {
     marginHorizontal: 10,
+    marginEnd: -5,
+    // justifyContent:'flex-end',
+    // alignContent:'flex-end',
+    marginStart: 10,
+    //backgroundColor: 'red',
+    //width: 50,
   },
   marginVertical5: {
     marginVertical: 5,
@@ -105,7 +129,14 @@ export default StyleSheet.create({
     marginVertical: 10,
   },
   marginHorizontal15: {
-    marginHorizontal: 15,
+    // marginHorizontal: 8,
+    // marginEnd: 8,
+    marginHorizontal: 10,
+    marginEnd: 15,
+    // justifyContent:'flex-end',
+    // alignContent:'flex-end',
+    marginStart: 20,
+    //backgroundColor: 'red',
   },
 
   marginVertical15: {
@@ -143,6 +174,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.backgroundColor,
+    height: 60,
   },
   homeTabImageStyle: {
     width: 20,

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Linking,
@@ -22,20 +23,14 @@ import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 import moment from 'moment';
-import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
-import {FONTS} from '../../constants/themes';
 import crashlytics from '@react-native-firebase/crashlytics';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-// import PayPal from 'react-native-paypal-gateway';
-// PayPal.initialize(
-//   // PayPal.NO_NETWORK,
-//   PayPal.SANDBOX,
-//   'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM',
-// );
-import {
-  requestOneTimePayment,
-  requestBillingAgreement,
-} from 'react-native-paypal';
+
+
+import axios from 'axios';
+import qs from 'qs';
+import {decode, encode} from 'base-64';
+import {WebView} from 'react-native-webview';
 
 const TEST_PAYPAL_KEY =
   'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM';
@@ -51,12 +46,13 @@ const Order = ({navigation, route}) => {
 
   const [receivedData, setReceivedData] = useState();
   const [orderId, setOfferId] = useState('');
+  const [CurrentDate, setCurrentDate] = useState('');
   const [orderDateTime, setOfferDateTime] = useState('');
   const [count, setCount] = useState('');
   const [price, setPrice] = useState('');
   const [originalPrice, setOriginalPrice] = useState(0);
   const [telephone, setTelephone] = useState('');
-
+  const [order_amount, setorderAmount] = useState('');
   useEffect(() => {
     let {item} = route.params;
     let {count} = route.params;
@@ -65,17 +61,29 @@ const Order = ({navigation, route}) => {
     let {telephone} = route.params;
     getPaymentGatewayList();
     setReceivedData(item);
+    // ShowConsoleLogMessage('orderamount ' + JSON.stringify(originalPrice));
+    // setorderAmount('orderamount',+ JSON.stringify(originalPrice));
     ShowConsoleLogMessage('originalPrice => ' + JSON.stringify(originalPrice));
     ShowConsoleLogMessage('price ' + JSON.stringify(price));
+    // setorderAmount(price +'');
     setCount(count + '');
     setPrice(price + '');
+
     setOriginalPrice(originalPrice + '');
     setTelephone(telephone + '');
     setTimeout(async () => {
       await getUserFromStorage();
     }, 0);
   }, []);
+  useEffect(() => {
+    if (!global.btoa) {
+      global.btoa = encode;
+    }
 
+    if (!global.atob) {
+      global.atob = decode;
+    }
+  }, []);
   const getUserFromStorage = async () => {
     try {
       await AsyncStorage.getItem('userData', (error, value) => {
@@ -94,6 +102,20 @@ const Order = ({navigation, route}) => {
       console.log('ERROR IN GETTING USER FROM STORAGE');
     }
   };
+
+  const currentTime = moment().format('HH:mm');
+
+  // Function to determine AM or PM
+  const getAMPM = time => {
+    const hour = parseInt(time.split(':')[0]);
+    const minutes = time.split(':')[1];
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+    return `${formattedHour}:${minutes} ${ampm}`;
+  };
+
+  const currentAMPM = getAMPM(currentTime);
+  console.log(currentAMPM);
 
   const [paymentList, setPaymentList] = useState([]);
   const [masterPaymentList, setMasterPaymentList] = useState([]);
@@ -250,19 +272,21 @@ const Order = ({navigation, route}) => {
       }),
       payment_method: selectedPayment?.id,
       user_token: userData?.token,
+      order_amount: price + '',
+      order_date: moment().format('YYYY-MM-DD'),
+      order_time: moment().format('HH:mm:ss'),
       cart: [
         {
           module: 'offer',
           module_id: parseInt(receivedData?.id_offer),
           qty: parseInt(count),
-          amount: originalPrice + '.0',
+          amount: originalPrice + '',
         },
       ],
     };
     // {module_id=8, req_cf_data={"Full Name":"g ","Phone Number":"0293393839","Notes":"yv"},
     //  user_id=565, module=store, user_token=76558d292d03a265e91054a2cb33b0d3, seller_id=98,
     // fcm_id=fG, cart=[{"module":"offer","module_id":98,"qty":1,"amount":"15.0"}], payment_method=3}
-
     ShowConsoleLogMessage('API_URl -> ' + API_END_POINTS.API_ORDERS_CREATE_COD);
     ShowConsoleLogMessage('req body \n ' + JSON.stringify(body));
 
@@ -271,14 +295,29 @@ const Order = ({navigation, route}) => {
     })
       .then(response => {
         let da = response?.data?.split(':')[1];
-
         ShowConsoleLogMessage(
           'response of create order cod api \n -> ' + response?.data,
         );
         // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
         if (da.split(',')[0] == 1) {
           setShowDone(true);
-          setOfferDateTime(moment().format('LLL'));
+          // setorderAmount(order_amount);
+          const currentDateTime = moment().format('DD-MM-YYYY');
+          const currentTime = moment().format('HH:mm');
+          setCurrentDate(currentDateTime);
+
+          // Function to determine AM or PM
+          function getAMPM(time) {
+            const hour = parseInt(time.split(':')[0]);
+            const minutes = time.split(':')[1];
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const formattedHour = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+            return `${formattedHour}:${minutes} ${ampm}`;
+          }
+
+          const currentAMPM = getAMPM(currentTime);
+          setOfferDateTime(currentAMPM);
+          setorderAmount('');
           setOfferId(
             response?.data
               ?.split(',')[1]
@@ -312,9 +351,12 @@ const Order = ({navigation, route}) => {
     let body = {
       user_id: userData?.id_user,
       seller_id: receivedData?.id_offer,
-      module: 'store',
+      module: 'offer',
       module_id: receivedData?.store_id,
       fcm_id: 'fcm_token',
+      order_amount: price + '',
+      order_date: moment().format('YYYY-MM-DD'),
+      order_time: moment().format('HH:mm:ss'),
       req_cf_data: JSON.stringify({
         'Full Name': userData?.name,
         'Phone Number': userData?.telephone,
@@ -326,7 +368,7 @@ const Order = ({navigation, route}) => {
           module: 'offer',
           module_id: parseInt(receivedData?.id_offer),
           qty: parseInt(count),
-          amount: originalPrice + '.0',
+          amount: originalPrice + '',
         },
       ],
     };
@@ -351,7 +393,25 @@ const Order = ({navigation, route}) => {
         // ShowConsoleLogMessage('response da -> ' + da.split(',')[0]);
         if (da.split(',')[0] == 1) {
           setShowDone(true);
-          setOfferDateTime(moment().format('LLL'));
+          setorderAmount('');
+
+          const currentDateTime = moment().format('DD-MM-YYYY');
+          const currentTime = moment().format('HH:mm');
+          setCurrentDate(currentDateTime);
+
+          // Function to determine AM or PM
+          function getAMPM(time) {
+            const hour = parseInt(time.split(':')[0]);
+            const minutes = time.split(':')[1];
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const formattedHour = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+            return `${formattedHour}:${minutes} ${ampm}`;
+          }
+
+          const currentAMPM = getAMPM(currentTime);
+          setOfferDateTime(currentAMPM);
+
+          // setOfferDateTime(moment().format('YYYY-MM-DD HH:mm:ss'));
           // setOfferId(response?.data?.split(',')[1]?.split(':')[1] + '');
           setOfferId(
             response?.data
@@ -361,7 +421,11 @@ const Order = ({navigation, route}) => {
               ?.replaceAll('"', '') + '',
           );
           updatePaypalOrderApi(
-            response?.data?.split(',')[1]?.split(':')[1] + '',
+            response?.data
+              ?.split(',')[1]
+              ?.split(':')[1]
+              ?.split('}')[0]
+              ?.replaceAll('"', '') + '',
             paymentId,
           );
         } else {
@@ -404,14 +468,14 @@ const Order = ({navigation, route}) => {
         if (response?.data?.result == '1') {
           ShowToastMessage('Payment Successful');
         } else {
-          ShowToastMessage('Something went wrong.');
+          ShowToastMessage('Something went wrong payment.......');
           setSelectedPayment(null);
           getPaymentGatewayList();
         }
       })
       .catch(error => {
         crashlytics().recordError(error);
-        ShowToastMessage('Something went wrong.');
+        ShowToastMessage('Something went wrong>>>>>>>>>>.');
         setSelectedPayment(null);
         getPaymentGatewayList();
       })
@@ -420,60 +484,212 @@ const Order = ({navigation, route}) => {
       });
   };
 
-  const submitPaypalPayment = async () => {
-    // PayPal.pay({
-    //   price: price + '.0',
-    //   currency: 'AUD',
-    //   description: receivedData?.name + '',
-    // })
-    //   .then(confirm => {
-    //     console.log('confirm -> ', confirm?.response?.state);
-    //     if (confirm?.response?.state == 'approved') {
-    // createPaypalOrderApi('326re13ddhwgdgashddsa23d');
-    //     }
-    //   })
-    //   .catch(error => console.log('error -> ' + error));
-    // new commented
-    try {
-      // For one time payments
-      const {nonce, payerId, email, firstName, lastName, phone} =
-        await requestOneTimePayment('sandbox_q7r32b9d_sm49psk825368ztf', {
-          amount: '1', // required
-          // any PayPal supported currency (see here: https://developer.paypal.com/docs/integration/direct/rest/currency-codes/#paypal-account-payments)
-          currency: 'AUD',
-          // any PayPal supported locale (see here: https://braintree.github.io/braintree_ios/Classes/BTPayPalRequest.html#/c:objc(cs)BTPayPalRequest(py)localeCode)
-          localeCode: 'en_AU',
-          shippingAddressRequired: false,
-          userAction: 'commit', // display 'Pay Now' on the PayPal review page
-          // one of 'authorize', 'sale', 'order'. defaults to 'authorize'. see details here: https://developer.paypal.com/docs/api/payments/v1/#payment-create-request-body
-          intent: 'authorize',
-          // intent: 'sale',
-        });
-      ShowConsoleLogMessage(
-        'paypal config -> nonce => ' +
-          nonce +
-          'payerId=> ' +
-          payerId +
-          'email=> ' +
-          email +
-          'firstName=> ' +
-          firstName +
-          'lastName => ' +
-          lastName +
-          'phone => ' +
-          phone,
-      );
-      createPaypalOrderApi(nonce + '' || '326re13ddhwgdgashddsa23d');
-    } catch (err) {
-      crashlytics().recordError(err);
-    }
-    /**
+  const [isWebViewLoading, SetIsWebViewLoading] = useState(false);
+  const [paypalUrl, setPaypalUrl] = useState('');
+  const [accessToken, setAccessToken] = useState('');
+  const [shouldShowWebViewLoading, setShouldShowWebviewLoading] =
+    useState(true);
 
-     */
+  const [firstTime, setFirstTime] = useState(true);
+
+  const onWebviewLoadStart = () => {
+    if (shouldShowWebViewLoading) {
+      SetIsWebViewLoading(true);
+    }
+  };
+
+  const _onNavigationStateChange = webViewState => {
+    // console.log('webViewState', webViewState);
+
+    //When the webViewState.title is empty this mean it's in process loading the first paypal page so there is no paypal's loading icon
+    //We show our loading icon then. After that we don't want to show our icon we need to set setShouldShowWebviewLoading to limit it
+    if (webViewState.title == '') {
+      //When the webview get here Don't need our loading anymore because there is one from paypal
+      setShouldShowWebviewLoading(false);
+    }
+
+    if (webViewState.url.includes('https://bunchofdeals.com.au/')) {
+      if (firstTime) {
+        setFirstTime(false);
+        const urlArr = webViewState.url.split(/(=|&)/);
+        setLoading(true);
+        const paymentId = urlArr[2];
+        const payerId = urlArr[10];
+        console.log(paymentId + ' --- ' + payerId);
+        console.log(accessToken);
+
+        fetch(
+          //`https://api.sandbox.paypal.com/v1/payments/payment/${paymentId}/execute`, // test
+          `https://api.paypal.com/v1/payments/payment/${paymentId}/execute`, // live
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + accessToken,
+            },
+            body: JSON.stringify({payer_id: payerId}),
+          },
+        )
+          .then(response => {
+            return response.json();
+          })
+          .then(response => {
+            console.log('fetch response');
+            console.log(JSON.stringify(response));
+            if (response?.id) {
+              setPaypalUrl('');
+              SetIsWebViewLoading(false);
+              createPaypalOrderApi(response?.id);
+            } else if (response?.name == 'TRANSACTION_REFUSED') {
+              setPaypalUrl('');
+              SetIsWebViewLoading(false);
+              setFirstTime(true);
+
+              setLoading(false);
+              ShowToastMessage('Payment Failed');
+            } else {
+              setPaypalUrl('');
+              SetIsWebViewLoading(false);
+              setFirstTime(true);
+
+              setLoading(false);
+              ShowToastMessage('Payment Failed');
+            }
+          })
+          .catch(err => {
+            setShouldShowWebviewLoading(true);
+
+            console.log({...err});
+            setLoading(false);
+            ShowToastMessage('Payment Failed');
+            setPaypalUrl('');
+            setFirstTime(true);
+
+            SetIsWebViewLoading(false);
+          });
+      }
+    }
+  };
+
+  const generatePaypalUrl = async () => {
+    try {
+      setLoading(true);
+      const dataDetail = {
+        intent: 'sale',
+        payer: {
+          payment_method: 'paypal',
+        },
+        transactions: [
+          {
+            amount: {
+              currency: 'AUD',
+              total: price + '',
+              // details: {
+              //   shipping: '6',
+              //   subtotal: '20',
+              //   shipping_discount: '0',
+              //   insurance: '0',
+              //   handling_fee: '0',
+              //   tax: '0',
+              // },
+            },
+            description: 'This is the payment transaction description',
+            payment_options: {
+              allowed_payment_method: 'IMMEDIATE_PAY',
+            },
+            item_list: {
+              items: [
+                {
+                  name: receivedData?.name,
+                  description: receivedData?.description,
+                  quantity: count + '',
+                  price: price + '',
+                  tax: '0',
+                  sku:
+                    '' +
+                    receivedData?.id_offer +
+                    '_' +
+                    receivedData?.store_id +
+                    '_' +
+                    receivedData?.user_id,
+                  currency: 'AUD',
+                },
+                // receivedData,
+              ],
+            },
+          },
+        ],
+        redirect_urls: {
+          return_url: 'https://bunchofdeals.com.au/',
+          cancel_url: 'https://bunchofdeals.com.au/APP/index.php/',
+        },
+      };
+      // Step 1: Get an access token from PayPal
+      const tokenResponse = await axios.post(
+        //'https://api.sandbox.paypal.com/v1/oauth2/token', // test
+        'https://api.paypal.com/v1/oauth2/token', // live
+        qs.stringify({grant_type: 'client_credentials'}),
+        {
+          headers: {
+            'Content-type': 'application/x-www-form-urlencoded',
+          },
+          auth: {
+            username:
+              // 'ARELQn0UMVmN65u5e6oMKWSekG4-63P6MnN7uUXgvn-EkBjKrkxAKeoyEyeO4oXgkhinXHJaa0sTyFLM',
+              'AQNVRTj2GQT-m_NITEuxE1rz35-QvsUwHlj2vHLdk35JU8rYhnYnQ5lJNRvDQMYiSq6DmFO3ibrnu7ls', //"your_paypal-app-client-ID",
+            password:
+              //'EJnyaIIG65X7UamY46_nFhpw4AZN93U8VoKXqCNuNA2oBD1OcqEnq79ho6g9lhRVttzd65iW5ZmT_31K',
+              'EMmZzsanz9p8d_6zkm6iJuerJC3M0V-l_i8kGwc4NEzE3vbP0segfFtZHLygTO-jb5s563gVPprbLEvm',
+          },
+        },
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+      setAccessToken(accessToken);
+      // Step 2: Create a PayPal payment request
+      const paymentResponse = await axios.post(
+        // 'https://api.sandbox.paypal.com/v1/payments/payment', // test
+        'https://api.paypal.com/v1/payments/payment', // live
+        dataDetail,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const {id, links} = paymentResponse.data;
+      const approvalUrl = links.find(data => data.rel === 'approval_url').href;
+
+      console.log('PayPal response:', approvalUrl);
+
+      // Set the PayPal URL or do something else with it
+      setLoading(false);
+
+      setPaypalUrl(approvalUrl);
+
+      // Navigate to the payment page or handle the URL as needed
+      // navigation.navigate('Payment', {
+      //   paypalUrl: approvalUrl,
+      //   accessToken: accessToken,
+      //   userData: userData,
+      //   receivedData: receivedData,
+      //   paymentType: selectedPayment?.id,
+      //   price: price,
+      //   count: count,
+      //   originalPrice: originalPrice,
+      // });
+    } catch (error) {
+      console.error('Error:', error);
+      setLoading(false);
+
+      // Handle the error as needed, e.g., show an error message to the user
+    }
   };
 
   return (
-    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+    <View style={GlobalStyle.mainContainerBgColor}>
       <BunchDealProgressBar loading={loading} />
       <View>
         <View
@@ -489,6 +705,10 @@ const Order = ({navigation, route}) => {
             size={25}
             onPress={() => {
               navigation.goBack();
+            }}
+            style={{
+              padding: 5,
+              //backgroundColor: 'red',
             }}
             color={COLORS.shimmer_loading_color_darker}
           />
@@ -678,7 +898,18 @@ const Order = ({navigation, route}) => {
               }}>
               Product Name: {receivedData?.name}
             </Text>
-
+            {/* <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+                marginTop: 5,
+                marginStart: 5,
+              }}
+              numberOfLines={2}>
+              Order Amount: {order_amount}
+              .0
+            </Text> */}
             <Text
               style={{
                 fontSize: 14,
@@ -701,7 +932,19 @@ const Order = ({navigation, route}) => {
               }}
               numberOfLines={2}>
               {/* Order Date & Time: {moment().format('LLL')} */}
-              Order Date & Time: {orderDateTime}
+              Order Date : {CurrentDate}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: 'Montserrat-Regular',
+                color: COLORS.black,
+                marginTop: 5,
+                marginStart: 5,
+              }}
+              numberOfLines={2}>
+              {/* Order Date & Time: {moment().format('LLL')} */}
+              Order Time: {orderDateTime}
             </Text>
           </View>
 
@@ -923,8 +1166,9 @@ const Order = ({navigation, route}) => {
             style={{
               padding: 10,
               flexDirection: 'row',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               justifyContent: 'space-between',
+              flex: 1,
             }}>
             <Text
               style={{
@@ -1034,10 +1278,10 @@ const Order = ({navigation, route}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            left: 0,
+            //position: 'absolute',
+            //bottom: 0,
+            // right: 0,
+            // left: 0,
           }}>
           {changeOne ? (
             <TouchableOpacity
@@ -1068,7 +1312,8 @@ const Order = ({navigation, route}) => {
                   if (selectedPayment?.id == 3) {
                     submitOrderApi();
                   } else if (selectedPayment?.id == 1) {
-                    await submitPaypalPayment();
+                    // await submitPaypalPayment();
+                    await generatePaypalUrl();
                   }
                 } else {
                   ShowToastMessage('Please choose your payment gateway!');
@@ -1117,10 +1362,45 @@ const Order = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
       )}
-    </SafeAreaView>
+
+      <>
+        <BunchDealProgressBar loading={loading} />
+        {paypalUrl ? (
+          <View style={styles.webview}>
+            <WebView
+              style={{height: '100%', width: '100%'}}
+              source={{uri: paypalUrl}}
+              onNavigationStateChange={_onNavigationStateChange}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={false}
+              onLoadStart={onWebviewLoadStart}
+              onLoadEnd={() => SetIsWebViewLoading(false)}
+            />
+          </View>
+        ) : null}
+        {isWebViewLoading ? (
+          <View
+            style={{
+              ...StyleSheet.absoluteFill,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#ffffff',
+            }}>
+            <ActivityIndicator size="large" color={COLORS.colorPrimary} />
+          </View>
+        ) : null}
+      </>
+      <View
+        style={{
+          backgroundColor: COLORS.colorPrimary,
+
+          //height: 20,
+        }}
+      />
+    </View>
   );
 };
-
 export default Order;
 
 const styles = StyleSheet.create({
@@ -1131,4 +1411,36 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'grey',
   },
+  webview: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
 });
+/**
+ PERSONAL
+--------
+email
+sb-qv7vc5159902@personal.example.com
+Password
+KM/.Cc6v ruko
+Phone 
+0365123651
+John Doe
+
+
+
+INDIA----
+---------
+email
+sb-yxsc23885116@personal.example.com
+Password
+7DQHxq!=
+Phone 
+2089805663
+John Doe
+ */

@@ -1,8 +1,9 @@
 import Toast from 'react-native-simple-toast';
 import DeviceInfo from 'react-native-device-info';
-import {Platform, NativeModules} from 'react-native';
+import {Platform} from 'react-native';
 import moment from 'moment';
 import crashlytics from '@react-native-firebase/crashlytics';
+
 export const ShowToastMessage = msg => {
   Toast.showWithGravity(msg + '' || '', Toast.SHORT, Toast.BOTTOM);
 };

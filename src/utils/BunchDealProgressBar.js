@@ -1,10 +1,34 @@
-import React from 'react';
-import {ActivityIndicator, Modal, StyleSheet, Text, View} from 'react-native';
-import {COLORS} from '../constants/Colors';
-import {STRING} from '../constants/String';
-import {FONTS, SIZES} from '../constants/themes';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Modal, StyleSheet, Text, View } from 'react-native';
+import { COLORS } from '../constants/Colors';
+import { STRING } from '../constants/String';
+import { FONTS, SIZES } from '../constants/themes';
 
 const BunchDealProgressBar = ({loading}) => {
+
+
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let timeout;
+
+    if (loading) {
+      // Show the loading indicator after a delay (e.g., 1000 milliseconds)
+      timeout = setTimeout(() => {
+        setVisible(true);
+      }, 500); // Adjust the delay as needed
+    } else {
+      // Clear the timeout and hide the loading indicator
+      clearTimeout(timeout);
+      setVisible(false);
+    }
+    
+    return () => {
+      // Cleanup the timeout on unmount
+      clearTimeout(timeout);
+    };
+  }, [loading]);
+
   return (
     <Modal
       transparent={true}

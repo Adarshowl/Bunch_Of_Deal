@@ -11,17 +11,20 @@ import {
 import {Slider} from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {SIZES, STRING, images} from '../../constants';
+import {images, SIZES, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
+
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 import crashlytics from '@react-native-firebase/crashlytics';
-
+import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
+import GlobalStyle from '../../styles/GlobalStyle';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const SearchDialog = ({
   show,
   onPress,
@@ -32,10 +35,75 @@ const SearchDialog = ({
   onChangeRadius,
   onChangeCategoryId,
   onCurrentLocationPress,
+  onSearchByTitle,
+  radius,
+  categoryId,
+  catId,
+  location,
+  selectedTab,
+  dataChange,
+
+  // new
+  handleTabChange,
+  changeTwo,
+  changeOne,
 }) => {
   //   const [password, setPassword] = useState('');
   const [categoryData, setCategoryData] = useState([]);
   const [sliderValue, setSliderValue] = useState(100);
+  const [maxSliderValue, setMaxSliderValue] = useState(100); // Add this state for dynamic maximum value
+
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showPlacePickModal, setShowPlacePickModal] = useState(false);
+  const [showPlaceChooseModal, setShowPlaceChooseModal] = useState(false);
+
+  const [toolbarTitle, setToolbarTitle] = useState('');
+
+  const [update, setUpdate] = useState(false);
+  const [storeUpdate, setStoreUpdate] = useState(false);
+  const handleSearchButtonClick = () => {
+    closeSearchModal();
+    setUpdate(true);
+    setToolbarTitle(true);
+  };
+  // const [searchText, setSearchText] = useState('');
+  // const [categoryId, setCategoryId] = useState('');
+  // const [radius, setRadius] = useState('');
+
+  const handleStoreSearchButtonClick = () => {
+    closeSearchModal();
+    setStoreUpdate(true);
+    setToolbarTitle(true);
+  };
+
+  const closeSearchModal = () => {
+    setUpdate(false);
+    setStoreUpdate(false);
+    setShowSearchModal(!showSearchModal);
+  };
+
+  const closePlacePickModal = () => {
+    if (showPlaceChooseModal) {
+      closePlaceChooseModal();
+    }
+    setShowPlacePickModal(!showPlacePickModal);
+  };
+  const closePlaceChooseModal = () => {
+    setShowPlaceChooseModal(!showPlaceChooseModal);
+  };
+
+  const [percent, setPercent] = useState(true);
+  const [storeFront, setStoreFront] = useState(false);
+  const handleSearchByTitle = selectedTitle => {
+    // Handle the search based on the selected title
+    if (selectedTitle === 'offers') {
+      // Perform offer search logic
+      console.log('Performing offer search...');
+    } else if (selectedTitle === 'stores') {
+      // Perform store search logic
+      console.log('Performing store search...');
+    }
+  };
 
   const navigation = useNavigation();
 
@@ -50,9 +118,8 @@ const SearchDialog = ({
     })
       .then(response => {
         if (response?.data?.success == 1) {
-          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
+          // ShowConsoleLogMessage(JSON.stringify(response?.data));
           let result = Object.values(response.data?.result);
-          //   ShowConsoleLogMessage(JSON.stringify(result));
           setCategoryData(result);
         } else {
           setCategoryData([]);
@@ -82,7 +149,7 @@ const SearchDialog = ({
   };
 
   const renderItem = ({item, index}) => {
-    let imageUrl = item.image['560_560'].url;
+    let imageUrl = item.image['560_560']?.url;
     // ShowConsoleLogMessage(item.image['560_560'].url);
     return (
       <TouchableOpacity
@@ -139,6 +206,7 @@ const SearchDialog = ({
       </TouchableOpacity>
     );
   };
+  const [loading, setLoading] = useState(false);
 
   return (
     <Modal
@@ -148,6 +216,8 @@ const SearchDialog = ({
       onRequestClose={() => {
         onRequestClose();
       }}>
+      <BunchDealProgressBar loading={loading} />
+
       <View style={styles.modalBackground}>
         <View style={styles.activityIndicatorWrapper}>
           <View
@@ -155,16 +225,154 @@ const SearchDialog = ({
               paddingHorizontal: 15,
               marginTop: 10,
             }}>
-            <Text
+            <View style={[GlobalStyle.flexRowAlignCenter]}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontFamily: 'Montserrat-Bold',
+                  marginTop: 5,
+                  color: COLORS.black,
+                  flex: 1,
+                }}>
+                Search
+              </Text>
+              <Ionicons
+                onPress={() => {
+                  onRequestClose();
+                }}
+                name={'close-circle-outline'}
+                size={30}
+                color={COLORS.black}
+              />
+            </View>
+            <View
               style={{
-                fontSize: 18,
-                fontFamily: 'Montserrat-Bold',
-                marginTop: 5,
-                color: COLORS.black,
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                marginTop: 10,
               }}>
-              Search on {title}
-            </Text>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{
+                  // flexGrow: 1,
+                  alignItems: 'center',
+                  marginStart: 10,
+                }}
+                // onPress={() => {
+                //   // setPercent(true);
+                //   // // handleSearchButtonClick()
+                //   // setStoreFront(false);
+                //   // setToolbarTitle('Offers');
+                //   // setUpdate(false);
+                //   // setStoreUpdate(false);
+                // }}
+                onPress={() => handleTabChange(1)}>
+                <Text
+                  style={[
+                    FONTS.h6,
+                    {
+                      color:
+                        selectedTab === 1
+                          ? COLORS.colorAccent
+                          : COLORS.shimmer_loading_color,
 
+                      fontSize: 18,
+                    },
+                  ]}>
+                  Offers
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{
+                  // flexGrow: 1,
+                  alignItems: 'center',
+                  marginEnd: 10,
+                }}
+                onPress={() => handleTabChange(2)}
+                //   onPress={() => {
+                //   // setPercent(false);
+                //   // setStoreFront(true);
+                //   // // handleStoreSearchButtonClick()
+                //   // setToolbarTitle('Stores');
+                //   // setStoreUpdate(false);
+                //   // setUpdate(false);
+                // }}
+              >
+                <Text
+                  style={[
+                    FONTS.h6,
+                    {
+                      color:
+                        selectedTab === 2
+                          ? COLORS.colorAccent
+                          : COLORS.shimmer_loading_color,
+
+                      fontSize: 18,
+                    },
+                  ]}>
+                  Stores
+                </Text>
+              </TouchableOpacity>
+
+              {/* <SearchDialog
+                show={showSearchModal}
+                onPress={
+                  percent ? handleSearchButtonClick : handleStoreSearchButtonClick
+                }
+                title={percent ? 'offers' : 'stores'}
+                onRequestClose={closeSearchModal}
+                searchText={searchText}
+                onChangeText={onChangeText}
+                // onChangeText={val => {
+                //   setSearchText(val);
+                // }}
+                onCurrentLocationPress={() => {
+                  closeSearchModal();
+                  closePlacePickModal();
+                  closePlaceChooseModal();
+                }}
+                onChangeRadius={radius}
+                onChangeCategoryId={catId}
+                // onChangeRadius={val => {
+                //   setRadius(val);
+                // }}
+                // onChangeCategoryId={val => {
+                //   setCategoryId(val);
+                // }}
+              /> */}
+            </View>
+
+            {/* <View style={{}}>
+              <View
+                style={{
+                  backgroundColor: COLORS.lightGrey,
+                  height: 0.5,
+                  width: '100%',
+                }}
+              />
+              <View style={{ flexDirection: 'row' }}>
+                {percent ? (
+                  <Offer
+                    searchText={searchText}
+                    location={STRING.SEARCH_LOCATION}
+                    radius={radius}
+                    catId={catId}
+                    dataChange={update}
+                  />
+                ) : null}
+                {storeFront ? (
+                  <Store
+                    searchText={searchText}
+                    location={STRING.SEARCH_LOCATION}
+                    radius={radius}
+                    catId={catId}
+                    dataChange={storeUpdate}
+                  />
+                ) : null}
+              </View> */}
+            {/* </View> */}
             <View
               style={{
                 flexDirection: 'row',
@@ -176,32 +384,33 @@ const SearchDialog = ({
                 style={{
                   fontSize: 14,
                   fontFamily: 'Montserrat-SemiBold',
-                  marginTop: 5,
+                  marginTop: 10,
                   color: COLORS.black,
+                  flex: 1,
+                  //height: 36,
                 }}>
                 Location:{' '}
-              </Text>
-              <Text
-                onPress={onCurrentLocationPress}
-                style={{
-                  fontSize: 14,
-                  fontFamily: 'Montserrat-Medium',
-                  marginTop: 5,
-                  color: COLORS.colorAccent,
-                  flex: 1,
-                  height: 36,
-                  textAlignVertical: 'center',
-                }}
-                numberOfLines={2}>
-                <FontAwesome
-                  name="dot-circle-o"
-                  size={13}
+                <Text
+                  onPress={onCurrentLocationPress}
                   style={{
-                    marginEnd: 5,
+                    fontSize: 14,
+                    fontFamily: 'Montserrat-Medium',
+
+                    color: COLORS.colorAccent,
+
+                    textAlignVertical: 'center',
                   }}
-                  color={COLORS.colorAccent}
-                />{' '}
-                {STRING.SEARCH_LOCATION}
+                  numberOfLines={2}>
+                  <FontAwesome
+                    name="dot-circle-o"
+                    size={13}
+                    style={{
+                      marginEnd: 5,
+                    }}
+                    color={COLORS.colorAccent}
+                  />{' '}
+                  {STRING.SEARCH_LOCATION}
+                </Text>
               </Text>
             </View>
 
@@ -275,11 +484,18 @@ const SearchDialog = ({
                 minimumTrackTintColor={COLORS.colorAccent}
                 maximumTrackTintColor={COLORS.editTextBorder}
                 value={sliderValue}
-                maximumValue={100}
+                // maximumValue={100}
                 minimumValue={0}
+                // maximumValue={maxSliderValue} // Set maximum value dynamically
+                maximumValue={100} // Set the maximum value to any positive number you want
+                // onSlidingComplete={value => {
+                //   setSliderValue(parseInt(value));
+                //   onChangeRadius(parseInt(value));
+                // }}
                 onValueChange={value => {
                   setSliderValue(parseInt(value));
                   onChangeRadius(parseInt(value));
+                  // setMaxSliderValue(200); // You can set it to any value you want
                 }}
               />
             </View>

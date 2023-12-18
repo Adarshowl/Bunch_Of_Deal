@@ -2,4 +2,7 @@
     <string name="app_name">React Bunch Of Deals</string>
     <string name="facebook_app_id">645386946470482</string>
     <string name="facebook_client_token">02b421a797edbf8fe621d691fb77dd82</string>
+
+    <string name="default_notification_channel_id">Bunch_of_deals</string>
+    <string name="default_notification_channel_name">Bunch_of_deals_Channel</string>
 </resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>719363581249-gsrd2mqkgnrffo1ib4q2t0tjqi87pn6e.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.719363581249-gsrd2mqkgnrffo1ib4q2t0tjqi87pn6e</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>719363581249-6iqvq2oiojtkrtn0ifvp6egr6i64r91i.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyASSmJlY4X8wTPX-U2fka7VB8C1q0uMobQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>719363581249</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.bunchodDeals</string>
+	<key>PROJECT_ID</key>
+	<string>bunch-of-deals</string>
+	<key>STORAGE_BUCKET</key>
+	<string>bunch-of-deals.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:719363581249:ios:07dce2393c5d630863adc0</string>
+	<key>DATABASE_URL</key>
+	<string>https://bunch-of-deals.firebaseio.com</string>
+</dict>
+</plist>

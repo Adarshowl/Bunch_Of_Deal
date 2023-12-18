@@ -21,6 +21,7 @@ import {
   validateEmail,
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
+
 const SignUp = ({navigation}) => {
   const [pseudo, setPseudo] = useState('');
   const [email, setEmail] = useState('');
@@ -84,7 +85,6 @@ const SignUp = ({navigation}) => {
           // ShowConsoleLogMessage(JSON.stringify(response));
           if (response?.data?.status == true) {
             ShowToastMessage(response?.data?.message);
-            console.log(response);
             navigation.navigate('OtpVerification', {
               data,
               imageBase64: imageBase64,
@@ -131,6 +131,7 @@ const SignUp = ({navigation}) => {
 
   return (
     <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="handled"
       style={{
         flex: 1,
         backgroundColor: COLORS.backgroundColor,
@@ -139,7 +140,7 @@ const SignUp = ({navigation}) => {
     >
       <BunchDealProgressBar loading={loading} />
 
-      <View style={[GlobalStyle.nav_bg, {}]}>
+      <View style={GlobalStyle.nav_bg}>
         <Image
           source={images.navigation_icon_bg}
           style={GlobalStyle.nav_bg_image}
@@ -223,7 +224,8 @@ const SignUp = ({navigation}) => {
         />
         <BunchDealEditText
           borderBottomWidth={1}
-          placeholder={STRING.pseudo}
+          // placeholder={STRING.pseudo}
+          placeholder="User Name"
           style={FONTS.body3}
           value={pseudo}
           onChangeText={val => {

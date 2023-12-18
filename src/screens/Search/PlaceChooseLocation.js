@@ -1,11 +1,12 @@
 import React from 'react';
-import {Modal, StyleSheet, View, Text} from 'react-native';
+import {Modal, StyleSheet, Text, View} from 'react-native';
 import {SIZES, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import BunchDealCommonBtn from '../../utils/BunchDealCommonBtn';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {requestLocationPermission} from '../../utils/RequestUserPermission';
+import {useDispatch} from 'react-redux';
 
 const PlaceChooseLocation = ({
   navigation,
@@ -13,6 +14,8 @@ const PlaceChooseLocation = ({
   onRequestClose,
   onChangeLocation,
 }) => {
+  const dispatch = useDispatch();
+
   return (
     <Modal
       transparent={true}
@@ -63,12 +66,12 @@ const PlaceChooseLocation = ({
             width={'95%'}
             backgroundColor={COLORS.colorAccent}
             marginHorizontal={5}
-            text={'KEEP CURRENT LOCATION'}
+            text={'CHANGE LOCATION'}
             textStyle={FONTS.body3}
             textColor={COLORS.white}
             onPress={() => {
-              requestLocationPermission().then(r => {});
-              STRING.SEARCH_LOCATION = 'Current Location';
+              // requestLocationPermission(dispatch).then(r => {});
+              // STRING.SEARCH_LOCATION = 'Current Location';
               onRequestClose();
             }}
             marginTop={25}
@@ -80,10 +83,13 @@ const PlaceChooseLocation = ({
             width={'95%'}
             backgroundColor={COLORS.colorAccent}
             marginHorizontal={5}
-            text={'CHANGE LOCATION'}
+            text={'KEEP CURRENT LOCATION'}
             textStyle={FONTS.body3}
             textColor={COLORS.white}
             onPress={() => {
+              STRING.SEARCH_LOCATION = 'Current Location';
+              requestLocationPermission(dispatch).then(r => {});
+
               onChangeLocation();
             }}
             marginTop={10}

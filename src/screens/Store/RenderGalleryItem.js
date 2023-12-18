@@ -13,7 +13,7 @@ const RenderGalleryItem = ({
   bigGallery,
 }) => {
   // ShowConsoleLogMessage(item);
-  let imageUrl = item['200_200'].url;
+  let imageUrl = item['200_200']?.url;
   return (
     <TouchableOpacity
       key={imageUrl}

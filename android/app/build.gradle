@@ -191,8 +191,7 @@ dependencies {
     // GIF DEPENDENCY
     implementation 'com.facebook.fresco:animated-gif:2.5.0'          
 
-    // paypal
-    // implementation project(':react-native-paypal')
+
     implementation "com.braintreepayments.api:braintree:3.+"
     implementation "com.braintreepayments.api:data-collector:3.+"
 

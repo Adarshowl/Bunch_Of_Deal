@@ -44,7 +44,7 @@ const BunchDealImageLoader = ({
         style={[
           {
             opacity: defImageAnimated,
-            // resizeMode: 'stretch',
+            resizeMode: 'cover',
             // tintColor: COLORS.grey,
             // backgroundColor: COLORS.editTextTitle,
           },

@@ -35,13 +35,14 @@ export const markReceive = async cid => {
     'Content-Type': 'multipart/form-data',
   })
     .then(response => {
+      console.log("ppppppppppppppppp")
       ShowConsoleLogMessage(response);
     })
     .catch(err => {
       crashlytics().recordError(err);
 
       ShowConsoleLogMessage(
-        'Error in get offer recent api call: ' + err.message,
+        'Errr get off ppppppppppppppp: ' + err.message,
       );
     })
     .finally(() => {});

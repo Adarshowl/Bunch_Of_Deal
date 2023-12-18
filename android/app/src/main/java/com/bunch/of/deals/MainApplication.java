@@ -13,6 +13,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -65,7 +66,14 @@ public class MainApplication extends Application implements ReactApplication {
       DefaultNewArchitectureEntryPoint.load();
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    createNotificationChannels();
   }
+
+     private void createNotificationChannels() {
+        ReactNativePushNotificationPackage notificationsPackage = new ReactNativePushNotificationPackage();
+        // notificationsPackage.onHostResume(); // Add this line
+        // notificationsPackage.createNotificationChannels(); // Add this line
+    }
 
 // new method added for paypal
 // @Override    

@@ -253,14 +253,14 @@ const InvoiceList = ({navigation}) => {
 
   const getOrderList = val => {
     setLoading(true);
-    let body = {user_id: val, limit: 30, page: '1'};
+    let body = {user_id: val, limit: 100, page: '1'};
 
     ApiCall('post', body, API_END_POINTS.API_ORDERS_GET, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        ShowConsoleLogMessage(JSON.stringify(response));
+        //ShowConsoleLogMessage(JSON.stringify(response));
         if (response?.data?.success == 1) {
           let result = Object.values(response.data?.result);
 
@@ -302,7 +302,8 @@ const InvoiceList = ({navigation}) => {
     // ShowConsoleLogMessage(url);
     navigation.navigate('InvoiceDetail', {
       url: url + '',
-      order_id: item?.id + '',
+      // order_id: item?.id + '',
+      order_id: item?.order_id + '',
     });
   };
 
@@ -434,6 +435,7 @@ const InvoiceList = ({navigation}) => {
                   paddingVertical: 1.5,
                   paddingHorizontal: 6,
                   borderRadius: 5,
+                  overflow: 'hidden',
                 }}>
                 {order_status}
               </Text>
@@ -444,7 +446,7 @@ const InvoiceList = ({navigation}) => {
                   color: COLORS.white,
                   backgroundColor: `${payment_statusColor}`,
                   paddingVertical: 1.5,
-
+                  overflow: 'hidden',
                   paddingHorizontal: 6,
                   borderRadius: 5,
                 }}>
@@ -477,7 +479,7 @@ const InvoiceList = ({navigation}) => {
         {item?.selected ? (
           <>
             <FlatList
-              data={Object.values(item?.items)}
+              data={Object.values(item?.items) || []}
               renderItem={renderInterItem}
             />
             {/* <AntDesign
@@ -527,7 +529,7 @@ const InvoiceList = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: COLORS.white, flex: 1}}>
+    <View style={{backgroundColor: COLORS.white, flex: 1}}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -575,7 +577,6 @@ const InvoiceList = ({navigation}) => {
                     textAlign: 'center',
                     marginTop: 200,
                     fontSize: 18,
-                    fontFamily: 'Quicksand-Medium',
                   }}>
                   No data Found
                 </Text>
@@ -605,7 +606,7 @@ const InvoiceList = ({navigation}) => {
           <NoResult onReloadBtn={onReloadBtn} />
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

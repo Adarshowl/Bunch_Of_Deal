@@ -150,11 +150,15 @@ export default StyleSheet.create({
     textDecorationLine: 'underline',
   },
   Product_image: {
-    height: 390,
-    backgroundColor: COLORS.colorPrimary,
-    alignItems: 'center',
-    // resizeMode: 'contain',
     width: '100%',
+    height:260,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    resizeMode:'cover'
+    // height:250,
+    // width: Dimensions.get('window').width,
+    // resizeMode:'stretch',
+    // width:'100%',
   },
   price: {
     height: 40,
@@ -180,7 +184,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     color: COLORS.white,
-    fontSize: 17,
+    fontSize: 18,
     fontFamily: 'Montserrat-SemiBold',
   },
   minute: {
@@ -216,11 +220,15 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   store_image: {
-    height: 300,
-    // backgroundColor: COLORS.colorPrimary,
-    alignItems: 'center',
+    height:260,
+    resizeMode:'cover',
+    // height:290,
+    // // backgroundColor: COLORS.colorPrimary,
     // resizeMode: 'contain',
+    //  width: Dimensions.get('window').width,
     width: '100%',
+    paddingVertical:50
+    
   },
   Fonticon: {
     height: 56,
@@ -235,6 +243,7 @@ export default StyleSheet.create({
     marginStart: 10,
     alignItems: 'center',
     marginTop: 10,
+    backgroundColor: COLORS.white,
   },
   storeprice: {
     height: 40,

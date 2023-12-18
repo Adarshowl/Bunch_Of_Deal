@@ -142,13 +142,12 @@
 
 import React, {useEffect, useState} from 'react';
 import {
+  Alert,
+  Platform,
+  SafeAreaView,
   StyleSheet,
   Text,
   View,
-  Platform,
-  PermissionsAndroid,
-  Alert,
-  SafeAreaView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {WebView} from 'react-native-webview';
@@ -161,34 +160,39 @@ import crashlytics from '@react-native-firebase/crashlytics';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
-
+import RNFS from 'react-native-fs';
+import notifee, {AndroidImportance} from '@notifee/react-native';
+import {
+  downloadFile,
+  getDownloadPermissionAndroid,
+} from '../../screens/Func/index';
 const InvoiceDetail = ({navigation, route}) => {
   const [webViewLoading, setWebViewLoading] = useState(true);
   const [downloaded, setisdownloaded] = useState(true);
   const showSpinner = () => setWebViewLoading(true);
   const hideSpinner = () => setWebViewLoading(false);
-
+  const fileUrl = 'https://www.africau.edu/images/default/sample.pdf';
   const permissionFunc = async () => {
     if (Platform.OS == 'ios') {
       createPDF();
     } else {
       if (downloaded) {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            createPDF();
-          } else {
-            ShowToastMessage(
-              'You need to give storage permission to download the file',
-            );
-          }
-        } catch (err) {
-          crashlytics().recordError(err);
-
-          console.warn(err);
-        }
+        // try {
+        //   const granted = await PermissionsAndroid.request(
+        //     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        //   );
+        //   if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        await createPDF();
+        //   } else {
+        //     ShowToastMessage(
+        //       'You need to give storage permission to download the file',
+        //     );
+        // }
+        // } catch (err) {
+        //   crashlytics().recordError(err);
+        //
+        //   console.warn(err);
+        // }
       } else {
         ShowToastMessage('File is already downloaded.');
       }
@@ -199,6 +203,7 @@ const InvoiceDetail = ({navigation, route}) => {
     'window.ReactNativeWebView.postMessage(document.documentElement.innerHTML)';
 
   let {url} = route?.params;
+
   let {order_id} = route?.params;
 
   const [htmlData, setHtmlData] = useState('');
@@ -224,37 +229,129 @@ const InvoiceDetail = ({navigation, route}) => {
   // console.log(url);
 
   const createPDF = async () => {
-    try {
-      const {dirs} = RNFetchBlob.fs;
-      const dirToSave =
-        Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
+    if (Platform.OS == 'android') {
+      // try {
+      //   const {dirs} = RNFetchBlob.fs;
+      //   const path = RNFS.ExternalStorageDirectoryPath;
+      //   const dirToSave =
+      //     Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
+      //   let options = {
+      //     html: htmlData,
+      //     fileName: 'BOD_OrderID' + '_' + order_id,
+      //     directory: Platform.OS == 'ios' ? dirToSave : path,
+      //   };
+      //   let file = await RNHTMLtoPDF.convert(options);
+      //   const destinationPath = RNFS.DownloadDirectoryPath;
+      //   const FileName = 'BOD_OrderID' + '_' + order_id + '.pdf';
+      //   const destinationFile = destinationPath + '/' + FileName;
+      //   RNFS.copyFile(file.filePath, destinationFile)
+      //     .then(result => {
+      //       // Delete a file on the project path using RNFS.unlink
+      //       return (
+      //         RNFS.unlink(file.filePath)
+      //           .then(() => {
+      //             console.log('FILE DELETED');
+      //           })
+      //           // `unlink` will throw an error, if the item to unlink does not exist
+      //           .catch(err => {
+      //             console.log(err.message);
+      //           })
+      //       );
+      //     })
+      //     .catch(err => {
+      //       console.log('err', err);
+      //     });
+      //   // ShowToastMessage('File Downloaded Successfully');
+      //   Alert.alert(
+      //     'File Downloaded Successfully',
+      //  'File saved to : Downloads/BOD_OrderID' + '_' + order_id + '.pdf',
+      //   );
+      //   await DisplayNotification('show');
+      // } catch (err) {
+      //   crashlytics().recordError(err);
+      //   ShowToastMessage('Failed to download invoice');
+      // }
+    } else {
+      // const {dirs} = RNFetchBlob.fs;
+      const {config, fs} = RNFetchBlob;
+      // const dirToSave =
+      // Platform.OS == 'ios' ? dirs.DownloadDir : dirs.DownloadDir;
+      const cacheDir = fs.dirs.DocumentDir;
+
+      // Generate a unique filename for the downloaded image
+      //const filename = url.split('/').pop();
+      const filename = 'BOD_OrderID' + '_' + order_id + '';
+      const imagePath = `${cacheDir}/${filename}`;
+
+      ShowConsoleLogMessage('cache dir path -> ' + cacheDir);
       let options = {
         html: htmlData,
-        fileName: 'BOD_OrderID_' + number + '_' + order_id,
-        directory: dirToSave,
+        fileName: 'BOD_OrderID' + '_' + order_id + '',
+        //directory: imagePath,
+        directory: 'Documents',
       };
 
       let file = await RNHTMLtoPDF.convert(options);
-      // console.log(file.filePath);
-      // alert(file.filePath);
-      // ShowToastMessage('File Downloaded Successfully');
+
       Alert.alert(
         'File Downloaded Successfully',
-        'File saved to : Documents/BOD_INVOICES/BOD_OrderID_' +
-          number +
-          '_' +
-          order_id +
-          '.pdf',
+        'File saved BOD_OrderID' + '_' + order_id + '.pdf',
       );
-    } catch (err) {
-      crashlytics().recordError(err);
-
-      ShowToastMessage('Failed to download invoice');
+      await DisplayNotification('show');
     }
+  };
+  const downloadHistory = async () => {
+    const {config, fs} = RNFetchBlob;
+    let PictureDir = fs.dirs.DownloadDir;
+    let date = new Date();
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        //Related to the Android only
+        useDownloadManager: true,
+        notification: true,
+        path:
+          PictureDir +
+          '/Report_Download' +
+          Math.floor(date.getTime() + date.getSeconds() / 2),
+        description: 'Risk Report Download',
+      },
+    };
+    config(options)
+      .fetch('GET', url)
+      .then(res => {
+        //Showing alert after successful downloading
+        console.log('res -> ', JSON.stringify(res));
+        alert('Report Downloaded Successfully.');
+      });
+  };
+
+  const DisplayNotification = async remoteMessage => {
+    const channelId = await notifee.createChannel({
+      id: 'BUNCH_OF_DEALS',
+      name: 'BUNCH_OF_DEALS',
+      importance: AndroidImportance.HIGH,
+    });
+
+    await notifee.displayNotification({
+      title: 'Invoice Downloaded.',
+      body: 'BOD_OrderID' + '_' + order_id + '.pdf downloaded successfully.',
+
+      android: {
+        channelId: channelId,
+        loopSound: false,
+        sound: 'default',
+        smallIcon: 'ic_launcher_full_latest',
+      },
+    });
+
+    notifee.onBackgroundEvent(event => {
+      console.log('on background event notifee -=> ' + JSON.stringify(event));
+    });
   };
 
   return (
-    <SafeAreaView
+    <View
       style={{
         flex: 1,
       }}>
@@ -319,11 +416,14 @@ const InvoiceDetail = ({navigation, route}) => {
         textColor={COLORS.white}
         onPress={() => {
           permissionFunc();
+          // downloadFile(fileUrl).then(res => {
+          //   RNFetchBlob.ios.previewDocument(res.path());
+          // });
         }}
         borderRadius={1}
         textSize={16}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

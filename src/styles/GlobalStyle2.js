@@ -377,11 +377,12 @@ export default StyleSheet.create({
     paddingBottom: 50,
   },
   AboutIcon: {
-    height: 200,
-    width: 200,
+    height: 300,
+    width: 300,
     alignSelf: 'center',
-    resizeMode: 'center',
-    marginTop: 40,
+    resizeMode: 'cover',
+    //marginTop: 40,
+    //backgroundColor: 'red',
   },
   AboutDes: {
     padding: 10,

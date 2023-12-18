@@ -27,7 +27,7 @@ const getFcmToken = async () => {
     try {
       const fcmToken = await messaging().getToken();
       if (fcmToken) {
-        // console.log(fcmToken, 'the new genrated token');
+        console.log(fcmToken, 'the new genrated token');
         STRING.FCM_TOKEN = fcmToken;
         await AsyncStorage.setItem('fcmToken', fcmToken);
         updateTokenToDatabase(fcmToken);
@@ -114,8 +114,8 @@ const updateTokenToDatabase = async fcmToken => {
       fcm_id: fcmToken,
       sender_id: '',
       platform: Platform.OS,
-      lat: STRING.CURRENT_LAT,
-      lng: STRING.CURRENT_LONG,
+      lat: '0.0',
+      lng: '0.0',
     };
     // ShowConsoleLogMessage(JSON.stringify(body) + ' --> update token');
     ApiCall('post', body, API_END_POINTS.API_USER_REGISTER_TOKEN, {

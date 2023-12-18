@@ -18,6 +18,7 @@ import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import BunchDealEditText from '../../utils/EditText/BunchDealEditText';
 import {requestExternalWritePermission} from '../../utils/RequestUserPermission';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import GlobalStyle2 from '../../styles/GlobalStyle2';
 
 const Account = ({navigation}) => {
   const [userData, setUserData] = useState({});
@@ -238,15 +239,16 @@ const Account = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+    <View style={GlobalStyle.mainContainerBgColor}>
       <BunchDealProgressBar loading={loading} />
       <View
-        style={{
-          height: 56,
-
-          alignItems: 'center',
-          flexDirection: 'row',
-        }}>
+        style={[
+          GlobalStyle2.headerFooterStyle,
+          {
+            elevation: 10,
+            maxHeight: 56,
+          },
+        ]}>
         <Ionicons
           onPress={() => {
             navigation.goBack();
@@ -265,7 +267,8 @@ const Account = ({navigation}) => {
               marginHorizontal: 10,
             },
           ]}>
-          Edit Profile
+          {/*Edit */}
+          Profile
         </Text>
 
         <View
@@ -365,7 +368,8 @@ const Account = ({navigation}) => {
               marginBottom: -10,
               marginStart: 10,
             }}>
-            {STRING.pseudo}
+            {/* {STRING.pseudo} */}
+            User Name
           </Text>
           <BunchDealEditText
             borderBottomWidth={1}
@@ -468,7 +472,7 @@ const Account = ({navigation}) => {
           />
         </View>
       </KeyboardAwareScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

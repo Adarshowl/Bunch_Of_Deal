@@ -6,8 +6,9 @@ import React, {useState} from 'react';
 import {Image, Modal, Text, TouchableOpacity, View} from 'react-native';
 import {AccessToken, LoginManager} from 'react-native-fbsdk';
 // import {AccessToken, LoginManager} from 'react-native-fbsdk-next';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Linking} from 'react-native';
+
 import {COLORS} from '../../../constants/Colors';
 import {STRING} from '../../../constants/String';
 import images from '../../../constants/images';
@@ -24,6 +25,8 @@ import {
   validateFieldNotEmpty,
 } from '../../../utils/Utility';
 import {requestUserPermission} from '../../../firebase/notificationService';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useSelector} from 'react-redux';
 //apple login
 
 // import appleAuth, {
@@ -71,7 +74,7 @@ const Login = ({navigation}) => {
 
       // Get the Access Token
       const data = await AccessToken.getCurrentAccessToken();
-      ShowConsoleLogMessage('fb data -> ' + JSON.stringify(data));
+      // ShowConsoleLogMessage('fb data -> ' + JSON.stringify(data));
       // If we don't get the access token, then something has went wrong.
       if (!data) {
         throw 'Something went wrong obtaining access token';
@@ -111,6 +114,8 @@ const Login = ({navigation}) => {
     }
   }
 
+  let userLat = useSelector(state => state?.state?.latitude);
+  let userLong = useSelector(state => state?.state?.longitude);
   const handleFbLogin = response => {
     try {
       let googleImage =
@@ -122,8 +127,8 @@ const Login = ({navigation}) => {
         telephone: '',
         social_type: 'Facebook',
         guest_id: '1',
-        lng: STRING.CURRENT_LONG,
-        lat: STRING.CURRENT_LAT,
+        lng: userLat,
+        lat: userLong,
         mac_adr: '02.00:00:00:00',
         images: response?.additionalUserInfo?.profile?.picture?.data?.url,
         password: '',
@@ -269,6 +274,80 @@ const Login = ({navigation}) => {
     // navigation.navigate('About');
   };
 
+  // const onLoginClick = () => {
+  //   if (validateFieldNotEmpty(email)) {
+  //     ShowToastMessage('Email is required');
+  //   } else if (validateFieldNotEmpty(password)) {
+  //     ShowToastMessage('Password is required');
+  //   } else {
+  //     setLoading(true);
+  //     let body = {
+  //       login: email.replace(/ /g, ''),
+  //       password: password,
+  //       social_type: 'Normal',
+  //       guest_id: '1',
+  //       lng: STRING.CURRENT_LONG,
+  //       lat: STRING.CURRENT_LAT,
+  //       mac_adr: '02.00:00:00:00',
+  //     };
+  //     ShowConsoleLogMessage(API_END_POINTS.signin);
+  //     ApiCall('post', body, API_END_POINTS.signin, {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'multipart/form-data',
+  //     })
+  //       .then(response => {
+  //         console.log(JSON.stringify(body));
+  //         ShowConsoleLogMessage(JSON.stringify(response?.data));
+
+  //         if (response?.data?.success == 1) {
+  //           ShowToastMessage('Login successful');
+  //           setLoading(false);
+  //           let arr = [];
+  //           arr.push(response?.data?.result);
+  //           try {
+  //             for (let i = 0; i < arr.length; i++) {
+  //               // console.log(arr[i]['0']?.images['0']['560_560']?.url);
+  //               AsyncStorage.setItem('userData', JSON.stringify(arr[i]['0']));
+
+  //               AsyncStorage.setItem(STRING.userEmail, arr[i]['0']?.email + '');
+  //               if (arr[i]['0']?.images != null || undefined) {
+  //                 AsyncStorage.setItem(
+  //                   'userImage',
+  //                   arr[i]['0']?.images['0']['560_560']?.url || '',
+  //                 );
+  //               }
+  //             }
+  //             // console.log(arr.length);
+  //             // console.log(JSON.stringify(response));
+  //             // closeFilterModal();
+
+  //             navigation.replace('MainContainer');
+  //           } catch (error) {
+  //             crashlytics().recordError(error);
+
+  //             AsyncStorage.setItem('userData', JSON.stringify(arr[0]['0']));
+  //             AsyncStorage.setItem(STRING.userEmail, arr[0]['0']?.email + '');
+  //             navigation.replace('MainContainer');
+  //           }
+  //         } else {
+  //           // ShowToastMessage(response?.data?.errors?.connect2);
+  //           Alert("noooooo")
+  //           setLoading(false);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         crashlytics().recordError(error);
+
+  //         ShowConsoleLogMessage('Something went wrong.' + error);
+  //         ShowToastMessage('Something went wrong.' + error);
+  //         setLoading(false);
+  //       })
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   }
+  // };
+
   const onLoginClick = () => {
     if (validateFieldNotEmpty(email)) {
       ShowToastMessage('Email is required');
@@ -281,8 +360,8 @@ const Login = ({navigation}) => {
         password: password,
         social_type: 'Normal',
         guest_id: '1',
-        lng: STRING.CURRENT_LONG,
-        lat: STRING.CURRENT_LAT,
+        lng: userLong,
+        lat: userLat,
         mac_adr: '02.00:00:00:00',
       };
       ShowConsoleLogMessage(API_END_POINTS.signin);
@@ -475,8 +554,9 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <KeyboardAwareScrollView style={GlobalStyle.mainContainerBgColor}>
+    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
       <View style={GlobalStyle.nav_bg}>
+        <BunchDealProgressBar loading={loading} />
         <Image
           source={images.navigation_icon_bg}
           style={GlobalStyle.nav_bg_image}
@@ -504,7 +584,7 @@ const Login = ({navigation}) => {
           borderRadius: 50,
         }}
       />
-      <BunchDealProgressBar loading={loading} />
+      {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
           GlobalStyle.loginCard,
@@ -545,17 +625,98 @@ const Login = ({navigation}) => {
           borderRadius={1}
           textSize={18}
         />
-        <Text style={[FONTS.h7, GlobalStyle.greyColorTextUnderline]}>
-          {STRING.also_login}
-        </Text>
         <View
+          style={{
+            marginLeft: 7,
+            marginTop: 10,
+          }}>
+          <Text
+            style={[
+              FONTS.h7,
+              GlobalStyle.greyColorTextUnderline,
+              {
+                textAlign: 'center',
+                fontSize: 15,
+                color: COLORS?.grey,
+              },
+            ]}>
+            {STRING.also_login}
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  'https://bunchofdeals.com.au/terms&services.php',
+                );
+              }}>
+              <Text
+                style={[
+                  FONTS.h7,
+                  GlobalStyle.greyColorTextUnderline,
+                  {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    marginLeft: 5,
+                    textAlign: 'center',
+                    marginRight: 5,
+                    // color: COLORS?.black,
+                    // backgroundColor: COLORS.white,
+                    color: COLORS.colorAccent,
+                  },
+                ]}>
+                {STRING.also_login_text}
+              </Text>
+            </TouchableOpacity>
+            <Text
+              style={[
+                FONTS.h7,
+                GlobalStyle.greyColorTextUnderline,
+                {
+                  textAlign: 'center',
+                  color: COLORS?.grey,
+                },
+              ]}>
+              and
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  'https://bunchofdeals.com.au/privacypolicy.php',
+                );
+              }}>
+              <Text
+                style={[
+                  FONTS.h7,
+                  GlobalStyle.greyColorTextUnderline,
+                  {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    marginLeft: 5,
+                    textAlign: 'center',
+                    // color: COLORS?.black,
+                    // backgroundColor: COLORS.white,
+                    color: COLORS.colorAccent,
+                  },
+                ]}>
+                {STRING.also_login_text1}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* <View
           style={{
             flexDirection: 'column',
             justifyContent: 'space-around',
             alignItems: 'center',
-            marginTop: 15,
-          }}>
-          {/* <AppleButton
+            marginTop: 15, */}
+        {/* }}> */}
+        {/* <AppleButton
         buttonStyle={AppleButton.Style.BLACK}
         buttonType={AppleButton.Type.SIGN_IN}
         style={{
@@ -566,6 +727,69 @@ const Login = ({navigation}) => {
         onPress={()=>onAppleButtonPress()}
         /> */}
 
+        {/* <TouchableOpacity
+            style={{
+              height: 45,
+              width: '80%',
+              // top: 5,
+              // backgroundColor: COLORS.red,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 15,
+            }}
+            onPress={() => {
+              fbSignIn();
+            }}>
+            <Image
+              source={images.fb_logo}
+              style={{
+                width: '100%',
+
+                flex: 1,
+                resizeMode: 'cover',
+              }}
+            />
+          </TouchableOpacity> */}
+
+        {/* <GoogleSigninButton
+            style={{width: 150, height: 48}}
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={_SignIn}
+
+            // disabled={this.state.isSigninInProgress}
+          /> */}
+        {/* </View> */}
+        <View
+          style={
+            {
+              // marginTop: 20,
+            }
+          }
+        />
+        <Text
+          onPress={() => {
+            navigation.navigate('ForgotPassword');
+          }}
+          style={[FONTS.h6, GlobalStyle.primaryColorTextUnderline]}>
+          {STRING.forgot_password}
+        </Text>
+        <Text
+          onPress={() => {
+            navigation.navigate('Profile');
+          }}
+          style={[FONTS.h6, GlobalStyle.primaryColorText]}>
+          {STRING.or}
+        </Text>
+
+        <View
+          style={{
+            flexDirection: 'column',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            marginTop: 10,
+            marginBottom: 10,
+          }}>
           <TouchableOpacity
             style={{
               height: 45,
@@ -579,7 +803,6 @@ const Login = ({navigation}) => {
             onPress={() => {
               fbSignIn();
             }}>
-            {/* <Text style={[FONTS.h6, {color: COLORS.white}]}>Google +</Text>*/}
             <Image
               source={images.fb_logo}
               style={{
@@ -590,7 +813,6 @@ const Login = ({navigation}) => {
               }}
             />
           </TouchableOpacity>
-
           <TouchableOpacity
             style={{
               height: 45,
@@ -602,8 +824,11 @@ const Login = ({navigation}) => {
               marginTop: 15,
             }}
             onPress={() => {
+              setLoading(true); // Show the loading spinner
+
               onGoogleButtonPress()
                 .then(response => {
+                  setLoading(true);
                   let googleImage =
                     response?.additionalUserInfo?.profile?.picture + '';
                   let body = {
@@ -613,8 +838,8 @@ const Login = ({navigation}) => {
                     telephone: response?.additionalUserInfo?.providerData?.name,
                     social_type: 'Google',
                     guest_id: '1',
-                    lng: STRING.CURRENT_LONG,
-                    lat: STRING.CURRENT_LAT,
+                    lng: userLong,
+                    lat: userLat,
                     mac_adr: '02.00:00:00:00',
                     images: response?.additionalUserInfo?.profile?.picture,
                   };
@@ -674,7 +899,7 @@ const Login = ({navigation}) => {
 
                 .catch(error => {
                   crashlytics().recordError(error);
-
+                  setLoading(false);
                   console.log('response -> ' + JSON.stringify(error));
                 });
             }}>
@@ -683,42 +908,12 @@ const Login = ({navigation}) => {
               source={images.google_btn}
               style={{
                 width: '100%',
-
                 flex: 1,
                 resizeMode: 'cover',
               }}
             />
           </TouchableOpacity>
-
-          {/* <GoogleSigninButton
-            style={{width: 150, height: 48}}
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
-            onPress={_SignIn}
-
-            // disabled={this.state.isSigninInProgress}
-          /> */}
         </View>
-        <View
-          style={{
-            marginTop: 20,
-          }}
-        />
-
-        <Text
-          onPress={() => {
-            navigation.navigate('ForgotPassword');
-          }}
-          style={[FONTS.h6, GlobalStyle.primaryColorTextUnderline]}>
-          {STRING.forgot_password}
-        </Text>
-        <Text
-          onPress={() => {
-            navigation.navigate('Profile');
-          }}
-          style={[FONTS.h6, GlobalStyle.primaryColorText]}>
-          {STRING.or}
-        </Text>
 
         <BunchDealCommonBtn
           height={40}
@@ -739,7 +934,7 @@ const Login = ({navigation}) => {
         />
       </View>
       {renderFilterModal()}
-    </KeyboardAwareScrollView>
+    </SafeAreaView>
   );
 };
 

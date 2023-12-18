@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ScrollView,
 } from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -115,7 +116,7 @@ const DrawerContent = ({navigation, props}) => {
   // };
 
   return (
-    <SafeAreaView
+    <View
       style={{
         flex: 1,
         backgroundColor: COLORS.white,
@@ -183,159 +184,154 @@ const DrawerContent = ({navigation, props}) => {
           )}
         </TouchableOpacity>
       </ImageBackground>
-      <View
-        style={{
-          marginTop: 10,
-        }}
-      />
-      <DrawerItem
-        name={'Home'}
-        title={Entypo}
-        iconName="home"
-        onPress={() => {
-          // navigation.goBack();
-          navigation.navigate('Home');
-        }}
-      />
-      <DrawerItem
-        name={'Categories'}
-        title={Ionicons}
-        iconName="md-reorder-three-outline"
-        onPress={() => {
-          // props?.navigation?.navigate('Category');
-          navigation.navigate('Category');
-        }}
-      />
-      <DrawerItem
-        name={'Geo Stores'}
-        title={Entypo}
-        iconName="location"
-        onPress={() => {
-          // props?.navigation?.navigate('GeoStore');
-          navigation.navigate('GeoStore');
-        }}
-      />
-      {userData?.id_user == null ? null : (
-        <DrawerItem
-          name={'Orders'}
-          title={Ionicons}
-          iconName="ios-cart"
-          onPress={() => {
-            // props?.navigation?.navigate('Invoice');
-            navigation.navigate('Invoice');
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <View
+          style={{
+            marginTop: 10,
           }}
         />
-      )}
-      {userData?.id_user == null ? null : (
         <DrawerItem
-          name={'Edit Profile'}
-          title={Ionicons}
-          iconName="ios-person-sharp"
+          name={'Home'}
+          title={Entypo}
+          iconName="home"
           onPress={() => {
-            // props?.navigation?.navigate('Account');
-            navigation.navigate('Account');
+            // navigation.goBack();
+            navigation.navigate('Home');
           }}
         />
-      )}
-
-      {/* {userData?.id_user == null ? null : ( */}
-      <DrawerItem
-        name={'Favorite Store'}
-        title={Fontisto}
-        iconName="favorite"
-        onPress={() => {
-          // props?.navigation?.navigate('FavStore');
-          navigation.navigate('FavStore');
-        }}
-      />
-      {/* )} */}
-      {/* {userData?.id_user == null ? null : ( */}
-      <DrawerItem
-        name={'Favorite Offer'}
-        title={Fontisto}
-        iconName="favorite"
-        onPress={() => {
-          // props?.navigation?.navigate('FavOffer');
-          navigation.navigate('FavOffer');
-        }}
-      />
-      {/* )} */}
-
-      <DrawerItem
-        name={'Settings'}
-        title={Feather}
-        iconName="settings"
-        onPress={() => {
-          // props?.navigation.navigate('Setting');
-          navigation.navigate('Setting');
-        }}
-      />
-
-      <DrawerItem
-        name={'About Us'}
-        title={Feather}
-        iconName="info"
-        onPress={() => {
-          // props?.navigation?.navigate('About');
-          navigation?.navigate('About');
-        }}
-      />
-
-      {userData?.id_user == null ? (
         <DrawerItem
-          name={'LogIn'}
+          name={'Categories'}
+          title={Ionicons}
+          iconName="md-reorder-three-outline"
+          onPress={() => {
+            // props?.navigation?.navigate('Category');
+            navigation.navigate('Category');
+          }}
+        />
+        <DrawerItem
+          name={'Geo Stores'}
+          title={Entypo}
+          iconName="location"
+          onPress={() => {
+            // props?.navigation?.navigate('GeoStore');
+            navigation.navigate('GeoStore');
+          }}
+        />
+        {userData?.id_user == null ? null : (
+          <DrawerItem
+            name={'Orders'}
+            title={Ionicons}
+            iconName="ios-cart"
+            onPress={() => {
+              // props?.navigation?.navigate('Invoice');
+              navigation.navigate('Invoice');
+            }}
+          />
+        )}
+        {userData?.id_user == null ? null : (
+          <DrawerItem
+            // name={'Edit Profile'}
+            name={'Profile'}
+            title={Ionicons}
+            iconName="ios-person-sharp"
+            onPress={() => {
+              navigation.navigate('Account');
+            }}
+          />
+        )}
+
+        <DrawerItem
+          name={'Favorite Store'}
+          title={Fontisto}
+          iconName="favorite"
+          onPress={() => {
+            navigation.navigate('FavStore');
+          }}
+        />
+
+        <DrawerItem
+          name={'Favorite Offer'}
+          title={Fontisto}
+          iconName="favorite"
+          onPress={() => {
+            navigation.navigate('FavOffer');
+          }}
+        />
+
+        <DrawerItem
+          name={'Settings'}
           title={Feather}
-          iconName="log-in"
+          iconName="settings"
           onPress={() => {
-            navigation.navigate('Auth', {
-              screen: 'Login',
-              params: {
+            navigation.navigate('Setting');
+          }}
+        />
+
+        <DrawerItem
+          name={'About Us'}
+          title={Feather}
+          iconName="info"
+          onPress={() => {
+            navigation?.navigate('About');
+          }}
+        />
+
+        {userData?.id_user == null ? (
+          <DrawerItem
+            name={'LogIn'}
+            title={Feather}
+            iconName="log-in"
+            onPress={() => {
+              navigation.navigate('Auth', {
                 screen: 'Login',
-              },
-            });
-          }}
-        />
-      ) : (
-        <DrawerItem
-          name={'Logout'}
-          title={Feather}
-          iconName="log-in"
-          onPress={() => {
-            Alert.alert(
-              'Log out',
-              'Do you want to logout?',
-              [
-                {
-                  text: 'Cancel',
-                  onPress: () => {
-                    return null;
-                  },
+                params: {
+                  screen: 'Login',
                 },
-                {
-                  text: 'Confirm',
-                  // onPress: () => {
-
-                  //   props?.navigation?.replace('Auth');
-                  //   AsyncStorage.clear().then(() => console.log('Cleared'));
-
-                  //   navigation.replace('Auth', {
-                  //     screen: 'Login',
-                  //     params: {
-                  //       screen: 'Login',
-                  //     },
-                  //   });
-                  // },
-                  onPress: () => {
-                    onLogouClick();
+              });
+            }}
+          />
+        ) : (
+          <DrawerItem
+            name={'Logout'}
+            title={Feather}
+            iconName="log-in"
+            onPress={() => {
+              Alert.alert(
+                'Log out',
+                'Do you want to logout?',
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => {
+                      return null;
+                    },
                   },
-                },
-              ],
-              {cancelable: false},
-            );
-          }}
-        />
-      )}
-    </SafeAreaView>
+                  {
+                    text: 'Confirm',
+                    // onPress: () => {
+
+                    //   props?.navigation?.replace('Auth');
+                    //   AsyncStorage.clear().then(() => console.log('Cleared'));
+
+                    //   navigation.replace('Auth', {
+                    //     screen: 'Login',
+                    //     params: {
+                    //       screen: 'Login',
+                    //     },
+                    //   });
+                    // },
+                    onPress: () => {
+                      onLogouClick();
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }}
+          />
+        )}
+      </ScrollView>
+    </View>
   );
 };
 

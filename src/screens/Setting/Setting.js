@@ -65,7 +65,7 @@ const Setting = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+    <View style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       <View
         style={{
           height: 56,
@@ -352,12 +352,12 @@ const Setting = ({navigation}) => {
                   marginTop: 3,
                 },
               ]}>
-              1.0.0
+              2.0.2
             </Text>
           </View>
         </View>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 };
 

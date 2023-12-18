@@ -83,6 +83,8 @@
 // };
 // export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP_CLONE/index.php';
 export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP/index.php';
+// export const CLONE_BASE_URL =
+//   'https://bunchofdeals.com.au/backup/APP/index.php';
 export const BASE_URL = 'https://bunchofdeals.com.au/APP/index.php';
 
 export const API = '/api/';
@@ -94,9 +96,13 @@ export const API_END_POINTS = {
   API_USER_GET_REVIEWS: CLONE_BASE_URL + API + 'store/getComments',
   API_USER_UPDATE_STORE: CLONE_BASE_URL + API + 'webservice/updateStore',
   API_RATING_STORE:
-    'https://bunchofdeals.com.au/APP_CLONE/index.php/api/1.0/store/rate',
+    // 'https://bunchofdeals.com.au/APP_CLONE/index.php/api/1.0/store/rate',
+    'https://bunchofdeals.com.au/APP/index.php/api/1.0/store/rate',
+
   API_SAVE_STORE: CLONE_BASE_URL + API + 'store/saveStore',
   API_REMOVE_STORE: CLONE_BASE_URL + API + 'store/removeStore',
+
+  API_GET_FAV_STORE_OFFER: CLONE_BASE_URL + API + 'offer/getofferbook',
 
   //event API's
   API_USER_GET_EVENTS: CLONE_BASE_URL + API + 'event/getEvents',
@@ -113,6 +119,8 @@ export const API_END_POINTS = {
   API_VERIFY_OTP: CLONE_BASE_URL + API + 'user/verifyOTP',
   API_RESEND_OTP: CLONE_BASE_URL + API + 'user/resendOTP',
   API_FACEBOOK_SIGNUP: CLONE_BASE_URL + API + 'user/verifyfacebook',
+
+  // https://bunchofdeals.com.au/APP/index.php/api/user/verifygoogleplus
   API_GOOGLE_SIGNUP: CLONE_BASE_URL + API + 'user/verifygoogleplus',
   API_USER_CHECK_CONNECTION: CLONE_BASE_URL + API + 'user/checkUserConnection',
   API_BLOCK_USER: CLONE_BASE_URL + API + 'user/blockUser',
@@ -159,8 +167,8 @@ export const API_END_POINTS = {
   API_AVAILABLE_MODULES:
     CLONE_BASE_URL + API + 'modules_manager/availableModules',
   UPDATE_STATUS_API:
-    'https://bunchofdeals.com.au/APP_CLONE/API/Update_Order_Status.php',
-
+    // 'https://bunchofdeals.com.au/APP_CLONE/API/Update_Order_Status.php',
+    'https://bunchofdeals.com.au/APP/API/Update_Order_Status.php',
   //payment
   API_PAYMENT_GATEWAY: CLONE_BASE_URL + API + 'order_payment/getPayments',
   API_PAYMENT_LINK: CLONE_BASE_URL + API + 'order_payment/get_payment_link',

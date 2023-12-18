@@ -2,6 +2,10 @@ export const STRING = {
   log_in: 'Login',
   create_an_account: 'CREATE AN ACCOUNT',
   or: 'OR',
+  also_login :'By login in Bunch Of Deals App, you accept our',
+  also_login_text :'terms of use',
+  also_login_text1 :'privacy policy',
+
   signUp: 'SIGN UP',
   pickPhoto: 'PICK PHOTO',
   pleaseWait: 'Please wait...',

@@ -1,6 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ImageBackground,
+} from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,9 +16,17 @@ import {FONTS} from '../../constants/themes';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../../utils/BunchDealVectorIcon';
 
+const formatDistance = distance => {
+  if (distance >= 1000) {
+    return `${(distance / 1000).toFixed(0)} km`;
+  } else {
+    return `${distance.toFixed(0)} m`;
+  }
+};
 const OfferCardView = ({item}) => {
   const navigation = useNavigation();
   // ShowConsoleLogMessage(item);
+
   return (
     <TouchableOpacity
       style={styles.wrapper}
@@ -20,7 +34,7 @@ const OfferCardView = ({item}) => {
       onPress={() => {
         navigation.navigate('OfferDetails', {item: item});
       }}>
-      <View>
+      <View style={styles.imageWrapper}>
         {/* <Image
           source={{
             uri: item?.images['0']['560_560'].url + '',
@@ -34,7 +48,10 @@ const OfferCardView = ({item}) => {
 
         <BunchDealImageLoader
           defaultImg={images.def_logo}
-          source={item?.images['0']['560_560'].url + ''}
+          // source={uri:item?.images}
+          source={item?.images ? item?.images['0']?.['560_560']?.url + '' : ''}
+          // source={item?.images['0']['560_560'] +url ''}
+
           styles={styles.image}
         />
         <View
@@ -47,17 +64,29 @@ const OfferCardView = ({item}) => {
           {item?.purchase_counter > 0 ? (
             <Text
               style={{
-                backgroundColor: COLORS.colorAccent,
-                paddingHorizontal: 15,
-                fontFamily: 'Montserrat-Medium',
-                paddingVertical: 6,
-                color: COLORS.white,
-                fontSize: 11,
+                // backgroundColor: COLORS.colorCountdownView,
+                // paddingHorizontal: 15,
+                // fontFamily: 'Montserrat-Medium',
+                // paddingVertical: 6,
+                // color: COLORS.white,
+                // fontSize: 11,
+                margin: 5,
+                borderRadius: 5,
+                backgroundColor: COLORS.colorCountdownView,
+                textAlignVertical: 'center',
+                textAlign: 'center',
+                paddingStart: 8,
+                paddingEnd: 8,
+                fontFamily: 'Montserrat-Regular',
+                fontSize: 12,
+                color: COLORS.black,
+                paddingVertical: 5,
               }}>
               +{item?.purchase_counter} sold
             </Text>
           ) : null}
-          {item?.distance != null ? (
+
+          {/* {item?.distance != null ? (
             item?.distance >= 100 ? (
               <Text
                 style={{
@@ -68,8 +97,10 @@ const OfferCardView = ({item}) => {
                   fontSize: 11,
                   backgroundColor: COLORS.colorPrimary,
                 }}>
-                +100km
-                {/*{item?.distance}km*/}
+              
+                {item?.distance != null ? (
+        <Text>{formatDistance(item.distance)}</Text>
+      ) : null}
               </Text>
             ) : item?.distance < 100 ? (
               <Text
@@ -84,7 +115,8 @@ const OfferCardView = ({item}) => {
                 {item?.distance}km
               </Text>
             ) : null
-          ) : null}
+          ) find kro
+          : null} */}
         </View>
       </View>
       <View style={styles.details}>
@@ -110,11 +142,13 @@ const OfferCardView = ({item}) => {
           </Text>
         </View>
         <View
+          numberOfLines={1}
           style={{
             flexDirection: 'row',
             // alignItems: 'center',
             marginTop: 5,
             flex: 1,
+            width: '50%',
           }}>
           <BunchDealVectorIcon
             title={Entypo}
@@ -126,18 +160,81 @@ const OfferCardView = ({item}) => {
             }}
             onPress={() => {}}
           />
-          <Text
+          {/* <Text
             style={[
               styles.dealName,
               {
-                fontFamily: 'Montserrat-Regular',
+                fontFamily: 'Montserrat-Medium',
                 marginEnd: 8,
               },
             ]}
-            numberOfLines={2}>
+            numberOfLines={2}> */}
+          <Text
+            //  style={[FONTS.body5, styles.dealName]}
+            style={{
+              color: COLORS.shimmer_loading_color_darker,
+              fontFamily: 'Montserrat-Regular',
+              fontSize: item?.distance >= 1000 ? 15 : 14,
+              alignItems: 'center',
+            }}
+            numberOfLines={1}
+            ellipsizeMode="tail">
             {/*{item?.address || ''}*/}
             {item?.address?.split(',')[1] || item?.address?.split(',')[0] || ''}
           </Text>
+          <View>
+            {item?.distance != null ? (
+              item?.distance >= 100 ? (
+                <Text
+                  //   style={{
+                  //   color: COLORS.shimmer_loading_color_darker,
+                  //   fontFamily: 'Montserrat-Regular',
+                  //   fontSize: item?.distance >= 1000 ? 15 : 14,
+                  //   alignItems: 'center',
+                  // }}
+                  //numberOfLines={1}
+                  style={{
+                    color: COLORS.shimmer_loading_color_darker,
+                    fontFamily: 'Montserrat-Regular',
+                    fontSize: item?.distance >= 1000 ? 15 : 14,
+                    alignItems: 'center',
+                    //elevation: 10,
+                    marginLeft: 5,
+                  }}>
+                    {`\u25CF ${item.distance_km} ${item.distance_by}`}
+                </Text>
+              ) : item?.distance < 100 ? (
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={{
+                    color: COLORS.shimmer_loading_color_darker,
+                    fontFamily: 'Montserrat-Regular',
+                    fontSize: item?.distance >= 1000 ? 15 : 14,
+                    alignItems: 'center',
+                    resizeMode: 'cover',
+                  }}>
+                  {`\u25CF ${item.distance_km} ${item.distance_by}`}
+                </Text>
+              ) : null
+            ) : null}
+          </View>
+          {/* <View>
+            {item?.distance != null && (
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{
+                  color: COLORS.shimmer_loading_color_darker,
+                  // color:COLORS.black,
+                  fontFamily: 'Montserrat-Medium',
+                  fontSize: item?.distance >= 1000 ? 15 : 14,
+                  alignItems: 'center',
+                }}>
+                {`\u25CF ${formatDistance(item.distance)} Away`}
+              </Text>
+            )}
+          </View> */}
         </View>
       </View>
 
@@ -165,16 +262,82 @@ const OfferCardView = ({item}) => {
             />
           ) : null}
         </View>
+        {item?.discount > 0 ? (
+          <View
+            style={{
+              position: 'absolute', // Set the position to absolute
+              top: 0, // Align the component to the top
+              left: 0, // Align the component to the left
+              marginTop: 5,
+              marginLeft: 5,
+            }}>
+            <ImageBackground
+              // source={{
+              //   uri:
+              //     'https://w7.pngwing.com/pngs/67/521/png-transparent-computer-icons-offers-text-logo-discount-thumbnail.png',
+              // }}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 100,
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+              imageStyle={{resizeMode: 'cover'}}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: COLORS.colorPromo,
+                  borderRadius: 100,
+                  width: 50,
+                  height: 50,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: 'white',
+                    fontWeight: 'bold',
+                    transform: [{rotate: '-20deg'}],
+                  }}>
+                  {item.discount}%
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: 'white',
+                    fontWeight: 'bold',
+                    transform: [{rotate: '-18deg'}],
+                    marginLeft: 5,
+                  }}>
+                  off
+                </Text>
+              </View>
+            </ImageBackground>
+          </View>
+        ) : null}
+
         <View
           style={{
             flexDirection: 'row',
             marginStart: 'auto',
           }}>
           <Text style={styles.dealText}>Deal</Text>
-          <Text style={styles.dealPriceText}>
+          {/* <Text style={styles.dealPriceText}>{item?.offer_value}</Text> */}
+
+          {item?.value_type === 'percent' ? (
+            <Text style={styles.dealPriceText}>{item?.offer_value}%</Text>
+          ) : (
+            <Text style={styles.dealPriceText}>
+              {item?.currency?.symbol + '' + item?.offer_value}.0
+            </Text>
+          )}
+
+          {/* <Text style={styles.dealPriceText}>
             {item?.currency?.symbol + '' + item?.offer_value}
             .0
-          </Text>
+          </Text> */}
         </View>
       </View>
     </TouchableOpacity>
@@ -186,19 +349,37 @@ export default memo(OfferCardView);
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.homepagebg,
     marginHorizontal: 7,
     marginTop: 9,
     marginBottom: 2,
     borderRadius: 5,
     elevation: 5,
   },
+  imageWrapper: {
+    position: 'relative',
+  },
+  // image: {
+  //   width: '100%',
+  //   height: 250,
+
+  //   borderTopLeftRadius: 5,
+  //   borderTopRightRadius: 5,
+  //   // resizeMode:'cover',
+  //   // padding: 20,
+  //   resizeMode: 'cover'  ,
+
+  //   // borderRadius:5,
+
+  // },
+
   image: {
     width: '100%',
-    height: 195,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
     resizeMode: 'cover',
+    // marginBottom: 10,
+    height: 190,
   },
   details: {
     padding: 10,
@@ -232,7 +413,7 @@ const styles = StyleSheet.create({
     paddingStart: 8,
     paddingEnd: 8,
     fontFamily: 'Montserrat-Regular',
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.black,
     paddingVertical: 5,
   },

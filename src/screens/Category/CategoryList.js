@@ -17,8 +17,11 @@ import SearchDialog from '../Search';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import StoreCardView from '../Store/StoreCardView';
+import {useSelector} from 'react-redux';
 
 const CategoryList = ({navigation, route}) => {
+  let userLat = useSelector(state => state?.state?.latitude);
+  let userLong = useSelector(state => state?.state?.longitude);
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [receivedData, setReceivedData] = useState(false);
@@ -44,8 +47,8 @@ const CategoryList = ({navigation, route}) => {
 
   const getOfferList = item => {
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
+      latitude: userLat + '',
+      longitude: userLong + '',
       order_by: 'recent',
       offer_ids: '0',
       token: STRING.FCM_TOKEN,
@@ -117,8 +120,8 @@ const CategoryList = ({navigation, route}) => {
 
   const getSearchStoreList = (search, catId, radius, location) => {
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
+      latitude: userLat + '',
+      longitude: userLong + '',
       order_by: 'nearby',
       current_date: moment().format('yyyy-MM-dd H:m:s'),
       current_tz: 'Asia/Kolkata',
@@ -214,7 +217,7 @@ const CategoryList = ({navigation, route}) => {
                   textAlign: 'center',
                   marginTop: 200,
                   fontSize: 18,
-                  fontFamily: 'Quicksand-Medium',
+                  fontFamily: 'Montserrat-Regular',
                 }}>
                 No data Found
               </Text>

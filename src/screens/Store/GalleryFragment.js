@@ -93,7 +93,7 @@ export default GalleryFragment;
 const styles = StyleSheet.create({});
 const renderItem = ({item}) => {
   // ShowConsoleLogMessage(item);
-  let imageUrl = item['200_200'].url;
+  let imageUrl = item['200_200']?.url;
   return (
     <TouchableOpacity activeOpacity={0.8}>
       <BunchDealImageLoader

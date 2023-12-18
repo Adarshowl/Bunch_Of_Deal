@@ -36,7 +36,6 @@ export let doSaveOfferOffline = id => {
         id: id + '',
         listID: id + '',
       };
-      console.log('saving to realm-> ', obj);
       realm.write(() => {
         realm.create(SAVE_OFFER_SCHEMA, obj);
       });
@@ -70,7 +69,6 @@ export let doDeleteOfferOffline = id => {
         var obj = realm
           .objects(SAVE_OFFER_SCHEMA)
           .filtered(`listID == '${id}'`);
-        console.log('Final obj -> ', obj);
 
         if (obj?.length > 0) {
           realm.delete(obj[0]);

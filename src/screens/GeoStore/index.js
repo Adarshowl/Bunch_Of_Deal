@@ -16,12 +16,11 @@ import {
 } from 'react-native';
 import {AirbnbRating} from 'react-native-elements';
 import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
-import MapViewDirections from 'react-native-maps-directions';
 
 import TimeZone from 'react-native-timezone';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {STRING, images} from '../../constants';
+import {images, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
@@ -31,6 +30,7 @@ import {ShowConsoleLogMessage} from '../../utils/Utility';
 import SearchDialog from '../Search';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
+import {useSelector} from 'react-redux';
 
 var {width, height} = Dimensions.get('window');
 const windowWidth = Dimensions.get('window').width;
@@ -41,6 +41,28 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const apiKey = 'AIzaSyCIcyfvlmMVSAxxvPTASWasIN8ncskIj0w';
 
 const GeoStore = ({navigation}) => {
+  let userLat = useSelector(state => state?.state?.latitude);
+
+  let userLong = useSelector(state => state?.state?.longitude);
+
+  const [percent, setPercent] = useState(true);
+
+  const [changeTabOne, setChangeTabOne] = useState(true);
+  const [changeTabTwo, setChangeTabTwo] = useState(false);
+  const [changeRadius, setChangeRadius] = useState(false);
+
+  const handleTabChange = tabNumber => {
+    if (tabNumber === 1) {
+      setChangeTabOne(true);
+      setChangeTabTwo(false);
+      // Optionally, you can perform additional actions here for the "Offers" tab
+    } else if (tabNumber === 2) {
+      setChangeTabOne(false);
+      setChangeTabTwo(true);
+      // Optionally, you can perform additional actions here for the "Stores" tab
+    }
+  };
+
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [showPlacePickModal, setShowPlacePickModal] = useState(false);
@@ -54,43 +76,81 @@ const GeoStore = ({navigation}) => {
   };
 
   const handleStoreSearchButtonClick = () => {
-    closeSearchModal();
-    getSearchStoreList(searchText, categoryId, radius);
+    if (changeTabOne) {
+      closeSearchModal();
+      console.log(searchText + ' -- ' + categoryId + ' -- ' + radius);
+
+      getSearchOfferList(searchText, categoryId, radius);
+    } else if (changeTabTwo) {
+      closeSearchModal();
+      getSearchStoreList(searchText, categoryId, radius, changeRadius);
+    }
   };
   const closePlacePickModal = () => {
-    if (showPlaceChooseModal) {
-      closePlaceChooseModal();
-    }
+    // if (showPlaceChooseModal) {
+    //   setShowSearchModal(!showSearchModal);
+    //   setShowPlaceChooseModal(false);
+    // }
+    setShowPlacePickModal(false);
+    setShowPlaceChooseModal(false);
+    setShowSearchModal(true);
+  };
+
+  const closePlaceChooseModalRequestClose = () => {
+    setShowPlaceChooseModal(false);
+
+    setShowSearchModal(false);
     setShowPlacePickModal(!showPlacePickModal);
   };
-  const closePlaceChooseModal = () => {
-    setShowPlaceChooseModal(!showPlaceChooseModal);
+
+  const preprocessSearchTerm = search => {
+    // Replace common special characters or words with spaces or remove them
+    return search
+      .replace("'", '') // Remove apostrophes
+      .trim(); // Trim leading and trailing spaces
   };
 
-  const getSearchStoreList = (search, catId, radius, location) => {
+  const getSearchOfferList = (search, catId, radius) => {
+    setLoading(true);
+
+    // Clear the existing store data
+    setRecentData([]);
+    const preprocessedSearch = preprocessSearchTerm(search);
+
     let body = {
-      latitude: STRING.CURRENT_LAT + '',
-      longitude: STRING.CURRENT_LONG + '',
-      order_by: 'nearby',
-      current_date: moment().format('yyyy-MM-dd H:m:s'),
-      current_tz: 'Asia/Kolkata',
+      latitude: userLat + '',
+      longitude: userLong + '',
+      // order_by: isNearby ? "nearby" : 'recent',
+      order_by: 'recent',
+      offer_ids: '0',
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
       limit: '30',
       page: '1',
-      search: search,
+      search: preprocessedSearch,
+      // location: location,
+      location: '',
       category_id: catId,
-      radius: radius,
+      radius: changeRadius ? radius + '' : '',
+      date: moment().format('yyyy-MM-dd H:m:s'),
+      timezone: timeZone,
     };
 
-    // ShowConsoleLogMessage(JSON.stringify(body));
-
+    // ShowConsoleLogMessage("search data recent", JSON.stringify(body));
+    console.log('search data', body);
     // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
-    ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+    ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
+        ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+        // console.log("ofereeeerrrrrrrr",response.data)
         if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage('search result -> ' + JSON.stringify(result));
+
           setRecentData(result);
         } else {
           setRecentData([]);
@@ -99,12 +159,115 @@ const GeoStore = ({navigation}) => {
       .catch(err => {
         crashlytics().recordError(err);
 
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        // console.log('eorir < ', err);
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   };
+  const closePlaceChooseModal = () => {
+    setShowPlaceChooseModal(!showPlaceChooseModal);
+  };
+
+  const getSearchStoreList = (
+    search,
+    catId,
+    radius,
+
+    changeRadius,
+  ) => {
+    setLoading(true);
+
+    // Clear the existing store data before each search
+    // setRecentData([]);
+    setTimeout(() => {
+      console.warn(recentData);
+      let body = {
+        latitude: userLat + '',
+        longitude: userLong + '',
+        order_by: 'nearby',
+        offer_ids: '0',
+        token: STRING.FCM_TOKEN,
+        mac_adr: STRING.MAC_ADR,
+        date: moment().format('yyyy-MM-dd H:m:s'),
+        // current_date: moment().format('yyyy-MM-dd H:m:s'),
+        // current_tz: 'Asia/Kolkata',
+        limit: '30',
+        page: '1',
+        // location: location === 'Current Location' ? '' : location,
+        location: '',
+        search: search,
+        category_id: catId,
+        radius: changeRadius ? radius + '' : '',
+        timezone: timeZone,
+      };
+      // ShowConsoleLogMessage("search store nerby", JSON.stringify(body));
+      console.warn('serch store data', body);
+      ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      })
+        .then(response => {
+          if (response?.data?.success == 1) {
+            let result = Object.values(response.data?.result);
+            // console.warn("store serch result", result)
+
+            setRecentData(result);
+          } else {
+            setRecentData([]);
+          }
+        })
+        .catch(err => {
+          crashlytics().recordError(err);
+          // setRecentData([]);
+
+          ShowConsoleLogMessage('Error in get offer recent API call: ' + err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 1000);
+  };
+
+  // const getSearchStoreList = (search, catId, radius, location) => {
+  //   let body = {
+  //     latitude: userLat + '',
+  //     longitude: userLong + '',
+  //     order_by: 'nearby',
+  //     current_date: moment().format('yyyy-MM-dd H:m:s'),
+  //     current_tz: 'Asia/Kolkata',
+  //     limit: '30',
+  //     page: '1',
+  //     search: search,
+  //     category_id: catId,
+  //     radius: radius,
+  //   };
+
+  //   // ShowConsoleLogMessage(JSON.stringify(body));
+
+  //   // ShowConsoleLogMessage(API_END_POINTS.API_GET_OFFERS);
+  //   ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+  //     Accept: 'application/json',
+  //     'Content-Type': 'multipart/form-data',
+  //   })
+  //     .then(response => {
+  //       if (response?.data?.success == 1) {
+  //         let result = Object.values(response.data?.result);
+  //         setRecentData(result);
+  //       } else {
+  //         setRecentData([]);
+  //       }
+  //     })
+  //     .catch(err => {
+  //       crashlytics().recordError(err);
+
+  //       ShowConsoleLogMessage(
+  //         'Error in get offer recent api call: ' + err.message,
+  //       );
+  //     })
+  //     .finally(() => {});
+  // };
 
   const [loading, setLoading] = useState(false);
   const markerRef = useRef();
@@ -196,14 +359,15 @@ const GeoStore = ({navigation}) => {
         // const currentLongitude = JSON.stringify(position.coords.longitude);
         // const currentLatitude = JSON.stringify(position.coords.latitude);
         if (coords) {
+          console.log('', coords);
           setLocation(coords);
           let {longitude, latitude} = coords;
 
           setMapRegion({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            latitudeDelta: 0,
-            longitudeDelta: 0,
+            latitude: position.coords.latitude || 0.5,
+            longitude: position.coords.longitude || 0.5,
+            latitudeDelta: LATITUDE_DELTA, // Default latitude delta for zoom level
+            longitudeDelta: LONGITUDE_DELTA,
           });
 
           getStoreList(latitude, longitude);
@@ -226,14 +390,14 @@ const GeoStore = ({navigation}) => {
           // );
         }
       },
-      error => {
-        console.log('google.maps. error -<> ', JSON.stringify(error));
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 30000,
-        // maximumAge: 1000,
-      },
+      // error => {
+      //   console.log('google.maps. error -<> ', JSON.stringify(error));
+      // },
+      // {
+      //   enableHighAccuracy: true,
+      //   timeout: 30000,
+      //   maximumAge: 1000,
+      // },
     );
     setLoading(false);
   };
@@ -317,31 +481,38 @@ const GeoStore = ({navigation}) => {
         crashlytics().recordError(err);
 
         // console.log('error < ', err);
-        ShowConsoleLogMessage(
-          'Error in get offer recent api call: ' + err.message,
-        );
+        ShowConsoleLogMessage('Error in getoffffffffffffffff ' + err.message);
       })
       .finally(() => {});
   };
 
   const renderOfferItem = ({item}) => {
     // ShowConsoleLogMessage(item);
-    let image = item?.images['0']['560_560']?.url;
+    let imageUrl = item?.images?.['0']?.['560_560']?.url;
+    //  console.log("dddddddddddddddddddd",item);
+    // const imageData = item?.images?.['0']?.url; // Replace '0' with the specific key of the image you want to display
+
     return (
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          navigation.navigate('OfferDetails', {item: item});
+          navigation.navigate('OfferDetails', {
+            item: {
+              id_offer: item?.id_offer,
+              intentFromGeo: true,
+            },
+          });
         }}
         style={{
           margin: 3,
           maxWidth: 95,
         }}>
         <BunchDealImageLoader
-          source={
-            // 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
-            image
-          }
+          source={imageUrl}
+          // source={
+          //     // 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg'
+          //     image
+          //   }
           defaultImg={images.def_logo}
           styles={{
             width: 90,
@@ -407,8 +578,9 @@ const GeoStore = ({navigation}) => {
                 flex: 1,
               },
             ]}>
-            Recent Offers{' '}
+            Recent Offers
           </Text>
+
           <Ionicons
             onPress={() => {
               setSelectedItem(null);
@@ -420,32 +592,35 @@ const GeoStore = ({navigation}) => {
             size={25}
           />
         </View>
-        {offerData?.length >= 1 ? (
-          <FlatList
-            style={{
-              paddingBottom: 30,
-              marginStart: 15,
-            }}
-            horizontal
-            extraData={offerData}
-            data={offerData}
-            renderItem={renderOfferItem}
-          />
-        ) : (
+        {loading ? (
           <ActivityIndicator
             size={'large'}
             color={COLORS.colorPrimary}
-            style={{
-              margin: 30,
-            }}
+            style={{margin: 30}}
           />
+        ) : (
+          <>
+            {offerData?.length >= 1 ? (
+              <FlatList
+                style={{paddingBottom: 30, marginStart: 15}}
+                horizontal
+                extraData={offerData}
+                data={offerData}
+                renderItem={renderOfferItem}
+              />
+            ) : (
+              <Text style={{margin: 30, alignSelf: 'center'}}>
+                No Data Found
+              </Text>
+            )}
+          </>
         )}
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
+    <View style={{flex: 1, backgroundColor: COLORS.white}}>
       <View
         style={{
           height: 56,
@@ -486,7 +661,9 @@ const GeoStore = ({navigation}) => {
           }}>
           <Ionicons
             onPress={() => {
+              setSearchText('');
               closeSearchModal();
+              setChangeRadius(false);
               // navigation.navigate('UniversalSearch');
             }}
             marginStart={15}
@@ -498,8 +675,8 @@ const GeoStore = ({navigation}) => {
           <MaterialIcons
             onPress={() => {
               setLocation({
-                latitude: 0.0,
-                longitude: 0.0,
+                latitude: 0,
+                longitude: 0,
                 latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA,
               });
@@ -589,6 +766,9 @@ const GeoStore = ({navigation}) => {
       <View>
         <MapView
           ref={mapRef}
+          region={mapRegion}
+          // showsUserLocation={true}
+          mapType="standard"
           style={{
             width: Dimensions.get('screen').width,
             height: Dimensions.get('screen').height - 100,
@@ -638,9 +818,12 @@ const GeoStore = ({navigation}) => {
           {recentData &&
             recentData.map(item => (
               <Marker
+                // key={item.id}
                 coordinate={{
-                  latitude: parseFloat(item?.latitude),
-                  longitude: parseFloat(item?.longitude),
+                  latitude: parseFloat(item?.latitude) || 0.0,
+                  longitude: parseFloat(item?.longitude) || 0.0,
+                  latitudeDelta: 0,
+                  longitudeDelta: 0,
                 }}
                 onPress={() => {
                   setSelectedItem(item);
@@ -663,7 +846,7 @@ const GeoStore = ({navigation}) => {
                       borderRadius: 5,
                     }}>
                     <BunchDealImageLoader
-                      source={item?.images['0']['560_560'].url}
+                      source={item?.images?.['0']?.['560_560']?.url}
                       defaultImg={images.def_logo}
                       styles={{
                         width: 56,
@@ -694,15 +877,16 @@ const GeoStore = ({navigation}) => {
               coordinate={{
                 latitude: location?.latitude,
                 longitude: location?.longitude,
+                latitudeDelta: 0,
+                longitudeDelta: 0,
               }}
               position={'center'}
             />
           ) : null}
         </MapView>
       </View>
-      {selectedItem != null ? renderOfferModal() : null}
-
-      <SearchDialog
+      {selectedItem !== null ? renderOfferModal() : <Text>No Data</Text>}
+      {/* <SearchDialog
         show={showSearchModal}
         onPress={handleStoreSearchButtonClick}
         title={'stores'}
@@ -723,7 +907,35 @@ const GeoStore = ({navigation}) => {
           setCategoryId(val);
           setCategoryName(name);
         }}
+      /> */}
+
+      <SearchDialog
+        show={showSearchModal}
+        onPress={handleStoreSearchButtonClick}
+        title={percent ? 'offers' : 'stores'}
+        onRequestClose={closeSearchModal}
+        searchText={searchText}
+        onChangeText={val => {
+          setSearchText(val);
+        }}
+        onCurrentLocationPress={() => {
+          closeSearchModal();
+          closePlaceChooseModal();
+        }}
+        selectedTab={changeTabOne ? 1 : 2}
+        handleTabChange={handleTabChange}
+        onChangeRadius={val => {
+          setChangeRadius(true);
+          setRadius(val);
+        }}
+        onchangeLocationdata={val => {}}
+        onChangeCategoryId={val => {
+          setCategoryId(val);
+        }}
+        changeOne={changeTabOne}
+        changeTwo={changeTabTwo}
       />
+
       <PlacePickerLocation
         navigation={navigation}
         onRequestClose={closePlacePickModal}
@@ -731,11 +943,11 @@ const GeoStore = ({navigation}) => {
       />
       <PlaceChooseLocation
         navigation={navigation}
-        onRequestClose={closePlaceChooseModal}
+        onRequestClose={closePlaceChooseModalRequestClose}
         onChangeLocation={closePlacePickModal}
         show={showPlaceChooseModal}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

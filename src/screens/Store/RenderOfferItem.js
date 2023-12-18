@@ -5,10 +5,13 @@ import {images} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
+
 const RenderOfferItem = ({item, navigation}) => {
   //   ShowConsoleLogMessage(item);
 
-  let imageUrl = item.images['0']['560_560'].url;
+  // let imageUrl = item?.images['0']['560_560']?.url;
+  let imageUrl = item?.images?.['0']?.['560_560']?.url;
+
   return (
     <TouchableOpacity
       key={imageUrl}

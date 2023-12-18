@@ -1,21 +1,23 @@
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {images} from '../../constants';
+import {images, STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
-import {useIsFocused} from '@react-navigation/native';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import crashlytics from '@react-native-firebase/crashlytics';
 import TimeZone from 'react-native-timezone';
 
 const StoreOffer = props => {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
+  let userLat = useSelector(state => state?.state?.latitude);
+  let userLong = useSelector(state => state?.state?.longitude);
   useEffect(() => {
     // ShowConsoleLogMessage('propse -> ' + JSON.stringify(props?.item?.id_store));
     TimeZone.getTimeZone().then(result => {
@@ -81,9 +83,66 @@ const StoreOffer = props => {
     }
   };
 
+  const onReloadBtn = () => {
+    getStoreList('rest');
+  };
+  const getStoreList = val => {
+    // setRecentData([]);
+
+    setLoading(true);
+    setShowError(false);
+    let body = {
+      latitude: userLat + '',
+      longitude: userLong + '',
+      radius: '',
+      // category_id: '',
+      token: STRING.FCM_TOKEN,
+      mac_adr: STRING.MAC_ADR,
+      search: '',
+      order_by: 'nearby',
+      offer_ids: '0',
+
+      date: moment().format('yyyy-MM-dd H:m:s'),
+      timezone: timeZone,
+
+      // current_date: moment().format('yyyy-MM-dd H:m:s'),
+      // current_tz: 'Asia/Kolkata',
+      limit: '30',
+      page: '1',
+    };
+
+    // ShowConsoleLogMessage(JSON.stringify(body));
+
+    ShowConsoleLogMessage('abhi cll kiya he ', body);
+    ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        if (response?.data?.success == 1) {
+          // ShowConsoleLogMessage("aaaa", JSON.stringify(response?.data));
+          let result = Object.values(response?.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(result));
+          setShowError(result.length <= 0);
+          setRecentData(result);
+        } else {
+          setShowError(true);
+          setRecentData([]);
+        }
+      })
+      .catch(err => {
+        crashlytics().recordError(err);
+
+        ShowConsoleLogMessage(
+          'Error in get offer recent api call: ' + err.message,
+        );
+      })
+      .finally(() => {});
+  };
+
   const renderItem = ({item}) => {
     // ShowConsoleLogMessage(item);
-    let imageUrl = item.images['0']['560_560'].url;
+    let imageUrl = item.images['0']['560_560']?.url;
     return (
       <TouchableOpacity
         activeOpacity={0.8}
