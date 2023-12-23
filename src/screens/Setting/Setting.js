@@ -65,7 +65,7 @@ const Setting = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       <View
         style={{
           height: 56,
@@ -357,7 +357,7 @@ const Setting = ({navigation}) => {
           </View>
         </View>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

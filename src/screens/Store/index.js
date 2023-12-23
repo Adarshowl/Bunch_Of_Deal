@@ -226,7 +226,9 @@ const Store = ({
 
     // ShowConsoleLogMessage(JSON.stringify(body));
 
-    ShowConsoleLogMessage('abhi cll kiya he ', body);
+    ShowConsoleLogMessage(
+      'abhi cll kiya he ' + API_END_POINTS.API_USER_GET_STORES,
+    );
     console.log('store list request ', body);
     ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
       Accept: 'application/json',
@@ -234,7 +236,6 @@ const Store = ({
     })
       .then(response => {
         if (response?.data?.success == 1) {
-          ShowConsoleLogMessage('aaaa', JSON.stringify(response));
           let result = Object.values(response?.data?.result);
           // ShowConsoleLogMessage(JSON.stringify(result));
 

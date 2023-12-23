@@ -1,38 +1,32 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
+  Alert,
   ImageBackground,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Alert,
-  ScrollView,
 } from 'react-native';
-import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {images, STRING} from '../constants';
+import {images} from '../constants';
 import {COLORS} from '../constants/Colors';
 import {FONTS} from '../constants/themes';
 import GlobalStyle from '../styles/GlobalStyle';
 import BunchDealImageLoader from '../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../utils/BunchDealVectorIcon';
-import {ShowConsoleLogMessage, ShowToastMessage} from '../utils/Utility';
-import {useIsFocused} from '@react-navigation/native';
-import {
-  GoogleSignin,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
+import {ShowToastMessage} from '../utils/Utility';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LoginManager} from 'react-native-fbsdk';
-import Realm from 'realm';
 import {clearRealm} from '../utils/RealmUtility';
 
 import crashlytics from '@react-native-firebase/crashlytics';
+
 const DrawerContent = ({navigation, props}) => {
   const [userData, setUserData] = useState({});
   const [image, setImage] = useState('');
@@ -103,7 +97,12 @@ const DrawerContent = ({navigation, props}) => {
   };
   const onLogouClick = () => {
     AsyncStorage.clear().then(() => console.log('Cleared'));
-    isSignedIn() ? signOut() : ShowToastMessage('Logout Failed');
+    isSignedIn()
+      ? signOut()
+          .then(res => {})
+          .catch(error => {})
+      : ShowToastMessage('Logout Failed');
+    navigation.replace('MainContainer');
   };
 
   // const clearRealm = () => {
@@ -184,153 +183,159 @@ const DrawerContent = ({navigation, props}) => {
           )}
         </TouchableOpacity>
       </ImageBackground>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
-        <View
-          style={{
-            marginTop: 10,
-          }}
-        />
+      <View
+        style={{
+          marginTop: 10,
+        }}
+      />
+      <DrawerItem
+        name={'Home'}
+        title={Entypo}
+        iconName="home"
+        onPress={() => {
+          // navigation.goBack();
+          navigation.navigate('Home');
+        }}
+      />
+      <DrawerItem
+        name={'Categories'}
+        title={Ionicons}
+        iconName="md-reorder-three-outline"
+        onPress={() => {
+          // props?.navigation?.navigate('Category');
+          navigation.navigate('Category');
+        }}
+      />
+      <DrawerItem
+        name={'Geo Stores'}
+        title={Entypo}
+        iconName="location"
+        onPress={() => {
+          // props?.navigation?.navigate('GeoStore');
+          navigation.navigate('GeoStore');
+        }}
+      />
+      {userData?.id_user == null ? null : (
         <DrawerItem
-          name={'Home'}
-          title={Entypo}
-          iconName="home"
-          onPress={() => {
-            // navigation.goBack();
-            navigation.navigate('Home');
-          }}
-        />
-        <DrawerItem
-          name={'Categories'}
+          name={'Orders'}
           title={Ionicons}
-          iconName="md-reorder-three-outline"
+          iconName="ios-cart"
           onPress={() => {
-            // props?.navigation?.navigate('Category');
-            navigation.navigate('Category');
+            // props?.navigation?.navigate('Invoice');
+            navigation.navigate('Invoice');
           }}
         />
+      )}
+      {userData?.id_user == null ? null : (
         <DrawerItem
-          name={'Geo Stores'}
-          title={Entypo}
-          iconName="location"
+          // name={'Edit Profile'}
+          name={'Profile'}
+          title={Ionicons}
+          iconName="ios-person-sharp"
           onPress={() => {
-            // props?.navigation?.navigate('GeoStore');
-            navigation.navigate('GeoStore');
+            // props?.navigation?.navigate('Account');
+            navigation.navigate('Account');
           }}
         />
-        {userData?.id_user == null ? null : (
-          <DrawerItem
-            name={'Orders'}
-            title={Ionicons}
-            iconName="ios-cart"
-            onPress={() => {
-              // props?.navigation?.navigate('Invoice');
-              navigation.navigate('Invoice');
-            }}
-          />
-        )}
-        {userData?.id_user == null ? null : (
-          <DrawerItem
-            // name={'Edit Profile'}
-            name={'Profile'}
-            title={Ionicons}
-            iconName="ios-person-sharp"
-            onPress={() => {
-              navigation.navigate('Account');
-            }}
-          />
-        )}
+      )}
 
-        <DrawerItem
-          name={'Favorite Store'}
-          title={Fontisto}
-          iconName="favorite"
-          onPress={() => {
-            navigation.navigate('FavStore');
-          }}
-        />
+      {/* {userData?.id_user == null ? null : ( */}
+      <DrawerItem
+        name={'Favorite Store'}
+        title={Fontisto}
+        iconName="favorite"
+        onPress={() => {
+          // props?.navigation?.navigate('FavStore');
+          navigation.navigate('FavStore');
+        }}
+      />
+      {/* )} */}
+      {/* {userData?.id_user == null ? null : ( */}
+      <DrawerItem
+        name={'Favorite Offer'}
+        title={Fontisto}
+        iconName="favorite"
+        onPress={() => {
+          // props?.navigation?.navigate('FavOffer');
+          navigation.navigate('FavOffer');
+        }}
+      />
+      {/* )} */}
 
-        <DrawerItem
-          name={'Favorite Offer'}
-          title={Fontisto}
-          iconName="favorite"
-          onPress={() => {
-            navigation.navigate('FavOffer');
-          }}
-        />
+      <DrawerItem
+        name={'Settings'}
+        title={Feather}
+        iconName="settings"
+        onPress={() => {
+          // props?.navigation.navigate('Setting');
+          navigation.navigate('Setting');
+        }}
+      />
 
+      <DrawerItem
+        name={'About Us'}
+        title={Feather}
+        iconName="info"
+        onPress={() => {
+          // props?.navigation?.navigate('About');
+          navigation?.navigate('About');
+        }}
+      />
+
+      {userData?.id_user == null ? (
         <DrawerItem
-          name={'Settings'}
+          name={'LogIn'}
           title={Feather}
-          iconName="settings"
+          iconName="log-in"
           onPress={() => {
-            navigation.navigate('Setting');
-          }}
-        />
-
-        <DrawerItem
-          name={'About Us'}
-          title={Feather}
-          iconName="info"
-          onPress={() => {
-            navigation?.navigate('About');
-          }}
-        />
-
-        {userData?.id_user == null ? (
-          <DrawerItem
-            name={'LogIn'}
-            title={Feather}
-            iconName="log-in"
-            onPress={() => {
-              navigation.navigate('Auth', {
+            navigation.navigate('Auth', {
+              screen: 'Login',
+              params: {
                 screen: 'Login',
-                params: {
-                  screen: 'Login',
+              },
+            });
+          }}
+        />
+      ) : (
+        <DrawerItem
+          name={'Logout'}
+          title={Feather}
+          iconName="log-in"
+          onPress={() => {
+            Alert.alert(
+              'Log out',
+              'Do you want to logout?',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => {
+                    return null;
+                  },
                 },
-              });
-            }}
-          />
-        ) : (
-          <DrawerItem
-            name={'Logout'}
-            title={Feather}
-            iconName="log-in"
-            onPress={() => {
-              Alert.alert(
-                'Log out',
-                'Do you want to logout?',
-                [
-                  {
-                    text: 'Cancel',
-                    onPress: () => {
-                      return null;
-                    },
-                  },
-                  {
-                    text: 'Confirm',
-                    // onPress: () => {
+                {
+                  text: 'Confirm',
+                  // onPress: () => {
 
-                    //   props?.navigation?.replace('Auth');
-                    //   AsyncStorage.clear().then(() => console.log('Cleared'));
+                  //   props?.navigation?.replace('Auth');
+                  //   AsyncStorage.clear().then(() => console.log('Cleared'));
 
-                    //   navigation.replace('Auth', {
-                    //     screen: 'Login',
-                    //     params: {
-                    //       screen: 'Login',
-                    //     },
-                    //   });
-                    // },
-                    onPress: () => {
-                      onLogouClick();
-                    },
+                  //   navigation.replace('Auth', {
+                  //     screen: 'Login',
+                  //     params: {
+                  //       screen: 'Login',
+                  //     },
+                  //   });
+                  // },
+                  onPress: () => {
+                    onLogouClick();
                   },
-                ],
-                {cancelable: false},
-              );
-            }}
-          />
-        )}
-      </ScrollView>
+                },
+              ],
+              {cancelable: false},
+            );
+          }}
+        />
+      )}
     </View>
   );
 };

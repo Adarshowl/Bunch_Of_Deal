@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import crashlytics from '@react-native-firebase/crashlytics';
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, Text, TextInput, View} from 'react-native';
+import {Image, SafeAreaView, Text, View} from 'react-native';
 import ImgToBase64 from 'react-native-image-base64';
 import ImagePicker from 'react-native-image-crop-picker';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -215,7 +215,7 @@ const Account = ({navigation}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        console.log(JSON.stringify(response), '&&&&&&&&&&&&&&&');
+        // console.log(JSON.stringify(response), '&&&&&&&&&&&&&&&');
 
         if (response?.data?.success == 1) {
           console.log(response);
@@ -239,8 +239,15 @@ const Account = ({navigation}) => {
   };
 
   return (
-    <View style={GlobalStyle.mainContainerBgColor}>
+    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
       <BunchDealProgressBar loading={loading} />
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    height: 56,*/}
+
+      {/*    alignItems: 'center',*/}
+      {/*    flexDirection: 'row',*/}
+      {/*  }}>*/}
       <View
         style={[
           GlobalStyle2.headerFooterStyle,
@@ -267,7 +274,7 @@ const Account = ({navigation}) => {
               marginHorizontal: 10,
             },
           ]}>
-          {/*Edit */}
+          {/*Edit Profile*/}
           Profile
         </Text>
 
@@ -277,7 +284,7 @@ const Account = ({navigation}) => {
             justifyContent: 'flex-end',
             flexDirection: 'row',
             alignItems: 'center',
-            flex: 1,
+            // flex: 1,
           }}
         />
       </View>
@@ -292,7 +299,7 @@ const Account = ({navigation}) => {
               // bottom: -150,
               borderRadius: 6,
               backgroundColor: COLORS.white,
-              marginTop: 100,
+              marginTop: 50,
             },
           ]}>
           <View
@@ -472,7 +479,7 @@ const Account = ({navigation}) => {
           />
         </View>
       </KeyboardAwareScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

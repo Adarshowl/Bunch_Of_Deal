@@ -6,7 +6,14 @@ import {NavigationContainer, useNavigation} from '@react-navigation/native';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
-import {LogBox, View, StyleSheet, StatusBar, Alert} from 'react-native';
+import {
+  LogBox,
+  View,
+  StyleSheet,
+  StatusBar,
+  Alert,
+  Platform,
+} from 'react-native';
 import {COLORS} from './src/constants/Colors';
 import {requestUserPermission} from './src/firebase/notificationService';
 import DrawerNav from './src/navigation/DrawerNav';
@@ -93,7 +100,9 @@ const App = ({navigation}) => {
       // navigation.navigate(remoteMessage.data.type);
     });
     notifee.onBackgroundEvent(event => {});
-    requestUserPermission();
+    if (Platform.OS == 'android') {
+      requestUserPermission();
+    }
 
     const removeNetInfoSubscription = NetInfo.addEventListener(state => {
       //const offline = !(state.isConnected && state.isInternetReachable);

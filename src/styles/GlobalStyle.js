@@ -7,6 +7,10 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.colorPrimary,
   },
+  flexRowAlignCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   mainContainerBgColor: {
     flex: 1,
     backgroundColor: COLORS.backgroundColor,
@@ -16,34 +20,17 @@ export default StyleSheet.create({
     height: '100%',
     tintColor: COLORS.lightGrey,
   },
-  flexAlignJustifyCenter: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  flexRowAlignCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  alignJustifyCenter: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flexRowJustifyBtwn: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
   nav_bg: {
     height: 300,
     backgroundColor: COLORS.colorPrimary,
     alignItems: 'center',
   },
   loginAppIcon: {
-    height: 132,
-    width: 132,
+    height: 100,
+    width: 120,
     position: 'absolute',
-    top: 30,
+    top: 50,
+    borderRadius: 10,
   },
   loginCard: {
     width: '77%',
@@ -115,12 +102,10 @@ export default StyleSheet.create({
   },
   marginHorizontal10: {
     marginHorizontal: 10,
-    marginEnd: -5,
+    marginEnd: 5,
     // justifyContent:'flex-end',
     // alignContent:'flex-end',
     marginStart: 10,
-    //backgroundColor: 'red',
-    //width: 50,
   },
   marginVertical5: {
     marginVertical: 5,
@@ -129,14 +114,8 @@ export default StyleSheet.create({
     marginVertical: 10,
   },
   marginHorizontal15: {
-    // marginHorizontal: 8,
-    // marginEnd: 8,
-    marginHorizontal: 10,
-    marginEnd: 15,
-    // justifyContent:'flex-end',
-    // alignContent:'flex-end',
-    marginStart: 20,
-    //backgroundColor: 'red',
+    marginHorizontal: 8,
+    marginEnd: 8,
   },
 
   marginVertical15: {
@@ -174,12 +153,17 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.backgroundColor,
-    height: 60,
+    height: 50,
   },
   homeTabImageStyle: {
     width: 20,
     height: 20,
     resizeMode: 'cover',
+  },
+  bothSideText: {
+    fontFamily: 'OpenSans-Regular',
+    fontSize: 14,
+    color: COLORS.black,
   },
 
   offerDetailToolBar: {

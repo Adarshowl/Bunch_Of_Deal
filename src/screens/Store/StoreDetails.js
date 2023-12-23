@@ -66,7 +66,7 @@ const StoreDetails = ({navigation, route}) => {
   let userLong = useSelector(state => state?.state?.longitude);
   const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
     // const paddingToBottom = 30;
-    const paddingToBottom = SIZES.width - 50;
+    const paddingToBottom = SIZES.width + 200;
     // ShowConsoleLogMessage('paddingToBottom -> ' + paddingToBottom);
     return (
       layoutMeasurement.height + contentOffset.y >=
@@ -1043,8 +1043,7 @@ const StoreDetails = ({navigation, route}) => {
       date: moment().format('yyyy-MM-dd H:m:s'),
     };
 
-    ShowConsoleLogMessage('Body', JSON.stringify(body));
-    console.log('aaaaaaaa', body);
+    ShowConsoleLogMessage(JSON.stringify(body));
     ApiCall('post', body, API_END_POINTS.API_USER_GET_STORES, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
@@ -1102,7 +1101,6 @@ const StoreDetails = ({navigation, route}) => {
     })
       .then(response => {
         if (response?.data?.success == 1) {
-          ShowConsoleLogMessage('bodyResponse -> ' + JSON.stringify(response));
           let result = Object.values(response.data?.result);
           setTelephone(result[0]?.telephone);
           // ShowConsoleLogMessage(result[0]?.telephone + ' => telephone ');
@@ -1143,7 +1141,6 @@ const StoreDetails = ({navigation, route}) => {
     }
   };
   const closeGalleryImageModal = () => {
-    console.log('i am claled ');
     setShowGalleryImageModal(!showGalleryImageModal);
   };
 
@@ -1242,7 +1239,7 @@ const StoreDetails = ({navigation, route}) => {
       //   }}>
       <Image
         style={{
-          height: '95%',
+          height: '100%',
           width: Dimensions.get('window').width,
           // resizeMode: 'cover' ,
         }}
@@ -1384,6 +1381,30 @@ const StoreDetails = ({navigation, route}) => {
                 // backgroundColor: COLORS.black,
               },
             ]}>
+            <TouchableOpacity
+              onPress={() => {
+                closeGalleryImageModal();
+              }}
+              activeOpacity={0.8}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'flex-start',
+              }}>
+              <AntDesign
+                name="close"
+                size={25}
+                color={COLORS.white}
+                style={{
+                  marginHorizontal: 20,
+                  paddingTop: 60,
+                  //opacity: 0.0,
+                }}
+                onPress={() => {
+                  closeGalleryImageModal();
+                }}
+              />
+            </TouchableOpacity>
             <Text
               style={{
                 fontSize: 18,
@@ -1418,37 +1439,6 @@ const StoreDetails = ({navigation, route}) => {
               />
             </View>
           </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              closeGalleryImageModal();
-            }}
-            activeOpacity={0.8}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-
-              position: 'absolute',
-              top: 40,
-              left: 25,
-              //backgroundColor:'yellow'
-            }}>
-            <AntDesign
-              name="close"
-              size={30}
-              color={COLORS.white}
-              style={
-                {
-                  // marginHorizontal: 20,
-                  // paddingTop: 60,
-                  //opacity: 0.0,
-                }
-              }
-              onPress={() => {
-                closeGalleryImageModal();
-              }}
-            />
-          </TouchableOpacity>
         </View>
       </Modal>
     );
@@ -1484,49 +1474,20 @@ const StoreDetails = ({navigation, route}) => {
     }));
   };
 
-  // const openMap = () => {  // 19 sep 3:2 pm
-  //   if (receivedData?.longitude && receivedData?.latitude) {
-  //     const scheme = Platform.select({
-  //       ios: 'maps:0,0?q=',
-  //       android: 'geo:0,0?q=',
-  //     });
-  //     const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
-  //     const label = receivedData?.name;
-  //     // const label = 'Open Google Map';
-  //     const url = Platform.select({
-  //       ios: `${scheme}${label}@${latLng}`,
-  //       android: `${scheme}${latLng}(${label})`,
-  //     });
-  //     Linking.openURL(url);
-  //   } else {
-  //     ShowToastMessage('Something went wrong.');
-  //   }
-  // };
-
   const openMap = () => {
     if (receivedData?.longitude && receivedData?.latitude) {
-      if (Platform.OS == 'android') {
-        const scheme = Platform.select({
-          ios: 'maps:0,0?q=',
-          android: 'geo:0,0?q=',
-        });
-        const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
-        const label = receivedData?.name;
-        // const label = 'Open Google Map';
-        const url = Platform.select({
-          ios: `${scheme}${label}@${latLng}`,
-          android: `${scheme}${latLng}(${label})`,
-        });
-        Linking.openURL(url);
-      } else {
-        // var scheme =
-        //   Platform.OS === 'ios' ? 'http://maps.apple.com/?ll=' : 'geo:';
-        var scheme = Platform.OS === 'ios' ? 'maps:0,0?q=' : 'geo:';
-        var url =
-          scheme + `${receivedData?.latitude},${receivedData?.longitude}`;
-        ShowConsoleLogMessage(url);
-        Linking.openURL(url);
-      }
+      const scheme = Platform.select({
+        ios: 'maps:0,0?q=',
+        android: 'geo:0,0?q=',
+      });
+      const latLng = `${receivedData?.latitude},${receivedData?.longitude}`;
+      const label = receivedData?.name;
+      // const label = 'Open Google Map';
+      const url = Platform.select({
+        ios: `${scheme}${label}@${latLng}`,
+        android: `${scheme}${latLng}(${label})`,
+      });
+      Linking.openURL(url);
     } else {
       ShowToastMessage('Something went wrong.');
     }
@@ -1817,16 +1778,14 @@ const StoreDetails = ({navigation, route}) => {
     console.log(StoreId);
 
     try {
-      // const longDynamicLink = `https://bunchofdeals123.page.link/qbvQ?offerDetails%2F${StoreId}`;
       const longDynamicLink = `https://bunchofdeals123.page.link/?link=https%3A%2F%2Fyour-actual-link-here.com%2FStoreDetails%2F${StoreId}`;
 
       const link = await dynamicLinks().buildShortLink(
         {
           link: longDynamicLink,
           domainUriPrefix: 'https://bunchofdeals123.page.link',
-          ios: {
-            appStoreId: '1572404530',
-            bundleId: 'com.bunchodDeals',
+          android: {
+            packageName: 'com.bunch.of.deals',
           },
         },
         dynamicLinks.ShortLinkType.DEFAULT,
@@ -2008,8 +1967,8 @@ const StoreDetails = ({navigation, route}) => {
         } else {
           const shareOptions = {
             message: `Bunch of Deals - checkout this store...\n\n${receivedData?.name}\n\n${receivedData?.address}\n\n${link}`,
-            url: base64Data,
-            urls: [base64Data],
+
+            // url: `data:image/jpeg;base64,${base64}`,
           };
 
           await Share.open(shareOptions);
@@ -2178,10 +2137,8 @@ const StoreDetails = ({navigation, route}) => {
 
   return (
     <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: COLORS.white,
-      }}>
+      style={GlobalStyle1.mainContainerBgColor}
+      showsVerticalScrollIndicator={false}>
       <BunchDealProgressBar loading={loading} />
 
       <ScrollView
@@ -2193,23 +2150,22 @@ const StoreDetails = ({navigation, route}) => {
             setShowDown(false);
           }
         }}
-        scrollEventThrottle={100}>
-        <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
-          <View style={{}}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => {
-                if (galleryItemClick) {
-                  setGalleryItemClick(!galleryItemClick);
-                }
-                closeImageModal();
-              }}>
-              <BunchDealImageLoader
-                defaultImg={images.def_logo}
-                source={imageUrl + ''}
-                styles={GlobalStyle1.store_image}
-              />
-              {/*<LinearGradient
+        scrollEventThrottle={8}>
+        <View style={{}}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              if (galleryItemClick) {
+                setGalleryItemClick(!galleryItemClick);
+              }
+              closeImageModal();
+            }}>
+            <BunchDealImageLoader
+              defaultImg={images.def_logo}
+              source={imageUrl + ''}
+              styles={GlobalStyle1.store_image}
+            />
+            {/*<LinearGradient
       colors={[ "#00000090","#00000090",COLORS.transparent]}
       style={[{
         width: '100%',
@@ -2257,7 +2213,7 @@ const StoreDetails = ({navigation, route}) => {
     </LinearGradient>
         */}
 
-              {/* <View
+            {/* <View
             style={[
               GlobalStyle1.price,
               {
@@ -2282,49 +2238,49 @@ const StoreDetails = ({navigation, route}) => {
             </Text>
           </View> */}
 
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                flexDirection: 'row',
+                height: 35,
+                alignItems: 'center',
+                backgroundColor: COLORS.colorAccent,
+              }}>
               <View
                 style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
+                  alignSelf: 'flex-start',
                   flexDirection: 'row',
-                  height: 35,
                   alignItems: 'center',
-                  backgroundColor: COLORS.colorAccent,
-                }}>
-                <View
+                }}
+              />
+              {images.length > 1 ? (
+                <Text
                   style={{
-                    alignSelf: 'flex-start',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                />
-                {images.length > 1 ? (
-                  <Text
-                    style={{
-                      backgroundColor: COLORS.colorAccent,
-                      paddingHorizontal: 15,
-                      fontFamily: 'Montserrat-Bold',
-                      paddingVertical: 6,
-                      color: COLORS.white,
-                      fontSize: 13,
-                    }}>
-                    <FontAwesome name="camera" color={COLORS.white} />
-                    {images.length > 1 ? `  ${images.length}` : ''}
-                  </Text>
-                ) : null}
-                {/*<Text*/}
-                {/*  style={{*/}
-                {/*    paddingHorizontal: 15,*/}
-                {/*    fontFamily: 'Montserrat-Medium',*/}
-                {/*    paddingVertical: 6,*/}
-                {/*    color: COLORS.white,*/}
-                {/*    fontSize: 11,*/}
-                {/*    backgroundColor: COLORS.colorAccent,*/}
-                {/*  }}>*/}
-                {/*  +100km*/}
-                {/*</Text>*/}
-                {/* {receivedData?.distance != null ? (
+                    backgroundColor: COLORS.colorAccent,
+                    paddingHorizontal: 15,
+                    fontFamily: 'Montserrat-Bold',
+                    paddingVertical: 6,
+                    color: COLORS.white,
+                    fontSize: 13,
+                  }}>
+                  <FontAwesome name="camera" color={COLORS.white} />
+                  {images.length > 1 ? `  ${images.length}` : ''}
+                </Text>
+              ) : null}
+              {/*<Text*/}
+              {/*  style={{*/}
+              {/*    paddingHorizontal: 15,*/}
+              {/*    fontFamily: 'Montserrat-Medium',*/}
+              {/*    paddingVertical: 6,*/}
+              {/*    color: COLORS.white,*/}
+              {/*    fontSize: 11,*/}
+              {/*    backgroundColor: COLORS.colorAccent,*/}
+              {/*  }}>*/}
+              {/*  +100km*/}
+              {/*</Text>*/}
+              {/* {receivedData?.distance != null ? (
               receivedData?.distance >= 100 ? (
                 <Text
                   style={{
@@ -2351,60 +2307,164 @@ const StoreDetails = ({navigation, route}) => {
                 </Text>
               ) : null
             ) : null} */}
-              </View>
-            </TouchableOpacity>
-            <View style={{}}>
-              <BunchDealImageLoader
-                defaultImg={images.def_logo}
-                source={catImageUrl}
-                styles={[
-                  GlobalStyle1.storeimage,
-                  {
-                    opacity: 1,
-                  },
-                ]}
-                viewStyle={{
-                  opacity: 0.2,
-                }}
-              />
-              <Text
-                style={[
-                  {
-                    textAlign: 'center',
-                    color: COLORS.black,
-                    position: 'absolute',
-                    // bottom: 0,
-                    top: 25,
-                    right: 0,
-                    left: 0,
-                    fontFamily: 'Montserrat-SemiBold',
-                    fontSize: 20,
-                  },
-                ]}>
-                {receivedData?.category_name}
-              </Text>
             </View>
+          </TouchableOpacity>
+          <View style={{}}>
+            <BunchDealImageLoader
+              defaultImg={images.def_logo}
+              source={catImageUrl}
+              styles={[
+                GlobalStyle1.storeimage,
+                {
+                  opacity: 1,
+                },
+              ]}
+              viewStyle={{
+                opacity: 0.2,
+              }}
+            />
+            <Text
+              style={[
+                {
+                  textAlign: 'center',
+                  color: COLORS.black,
+                  position: 'absolute',
+                  // bottom: 0,
+                  top: 25,
+                  right: 0,
+                  left: 0,
+                  fontFamily: 'Montserrat-SemiBold',
+                  fontSize: 20,
+                },
+              ]}>
+              {receivedData?.category_name}
+            </Text>
           </View>
-
+        </View>
+        {/* <View
+        style={{
+          // marginHorizontal: 8,
+          // backgroundColor: COLORS.white,
+          // paddingVertical: 5,
+          // marginTop: 12,
+          // minHeight: 350,
+          // flexGrow: 1,
+          // flex: 1,
+          marginHorizontal: 8,
+          backgroundColor: COLORS.white,
+          paddingVertical: 5,
+          marginTop: 12,
+          flexGrow: 1,
+          flex: 1,
+        }}>
+        <TopTabBar
+          tabBarOptions={{style: {height: tabBarHeight}}}
+          items={receivedData}
+        />
+      </View> */}
+        <View
+          style={{
+            marginHorizontal: 8,
+            backgroundColor: COLORS.white,
+            paddingVertical: 5,
+            marginTop: 12,
+            maxHeight: 350,
+          }}>
           <View
             style={{
-              marginHorizontal: 8,
-              backgroundColor: COLORS.white,
-              paddingVertical: 5,
-              marginTop: 12,
-              maxHeight: 350,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}>
-            <View
+            <TouchableOpacity
+              key={'Offers'}
+              accessibilityRole="button"
+              onPress={onPress => {
+                setChangeOne(true);
+                setChangeThree(false);
+                setChangeTwo(false);
+              }}
               style={{
-                flexDirection: 'row',
+                flex: 1,
+                justifyContent: 'center',
                 alignItems: 'center',
+                height: 45,
+                backgroundColor: changeOne ? COLORS.white : COLORS.colorAccent,
+                paddingHorizontal: 10,
+                borderColor: COLORS.white,
+                borderWidth: 0.5,
+                flexDirection: 'row',
               }}>
+              <MaterialIcons
+                name="local-offer"
+                color={changeOne ? COLORS.colorPrimary : COLORS.white}
+                size={18}
+                style={{
+                  marginEnd: 10,
+                }}
+              />
+              <Animated.Text
+                style={{
+                  color: changeOne ? COLORS.colorPrimary : COLORS.white,
+                  fontFamily: 'Montserrat-Medium',
+                  textTransform: 'uppercase',
+                  fontSize: 12,
+                }}>
+                Offers
+              </Animated.Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              key={'Reviews'}
+              onPress={onPress => {
+                // if (userData?.id_user == null) {
+                //   navigation.navigate('Auth', {
+                //     screen: 'Login',
+                //     params: {
+                //       screen: 'Login',
+                //     },
+                //   });
+                // } else {
+                setChangeTwo(true);
+                setChangeThree(false);
+                setChangeOne(false);
+                // }
+              }}
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 45,
+                backgroundColor: changeTwo ? COLORS.white : COLORS.colorAccent,
+                paddingHorizontal: 10,
+                borderColor: COLORS.white,
+                borderWidth: 0.5,
+                flexDirection: 'row',
+              }}>
+              <Ionicons
+                name="chatbox-sharp"
+                color={changeTwo ? COLORS.colorAccent : COLORS.white}
+                size={18}
+                style={{
+                  marginEnd: 10,
+                }}
+              />
+              <Animated.Text
+                style={{
+                  color: changeTwo ? COLORS.colorPrimary : COLORS.white,
+                  fontFamily: 'Montserrat-Medium',
+                  textTransform: 'uppercase',
+                  fontSize: 12,
+                }}>
+                Reviews
+              </Animated.Text>
+            </TouchableOpacity>
+
+            {galleryListData?.length > 0 ? (
               <TouchableOpacity
-                key={'Offers'}
+                key={'Gallery'}
                 accessibilityRole="button"
                 onPress={onPress => {
-                  setChangeOne(true);
-                  setChangeThree(false);
+                  setChangeThree(true);
+                  setChangeOne(false);
                   setChangeTwo(false);
                 }}
                 style={{
@@ -2412,7 +2472,7 @@ const StoreDetails = ({navigation, route}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   height: 45,
-                  backgroundColor: changeOne
+                  backgroundColor: changeThree
                     ? COLORS.white
                     : COLORS.colorAccent,
                   paddingHorizontal: 10,
@@ -2420,9 +2480,9 @@ const StoreDetails = ({navigation, route}) => {
                   borderWidth: 0.5,
                   flexDirection: 'row',
                 }}>
-                <MaterialIcons
-                  name="local-offer"
-                  color={changeOne ? COLORS.colorPrimary : COLORS.white}
+                <MaterialCommunityIcons
+                  name="view-gallery"
+                  color={changeThree ? COLORS.colorPrimary : COLORS.white}
                   size={18}
                   style={{
                     marginEnd: 10,
@@ -2430,121 +2490,67 @@ const StoreDetails = ({navigation, route}) => {
                 />
                 <Animated.Text
                   style={{
-                    color: changeOne ? COLORS.colorPrimary : COLORS.white,
+                    color: changeThree ? COLORS.colorPrimary : COLORS.white,
                     fontFamily: 'Montserrat-Medium',
                     textTransform: 'uppercase',
                     fontSize: 12,
                   }}>
-                  Offers
+                  Gallery
                 </Animated.Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                key={'Reviews'}
-                onPress={onPress => {
-                  // if (userData?.id_user == null) {
-                  //   navigation.navigate('Auth', {
-                  //     screen: 'Login',
-                  //     params: {
-                  //       screen: 'Login',
-                  //     },
-                  //   });
-                  // } else {
-                  setChangeTwo(true);
-                  setChangeThree(false);
-                  setChangeOne(false);
-                  // }
+            ) : null}
+          </View>
+          {changeOne ? (
+            <ScrollView
+              nestedScrollEnabled={true}
+              style={{
+                backgroundColor: COLORS.white,
+              }}>
+              <FlatList
+                data={offerListData}
+                keyExtractor={item => item?.id_store}
+                // renderItem={renderOfferItem}
+                renderItem={({item}) => {
+                  return (
+                    <RenderOfferItem item={item} navigation={navigation} />
+                  );
                 }}
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 45,
-                  backgroundColor: changeTwo
-                    ? COLORS.white
-                    : COLORS.colorAccent,
-                  paddingHorizontal: 10,
-                  borderColor: COLORS.white,
-                  borderWidth: 0.5,
-                  flexDirection: 'row',
-                }}>
-                <Ionicons
-                  name="chatbox-sharp"
-                  color={changeTwo ? COLORS.colorAccent : COLORS.white}
-                  size={18}
-                  style={{
-                    marginEnd: 10,
-                  }}
-                />
-                <Animated.Text
-                  style={{
-                    color: changeTwo ? COLORS.colorPrimary : COLORS.white,
-                    fontFamily: 'Montserrat-Medium',
-                    textTransform: 'uppercase',
-                    fontSize: 12,
-                  }}>
-                  Reviews
-                </Animated.Text>
-              </TouchableOpacity>
-
-              {galleryListData?.length > 0 ? (
-                <TouchableOpacity
-                  key={'Gallery'}
-                  accessibilityRole="button"
-                  onPress={onPress => {
-                    setChangeThree(true);
-                    setChangeOne(false);
-                    setChangeTwo(false);
-                  }}
-                  style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: 45,
-                    backgroundColor: changeThree
-                      ? COLORS.white
-                      : COLORS.colorAccent,
-                    paddingHorizontal: 10,
-                    borderColor: COLORS.white,
-                    borderWidth: 0.5,
-                    flexDirection: 'row',
-                  }}>
-                  <MaterialCommunityIcons
-                    name="view-gallery"
-                    color={changeThree ? COLORS.colorPrimary : COLORS.white}
-                    size={18}
-                    style={{
-                      marginEnd: 10,
-                    }}
-                  />
-                  <Animated.Text
-                    style={{
-                      color: changeThree ? COLORS.colorPrimary : COLORS.white,
-                      fontFamily: 'Montserrat-Medium',
-                      textTransform: 'uppercase',
-                      fontSize: 12,
-                    }}>
-                    Gallery
-                  </Animated.Text>
-                </TouchableOpacity>
-              ) : null}
-            </View>
-            {changeOne ? (
+                ListEmptyComponent={() => {
+                  return offerListLoading ? null : (
+                    <Text
+                      style={{
+                        color: COLORS.editTextBorder,
+                        fontSize: 16,
+                        fontFamily: 'Montserrat-Regular',
+                        textAlign: 'center',
+                        paddingVertical: 10,
+                      }}>
+                      No data found
+                    </Text>
+                  );
+                }}
+              />
+            </ScrollView>
+          ) : null}
+          {changeTwo ? (
+            <View>
               <ScrollView
                 nestedScrollEnabled={true}
                 style={{
                   backgroundColor: COLORS.white,
                 }}>
+                {/* {reviewListData?.map(item => {
+              return renderReviewItem(item);
+            })} */}
                 <FlatList
-                  data={offerListData}
+                  data={reviewListData}
                   keyExtractor={item => item?.id_store}
-                  // renderItem={renderOfferItem}
+                  // renderItem={renderReviewItem}
                   renderItem={({item}) => {
-                    return (
-                      <RenderOfferItem item={item} navigation={navigation} />
-                    );
+                    return <RenderReviewItem item={item} />;
                   }}
                   ListEmptyComponent={() => {
-                    return offerListLoading ? null : (
+                    return (
                       <Text
                         style={{
                           color: COLORS.editTextBorder,
@@ -2559,186 +2565,15 @@ const StoreDetails = ({navigation, route}) => {
                   }}
                 />
               </ScrollView>
-            ) : null}
-            {changeTwo ? (
-              <View>
-                <ScrollView
-                  nestedScrollEnabled={true}
-                  style={{
-                    backgroundColor: COLORS.white,
-                  }}>
-                  {/* {reviewListData?.map(item => {
-              return renderReviewItem(item);
-            })} */}
-                  <FlatList
-                    data={reviewListData}
-                    keyExtractor={item => item?.id_store}
-                    // renderItem={renderReviewItem}
-                    renderItem={({item}) => {
-                      return <RenderReviewItem item={item} />;
-                    }}
-                    ListEmptyComponent={() => {
-                      return (
-                        <Text
-                          style={{
-                            color: COLORS.editTextBorder,
-                            fontSize: 16,
-                            fontFamily: 'Montserrat-Regular',
-                            textAlign: 'center',
-                            paddingVertical: 10,
-                          }}>
-                          No data found
-                        </Text>
-                      );
-                    }}
-                  />
-                </ScrollView>
-                <BunchDealCommonBtn
-                  height={40}
-                  backgroundColor={COLORS.colorPrimary}
-                  marginHorizontal={5}
-                  text={STRING.add_review}
-                  textStyle={FONTS.body3}
-                  textColor={COLORS.white}
-                  onPress={async () => {
-                    if (userData?.id_user == null) {
-                      navigation.navigate('Auth', {
-                        screen: 'Login',
-                        params: {
-                          screen: 'Login',
-                        },
-                      });
-                    } else {
-                      let is_store_review = await isStoreReviewSaved(
-                        receivedData?.store_id || receivedData?.id_store,
-                      );
-                      setReviewAdded(is_store_review);
-                      if (is_store_review) {
-                        ShowToastMessage(STRING.you_ve_already_reviewd);
-                      } else {
-                        closeAddReviewModal();
-                      }
-                    }
-                  }}
-                  marginTop={25}
-                  borderRadius={1}
-                  textSize={16}
-                />
-              </View>
-            ) : null}
-            {galleryListData?.length > 0 ? (
-              changeThree ? (
-                <View
-                  style={{
-                    justifyContent: 'center',
-                  }}>
-                  <FlatList
-                    data={galleryListData}
-                    style={{
-                      marginTop: 5,
-                      // padding:30
-                    }}
-                    keyExtractor={item => item?.id_store}
-                    // renderItem={renderGalleryItem}
-                    renderItem={({item, index}) => {
-                      return (
-                        <RenderGalleryItem
-                          bigGalleryPhotoRef={bigGalleryPhotoRef}
-                          closeGalleryImageModal={() => {
-                            closeGalleryImageModal();
-                          }}
-                          bigGallery={() => {
-                            // ShowConsoleLogMessage('big gallery called 1');
-                            bigGalleryPhotoRef.current?.scrollToIndex({
-                              animated: true,
-                              index: index,
-                            });
-                            // ShowConsoleLogMessage('big gallery called 2');
-                          }}
-                          item={item}
-                        />
-                      );
-                    }}
-                    numColumns={4}
-                    ListEmptyComponent={() => {
-                      return (
-                        <Text
-                          style={{
-                            color: COLORS.editTextBorder,
-                            fontSize: 16,
-                            fontFamily: 'Montserrat-Regular',
-                            textAlign: 'center',
-                            paddingVertical: 10,
-                          }}>
-                          No data found
-                        </Text>
-                      );
-                    }}
-                  />
-                </View>
-              ) : null
-            ) : null}
-          </View>
-          <View
-            style={{
-              flex: 1,
-              marginTop: changeTwo
-                ? reviewListData?.length >= 5
-                  ? 100
-                  : 30
-                : 20,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 15,
-                marginHorizontal: 10,
-                marginBottom: 15,
-                backgroundColor: COLORS.white,
-              }}>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => {
-                  // let res = requestContactPermission();
-                  // ShowConsoleLogMessage(
-                  //   JSON.stringify(res) + ' Permission granted',
-                  // );
-                  // setHaveContactPermission(res);
-                  // if (haveContactPermission) {
-                  // }
-                  triggerCall();
-                }}
-                style={[GlobalStyle1.iconBOX, {}]}>
-                <FontAwesome
-                  name="phone"
-                  size={20}
-                  color={COLORS.white}
-                  style={{
-                    marginVertical: 10,
-                    alignSelf: 'center',
-                  }}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={openMap}
-                style={[GlobalStyle1.iconBOX, {}]}>
-                <MaterialCommunityIcons
-                  name="directions"
-                  size={20}
-                  color={COLORS.white}
-                  style={{
-                    marginVertical: 10,
-                    alignSelf: 'center',
-                  }}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => {
-                  if (userData?.id_user == null || '') {
+              <BunchDealCommonBtn
+                height={40}
+                backgroundColor={COLORS.colorPrimary}
+                marginHorizontal={5}
+                text={STRING.add_review}
+                textStyle={FONTS.body3}
+                textColor={COLORS.white}
+                onPress={async () => {
+                  if (userData?.id_user == null) {
                     navigation.navigate('Auth', {
                       screen: 'Login',
                       params: {
@@ -2746,212 +2581,350 @@ const StoreDetails = ({navigation, route}) => {
                       },
                     });
                   } else {
-                    if (favorite) {
-                      unSaveOnline();
-                      doDeleteStoreOffline(
-                        receivedData?.id_store || receivedData?.store_id,
-                      );
+                    let is_store_review = await isStoreReviewSaved(
+                      receivedData?.store_id || receivedData?.id_store,
+                    );
+                    setReviewAdded(is_store_review);
+                    if (is_store_review) {
+                      ShowToastMessage(STRING.you_ve_already_reviewd);
                     } else {
-                      doSaveOnline();
-                      doSaveStoreOffline(
-                        receivedData?.id_store || receivedData?.store_id,
-                      );
+                      closeAddReviewModal();
                     }
                   }
                 }}
-                style={[GlobalStyle1.iconBOX, {}]}>
-                <FontAwesome
-                  name={favorite ? 'heart' : 'heart-o'}
-                  size={20}
-                  color={COLORS.white}
+                marginTop={25}
+                borderRadius={1}
+                textSize={16}
+              />
+            </View>
+          ) : null}
+          {galleryListData?.length > 0 ? (
+            changeThree ? (
+              <View
+                style={{
+                  justifyContent: 'center',
+                }}>
+                <FlatList
+                  data={galleryListData}
                   style={{
-                    marginVertical: 10,
-                    alignSelf: 'center',
+                    marginTop: 5,
+                    // padding:30
+                  }}
+                  keyExtractor={item => item?.id_store}
+                  // renderItem={renderGalleryItem}
+                  renderItem={({item, index}) => {
+                    return (
+                      <RenderGalleryItem
+                        bigGalleryPhotoRef={bigGalleryPhotoRef}
+                        closeGalleryImageModal={() => {
+                          closeGalleryImageModal();
+                        }}
+                        bigGallery={() => {
+                          // ShowConsoleLogMessage('big gallery called 1');
+                          bigGalleryPhotoRef.current?.scrollToIndex({
+                            animated: true,
+                            index: index,
+                          });
+                          // ShowConsoleLogMessage('big gallery called 2');
+                        }}
+                        item={item}
+                      />
+                    );
+                  }}
+                  numColumns={4}
+                  ListEmptyComponent={() => {
+                    return (
+                      <Text
+                        style={{
+                          color: COLORS.editTextBorder,
+                          fontSize: 16,
+                          fontFamily: 'Montserrat-Regular',
+                          textAlign: 'center',
+                          paddingVertical: 10,
+                        }}>
+                        No data found
+                      </Text>
+                    );
                   }}
                 />
-              </TouchableOpacity>
-            </View>
-
-            <View
-              style={[
-                GlobalStyle1.StoreBOX1,
-                {
-                  paddingBottom: 10,
-                  paddingHorizontal: 6,
-                },
-              ]}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  width: '62%',
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={[
-                    {
-                      color: COLORS.black,
-                      marginTop: 10,
-                      fontFamily: 'Montserrat-SemiBold',
-                      fontSize: 16,
-                    },
-                  ]}>
-                  {receivedData?.name}
-                </Text>
-                <View>
-                  {receivedData?.distance != null ? (
-                    receivedData?.distance >= 100 ? (
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: 12,
-                        }}>
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          style={{
-                            textAlign: 'center',
-                            textAlignVertical: 'center',
-
-                            marginStart: 5,
-                            color: COLORS.shimmer_loading_color_darker,
-                            fontSize: 14,
-                            fontFamily: 'Montserrat-Medium',
-                          }}>
-                          {/* {`\u25CF ${formatDistance(receivedData.distance)}`} Away */}
-                          {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
-                        </Text>
-                      </View>
-                    ) : receivedData?.distance < 100 ? (
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: 10,
-                        }}>
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          style={{
-                            textAlign: 'center',
-                            textAlignVertical: 'center',
-                            marginStart: 5,
-                            color: COLORS.shimmer_loading_color_darker,
-                            fontSize: 14,
-                            fontFamily: 'Montserrat-Medium',
-                          }}>
-                          {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
-
-                          {/* {`\u25CF ${formatDistance(receivedData.distance)}`} Away */}
-                        </Text>
-                      </View>
-                    ) : null
-                  ) : null}
-                </View>
               </View>
+            ) : null
+          ) : null}
+        </View>
+        <View
+          style={{
+            flex: 1,
+            marginTop: changeTwo
+              ? reviewListData?.length >= 5
+                ? 100
+                : 30
+              : 20,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 15,
+              marginHorizontal: 10,
+              marginBottom: 15,
+              backgroundColor: COLORS.white,
+            }}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                // let res = requestContactPermission();
+                // ShowConsoleLogMessage(
+                //   JSON.stringify(res) + ' Permission granted',
+                // );
+                // setHaveContactPermission(res);
+                // if (haveContactPermission) {
+                // }
+                triggerCall();
+              }}
+              style={[GlobalStyle1.iconBOX, {}]}>
+              <FontAwesome
+                name="phone"
+                size={20}
+                color={COLORS.white}
+                style={{
+                  marginVertical: 10,
+                  alignSelf: 'center',
+                }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={openMap}
+              style={[GlobalStyle1.iconBOX, {}]}>
+              <MaterialCommunityIcons
+                name="directions"
+                size={20}
+                color={COLORS.white}
+                style={{
+                  marginVertical: 10,
+                  alignSelf: 'center',
+                }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                if (userData?.id_user == null || '') {
+                  navigation.navigate('Auth', {
+                    screen: 'Login',
+                    params: {
+                      screen: 'Login',
+                    },
+                  });
+                } else {
+                  if (favorite) {
+                    unSaveOnline();
+                    doDeleteStoreOffline(
+                      receivedData?.id_store || receivedData?.store_id,
+                    );
+                  } else {
+                    doSaveOnline();
+                    doSaveStoreOffline(
+                      receivedData?.id_store || receivedData?.store_id,
+                    );
+                  }
+                }
+              }}
+              style={[GlobalStyle1.iconBOX, {}]}>
+              <FontAwesome
+                name={favorite ? 'heart' : 'heart-o'}
+                size={20}
+                color={COLORS.white}
+                style={{
+                  marginVertical: 10,
+                  alignSelf: 'center',
+                }}
+              />
+            </TouchableOpacity>
+          </View>
 
+          <View
+            style={[
+              GlobalStyle1.StoreBOX1,
+              {
+                paddingBottom: 10,
+                paddingHorizontal: 6,
+              },
+            ]}>
+            <View
+              style={{
+                flexDirection: 'row',
+                width: '65%',
+                justifyContent: 'space-between',
+              }}>
               <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
                 style={[
-                  FONTS.body5,
                   {
-                    color: 'grey',
-
-                    fontFamily: 'Montserrat-Regular',
-                    fontSize: 13,
+                    color: COLORS.black,
+                    marginTop: 10,
+                    fontFamily: 'Montserrat-SemiBold',
+                    fontSize: 16,
                   },
                 ]}>
-                {receivedData?.detail}
-                {/* n publishing and graphic design,
-            Lorem ipsum is a placeholder text commonly used to demonstrate the
-            visual form of a document or a typeface */}
+                {receivedData?.name}
               </Text>
+              <View>
+                {receivedData?.distance != null ? (
+                  receivedData?.distance >= 100 ? (
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginTop: 12,
+                      }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          textAlign: 'center',
+                          textAlignVertical: 'center',
+
+                          marginStart: 5,
+                          color: COLORS.shimmer_loading_color_darker,
+                          fontSize: 14,
+                          fontFamily: 'Montserrat-Medium',
+                        }}>
+                        {/* {`\u25CF ${formatDistance(receivedData.distance)}`} Away */}
+                        {/*{`\u25CF ${receivedData.distance_km}`} km away*/}
+                        {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
+                      </Text>
+                    </View>
+                  ) : receivedData?.distance < 100 ? (
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          textAlign: 'center',
+                          textAlignVertical: 'center',
+                          marginStart: 5,
+                          color: COLORS.shimmer_loading_color_darker,
+                          fontSize: 14,
+                          fontFamily: 'Montserrat-Medium',
+                        }}>
+                        {/*{`\u25CF ${receivedData.distance_km}`} km away*/}
+                        {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
+
+                        {/* {`\u25CF ${formatDistance(receivedData.distance)}`} Away */}
+                      </Text>
+                    </View>
+                  ) : null
+                ) : null}
+              </View>
             </View>
 
-            <View
+            <Text
               style={[
-                GlobalStyle1.StoreBOX2,
+                FONTS.body5,
                 {
-                  paddingHorizontal: 10,
-                  marginBottom: 15,
+                  color: 'grey',
+
+                  fontFamily: 'Montserrat-Regular',
+                  fontSize: 13,
                 },
               ]}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: 5,
-                }}>
-                <Ionicons
-                  name="md-location-sharp"
-                  size={18}
-                  color={COLORS.colorAccent}
-                  style={{}}
-                />
-                <Text
-                  style={[
-                    FONTS.body4,
-                    {
-                      marginStart: 10,
-                      color: COLORS.black,
-                      flex: 1,
-                    },
-                  ]}>
-                  Store Location
-                </Text>
-              </View>
+              {receivedData?.detail}
+              {/* n publishing and graphic design,
+            Lorem ipsum is a placeholder text commonly used to demonstrate the
+            visual form of a document or a typeface */}
+            </Text>
+          </View>
+
+          <View
+            style={[
+              GlobalStyle1.StoreBOX2,
+              {
+                paddingHorizontal: 10,
+                marginBottom: 15,
+              },
+            ]}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Ionicons
+                name="md-location-sharp"
+                size={18}
+                color={COLORS.colorAccent}
+                style={{}}
+              />
               <Text
                 style={[
                   FONTS.body4,
                   {
-                    color: 'grey',
+                    marginStart: 10,
+                    color: COLORS.black,
                     flex: 1,
                   },
                 ]}>
-                {receivedData?.address}
+                Store Location
               </Text>
             </View>
-            {receivedData?.latitude ? (
-              <View style={styles.container}>
-                <MapView
-                  style={styles.mapcontainer}
-                  showsUserLocation={true}
-                  mapType={'standard'}
-                  showsMyLocationButton={false}
-                  zoomEnabled={true}
-                  scrollEnabled={true}
-                  showsScale={true}
-                  region={{
-                    latitude: parseFloat(receivedData?.latitude) || 0.0,
-                    longitude: parseFloat(receivedData?.longitude) || 0.0,
-                    // latitudeDelta: 9,
-                    // longitudeDelta: 9,
-                    latitudeDelta: receivedData?.latitudeDelta || 0.2, // Set a default value for latitudeDelta
-                    longitudeDelta: receivedData?.longitudeDelta || 0.2, // Set a default value for longitudeDelta
-                  }}>
-                  {/* <Marker
+            <Text
+              style={[
+                FONTS.body4,
+                {
+                  color: 'grey',
+                  flex: 1,
+                },
+              ]}>
+              {receivedData?.address}
+            </Text>
+          </View>
+          {receivedData?.latitude ? (
+            <View style={styles.container}>
+              <MapView
+                style={styles.mapcontainer}
+                showsUserLocation={true}
+                mapType={'standard'}
+                showsMyLocationButton={false}
+                zoomEnabled={true}
+                scrollEnabled={true}
+                showsScale={true}
+                region={{
+                  latitude: parseFloat(receivedData?.latitude) || 0.0,
+                  longitude: parseFloat(receivedData?.longitude) || 0.0,
+                  // latitudeDelta: 9,
+                  // longitudeDelta: 9,
+                  latitudeDelta: receivedData?.latitudeDelta || 0.2, // Set a default value for latitudeDelta
+                  longitudeDelta: receivedData?.longitudeDelta || 0.2, // Set a default value for longitudeDelta
+                }}>
+                {/* <Marker
                 coordinate={{ latitude: latitude, longitude: longitude }}
                 title="Marker Title" // Replace this with your desired marker title
                 description="Marker Description" // Replace this with your desired marker description
               /> */}
 
-                  <Marker.Animated
-                    coordinate={{
-                      latitude: parseFloat(receivedData?.latitude) || 0.0,
-                      longitude: parseFloat(receivedData?.longitude) || 0.0,
-                      latitudeDelta: 0,
-                      longitudeDelta: 0,
-                    }}
-                    title={receivedData?.name}
-                  />
-                </MapView>
-              </View>
-            ) : null}
+                <Marker.Animated
+                  coordinate={{
+                    latitude: parseFloat(receivedData?.latitude) || 0.0,
+                    longitude: parseFloat(receivedData?.longitude) || 0.0,
+                    latitudeDelta: 0,
+                    longitudeDelta: 0,
+                  }}
+                  title={receivedData?.name}
+                />
+              </MapView>
+            </View>
+          ) : null}
 
-            {/* <View style={styles.zoomButtonsContainer}>
+          {/* <View style={styles.zoomButtonsContainer}>
       <TouchableOpacity onPress={handleZoomIn}>
         <Text>Zoom In</Text>
       </TouchableOpacity>
@@ -2959,13 +2932,12 @@ const StoreDetails = ({navigation, route}) => {
         <Text>Zoom Out</Text>
       </TouchableOpacity>
     </View> */}
-            <View
-              style={{
-                padding: 10,
-              }}
-            />
-          </View>
-        </SafeAreaView>
+          <View
+            style={{
+              padding: 10,
+            }}
+          />
+        </View>
       </ScrollView>
 
       {!showDown ? (
@@ -2993,7 +2965,6 @@ const StoreDetails = ({navigation, route}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              //backgroundColor: COLORS.black,
             }}>
             <Entypofrom
               name="share"

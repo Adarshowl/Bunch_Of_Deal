@@ -1,4 +1,5 @@
-import {initializeApp} from 'firebase/app';
+import firebase from '@react-native-firebase/app';
+
 const firebaseConfig = {
   apiKey: 'AIzaSyCIcyfvlmMVSAxxvPTASWasIN8ncskIj0w',
   authDomain: 'bunch-of-deals.firebaseapp.com',
@@ -10,4 +11,4 @@ const firebaseConfig = {
   measurementId: 'G-SYLB7LXCZQ',
 };
 
-export const firebaseApp = await initializeApp(firebaseConfig);
+export const firebaseApp = await firebase.initializeApp(firebaseConfig);

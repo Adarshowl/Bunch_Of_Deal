@@ -1,4 +1,3 @@
-import 'react-native-gesture-handler';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 import {StyleSheet} from 'react-native';
@@ -11,7 +10,6 @@ import TermsOfUse from '../screens/Content/TermsOfUse';
 import FavOffer from '../screens/Favorite/FavOffer';
 import FavStore from '../screens/Favorite/FavStore';
 import GeoStore from '../screens/GeoStore';
-import Home from '../screens/Home';
 import InvoiceDetail from '../screens/Invoice/InvoiceDetail';
 import InvoiceList from '../screens/Invoice/InvoiceList';
 import Notification from '../screens/Notification/index';
@@ -22,8 +20,9 @@ import StoreDetails from '../screens/Store/StoreDetails';
 import UniversalSearch from '../screens/UniversalSearch';
 import {useNavigation} from '@react-navigation/native';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-import StoreCardView from '../screens/Store/StoreCardView';
+import Payment from '../screens/Payment';
 import BottomTabNav from '../bottom_tab_nav';
+import MyStuffScreen from '../screens/Account/MyStuffScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,55 +45,34 @@ const Router = ({}) => {
   // }, []);
 
   useEffect(() => {
-    try {
-      dynamicLinks()
-        .getInitialLink()
-        .then(link => {
-          try {
-            console.log(link, ' 22222222222222222222222 dynamic url of app ');
+    dynamicLinks()
+      .getInitialLink()
+      .then(link => {
+        if (link) {
+          const url = link.url;
+          let offerId = url.split('=').pop();
 
-            if (link) {
-              const url = link?.url;
-              let offerId = url?.split('=').pop();
+          if (url.includes('/StoreDetails/')) {
+            // Extract the storeId from the URL (assuming it's an integer)
+            const storeId = parseInt(url.split('/StoreDetails/')[1], 10);
+            console.log('storeId:', storeId);
 
-              if (url?.includes('/StoreDetails/')) {
-                // Extract the storeId from the URL (assuming it's an integer)
-                const storeId = parseInt(url?.split('/StoreDetails/')[1], 10);
-                console.log('storeId:', storeId);
+            // Navigate to the "StoreDetails" screen with the extracted storeId
+            navigation.navigate('StoreDetails', {
+              item: {store_id: storeId, id_store: storeId},
+            });
+          } else if (url.includes('/offerDetails/')) {
+            // Extract the offerId from the URL (assuming it's an integer)
+            const offerId = parseInt(url.split('/offerDetails/')[1], 10);
+            console.log('offerId:', offerId);
 
-                // Navigate to the "StoreDetails" screen with the extracted storeId
-                navigation?.navigate('StoreDetails', {
-                  item: {store_id: storeId, id_store: storeId},
-                });
-              } else if (url?.includes('/offerDetails/')) {
-                // Extract the offerId from the URL (assuming it's an integer)
-                const offerId = parseInt(url?.split('/offerDetails/')[1], 10);
-                console.log('offerId:', offerId);
-                console.log(' 1111111323232 dynamic url of app ');
-                // Navigate to the "OfferDetails" screen with the extracted offerId
-                navigation.navigate('OfferDetails', {
-                  item: {id_offer: offerId, offer_id: offerId},
-                });
-              } else if (url?.includes('?offerDetails/')) {
-                // Extract the offerId from the URL (assuming it's an integer)
-                const offerId = parseInt(url?.split('?offerDetails/')[1], 10);
-                console.log('offerId:', offerId);
-                console.log(' 454545454545454s dynamic url of app ');
-                // Navigate to the "OfferDetails" screen with the extracted offerId
-                navigation?.navigate('OfferDetails', {
-                  item: {id_offer: offerId, offer_id: offerId},
-                });
-              }
-            }
-          } catch (error) {
-            console.log(error);
-            alert('3' + JSON.stringify(error));
+            // Navigate to the "OfferDetails" screen with the extracted offerId
+            navigation.navigate('OfferDetails', {
+              item: {id_offer: offerId, offer_id: offerId},
+            });
           }
-        });
-    } catch (error) {
-      console.log(error, 'error');
-      alert('4' + JSON.stringify(error));
-    }
+        }
+      });
   }, []);
 
   // const [linking, setLinking] = useState({
@@ -147,8 +125,8 @@ const Router = ({}) => {
       }}>
       {/*<Stack.Screen name="Home" component={Home} />*/}
       <Stack.Screen name="Home" component={BottomTabNav} />
-      <Stack.Screen name="StoreCardView" component={StoreCardView} />
 
+      <Stack.Screen name="MyStuffScreen" component={MyStuffScreen} />
       <Stack.Screen name="StoreDetails" component={StoreDetails} />
       <Stack.Screen name="OfferDetails" component={OfferDetails} />
       <Stack.Screen name="Invoice" component={InvoiceList} />
@@ -159,6 +137,7 @@ const Router = ({}) => {
       <Stack.Screen name="Category" component={Category} />
       <Stack.Screen name="GeoStore" component={GeoStore} />
       <Stack.Screen name="Order" component={Order} />
+      <Stack.Screen name="Payment" component={Payment} />
       <Stack.Screen name="FavStore" component={FavStore} />
       <Stack.Screen name="FavOffer" component={FavOffer} />
       <Stack.Screen name="Account" component={Account} />

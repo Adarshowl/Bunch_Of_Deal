@@ -170,13 +170,7 @@ const GeoStore = ({navigation}) => {
     setShowPlaceChooseModal(!showPlaceChooseModal);
   };
 
-  const getSearchStoreList = (
-    search,
-    catId,
-    radius,
-
-    changeRadius,
-  ) => {
+  const getSearchStoreList = (search, catId, radius, changeRadius) => {
     setLoading(true);
 
     // Clear the existing store data before each search
@@ -349,7 +343,6 @@ const GeoStore = ({navigation}) => {
   };
 
   const getOneTimeLocation = () => {
-    console.log('getOneTimeLocation');
     setLoading(true);
 
     Geolocation.getCurrentPosition(
@@ -609,7 +602,12 @@ const GeoStore = ({navigation}) => {
                 renderItem={renderOfferItem}
               />
             ) : (
-              <Text style={{margin: 30, alignSelf: 'center'}}>
+              <Text
+                style={{
+                  margin: 30,
+                  alignSelf: 'center',
+                  fontFamily: 'Montserrat-Regular',
+                }}>
                 No Data Found
               </Text>
             )}
@@ -620,7 +618,7 @@ const GeoStore = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.white}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
       <View
         style={{
           height: 56,
@@ -947,7 +945,7 @@ const GeoStore = ({navigation}) => {
         onChangeLocation={closePlacePickModal}
         show={showPlaceChooseModal}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -12,7 +12,7 @@ const ForgotPassword = ({navigation, route}) => {
   const hideSpinner = () => setWebViewLoading(false);
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
       }}>
@@ -66,7 +66,7 @@ const ForgotPassword = ({navigation, route}) => {
         scalesPageToFit={true}
         style={{marginTop: 0, flex: 1}}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

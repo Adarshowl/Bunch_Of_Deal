@@ -137,7 +137,7 @@ const UniversalSearch = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -280,7 +280,7 @@ const UniversalSearch = ({navigation}) => {
           ) : null
         ) : null}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,11 +1,11 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
 import {
+  Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -31,7 +31,7 @@ const StoreCardView = ({item}) => {
     }
   };
 
-  // console.log("amoungttttttttttttt", item)
+  // console.log('amoungttttttttttttt', item);
   return (
     <TouchableOpacity
       style={styles.wrapper}
@@ -59,7 +59,7 @@ const StoreCardView = ({item}) => {
         {/* <BunchDealImageLoader
           defaultImg={images.def_logo}
           source={item?.images['0']['560_560'].url + ''}
-        
+
           styles={styles.image}
         /> */}
         <LinearGradient
@@ -188,7 +188,7 @@ const StoreCardView = ({item}) => {
                     // paddingVertical:2 ,
                     fontSize: 15,
                     alignItems:'center'
-                  }}>      
+                  }}>
                       {`\u25CF ${formatDistance(item.distance)}`} Away
                 </Text>
               ) : item?.distance < 100 ? (
@@ -197,7 +197,7 @@ const StoreCardView = ({item}) => {
                   ellipsizeMode='tail'
                   style={{
                     // paddingHorizontal: 15,
-                    color: COLORS.shimmer_loading_color_darker,                   
+                    color: COLORS.shimmer_loading_color_darker,
                      // paddingHorizontal: 15,
                     fontFamily: 'Montserrat-Regular',
                     fontSize:14,
@@ -220,6 +220,7 @@ const StoreCardView = ({item}) => {
                   fontSize: item?.distance >= 1000 ? 15 : 14,
                   alignItems: 'center',
                 }}>
+                {/*{`\u25CF ${item.distance_km} km away`}*/}
                 {`\u25CF ${item?.distance_km} ${item?.distance_by}`}
               </Text>
             )}

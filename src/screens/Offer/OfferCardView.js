@@ -1,11 +1,11 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {memo} from 'react';
 import {
+  ImageBackground,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ImageBackground,
 } from 'react-native';
 import {Image} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -23,9 +23,13 @@ const formatDistance = distance => {
     return `${distance.toFixed(0)} m`;
   }
 };
-const OfferCardView = ({item}) => {
+const OfferCardView = ({item, index}) => {
   const navigation = useNavigation();
-  // ShowConsoleLogMessage(item);
+
+  // ShowConsoleLogMessage(index + item?.name);
+  // ShowConsoleLogMessage('\n\n\n\n');
+  //
+  // ShowConsoleLogMessage(item?.images);
 
   return (
     <TouchableOpacity
@@ -48,10 +52,11 @@ const OfferCardView = ({item}) => {
 
         <BunchDealImageLoader
           defaultImg={images.def_logo}
-          // source={uri:item?.images}
-          source={item?.images ? item?.images['0']?.['560_560']?.url + '' : ''}
-          // source={item?.images['0']['560_560'] +url ''}
-
+          // source={item?.images ? item?.images['0']?.['560_560']?.url + '' : ''}
+          source={
+            // item?.image['0']?.['560_560']?.url + '' ||
+            item?.images['0']?.['560_560']?.url + ''
+          }
           styles={styles.image}
         />
         <View
@@ -97,7 +102,7 @@ const OfferCardView = ({item}) => {
                   fontSize: 11,
                   backgroundColor: COLORS.colorPrimary,
                 }}>
-              
+
                 {item?.distance != null ? (
         <Text>{formatDistance(item.distance)}</Text>
       ) : null}
@@ -115,7 +120,7 @@ const OfferCardView = ({item}) => {
                 {item?.distance}km
               </Text>
             ) : null
-          ) find kro
+          )
           : null} */}
         </View>
       </View>
@@ -147,8 +152,8 @@ const OfferCardView = ({item}) => {
             flexDirection: 'row',
             // alignItems: 'center',
             marginTop: 5,
-            flex: 1,
-            width: '50%',
+            // flex: 1,
+            width: '60%',
           }}>
           <BunchDealVectorIcon
             title={Entypo}
@@ -192,16 +197,14 @@ const OfferCardView = ({item}) => {
                   //   fontSize: item?.distance >= 1000 ? 15 : 14,
                   //   alignItems: 'center',
                   // }}
-                  //numberOfLines={1}
                   style={{
                     color: COLORS.shimmer_loading_color_darker,
                     fontFamily: 'Montserrat-Regular',
                     fontSize: item?.distance >= 1000 ? 15 : 14,
                     alignItems: 'center',
-                    //elevation: 10,
                     marginLeft: 5,
                   }}>
-                    {`\u25CF ${item.distance_km} ${item.distance_by}`}
+                  {`\u25CF ${item.distance_km} ${item.distance_by}`}
                 </Text>
               ) : item?.distance < 100 ? (
                 <Text
@@ -212,8 +215,8 @@ const OfferCardView = ({item}) => {
                     fontFamily: 'Montserrat-Regular',
                     fontSize: item?.distance >= 1000 ? 15 : 14,
                     alignItems: 'center',
-                    resizeMode: 'cover',
                   }}>
+                  {/*{`\u25CF ${item.distance_km}`} km away*/}
                   {`\u25CF ${item.distance_km} ${item.distance_by}`}
                 </Text>
               ) : null

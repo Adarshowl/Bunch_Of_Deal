@@ -49,7 +49,7 @@ PODS:
   - Firebase/Messaging (10.15.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 10.15.0)
-  - FirebaseAppCheckInterop (10.16.0)
+  - FirebaseAppCheckInterop (10.19.0)
   - FirebaseAuth (10.15.0):
     - FirebaseAppCheckInterop (~> 10.0)
     - FirebaseCore (~> 10.0)
@@ -63,7 +63,7 @@ PODS:
     - GoogleUtilities/Logger (~> 7.8)
   - FirebaseCoreExtension (10.15.0):
     - FirebaseCore (~> 10.0)
-  - FirebaseCoreInternal (10.16.0):
+  - FirebaseCoreInternal (10.19.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
   - FirebaseCrashlytics (10.15.0):
     - FirebaseCore (~> 10.5)
@@ -78,7 +78,7 @@ PODS:
     - leveldb-library (~> 1.22)
   - FirebaseDynamicLinks (10.15.0):
     - FirebaseCore (~> 10.0)
-  - FirebaseInstallations (10.16.0):
+  - FirebaseInstallations (10.19.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
@@ -92,7 +92,7 @@ PODS:
     - GoogleUtilities/Reachability (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - FirebaseSessions (10.16.0):
+  - FirebaseSessions (10.19.0):
     - FirebaseCore (~> 10.5)
     - FirebaseCoreExtension (~> 10.0)
     - FirebaseInstallations (~> 10.0)
@@ -160,7 +160,7 @@ PODS:
     - FlipperKit/FlipperKitNetworkPlugin
   - fmt (6.2.1)
   - glog (0.3.5)
-  - GoogleDataTransport (9.2.5):
+  - GoogleDataTransport (9.3.0):
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
@@ -168,53 +168,53 @@ PODS:
     - AppAuth (~> 1.5)
     - GTMAppAuth (< 3.0, >= 1.3)
     - GTMSessionFetcher/Core (< 4.0, >= 1.1)
-  - GoogleUtilities (7.11.5):
-    - GoogleUtilities/AppDelegateSwizzler (= 7.11.5)
-    - GoogleUtilities/Environment (= 7.11.5)
-    - GoogleUtilities/ISASwizzler (= 7.11.5)
-    - GoogleUtilities/Logger (= 7.11.5)
-    - GoogleUtilities/MethodSwizzler (= 7.11.5)
-    - GoogleUtilities/Network (= 7.11.5)
-    - "GoogleUtilities/NSData+zlib (= 7.11.5)"
-    - GoogleUtilities/Reachability (= 7.11.5)
-    - GoogleUtilities/SwizzlerTestHelpers (= 7.11.5)
-    - GoogleUtilities/UserDefaults (= 7.11.5)
-  - GoogleUtilities/AppDelegateSwizzler (7.11.5):
+  - GoogleUtilities (7.12.0):
+    - GoogleUtilities/AppDelegateSwizzler (= 7.12.0)
+    - GoogleUtilities/Environment (= 7.12.0)
+    - GoogleUtilities/ISASwizzler (= 7.12.0)
+    - GoogleUtilities/Logger (= 7.12.0)
+    - GoogleUtilities/MethodSwizzler (= 7.12.0)
+    - GoogleUtilities/Network (= 7.12.0)
+    - "GoogleUtilities/NSData+zlib (= 7.12.0)"
+    - GoogleUtilities/Reachability (= 7.12.0)
+    - GoogleUtilities/SwizzlerTestHelpers (= 7.12.0)
+    - GoogleUtilities/UserDefaults (= 7.12.0)
+  - GoogleUtilities/AppDelegateSwizzler (7.12.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (7.11.5):
+  - GoogleUtilities/Environment (7.12.0):
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/ISASwizzler (7.11.5)
-  - GoogleUtilities/Logger (7.11.5):
+  - GoogleUtilities/ISASwizzler (7.12.0)
+  - GoogleUtilities/Logger (7.12.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (7.11.5):
+  - GoogleUtilities/MethodSwizzler (7.12.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (7.11.5):
+  - GoogleUtilities/Network (7.12.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (7.11.5)"
-  - GoogleUtilities/Reachability (7.11.5):
+  - "GoogleUtilities/NSData+zlib (7.12.0)"
+  - GoogleUtilities/Reachability (7.12.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/SwizzlerTestHelpers (7.11.5):
+  - GoogleUtilities/SwizzlerTestHelpers (7.12.0):
     - GoogleUtilities/MethodSwizzler
-  - GoogleUtilities/UserDefaults (7.11.5):
+  - GoogleUtilities/UserDefaults (7.12.0):
     - GoogleUtilities/Logger
   - GTMAppAuth (2.0.0):
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 4.0, >= 1.5)
-  - GTMSessionFetcher/Core (3.1.1)
+  - GTMSessionFetcher/Core (3.2.0)
   - hermes-engine (0.72.5):
     - hermes-engine/Pre-built (= 0.72.5)
   - hermes-engine/Pre-built (0.72.5)
   - leveldb-library (1.22.2)
   - libevent (2.1.12)
-  - nanopb (2.30909.0):
-    - nanopb/decode (= 2.30909.0)
-    - nanopb/encode (= 2.30909.0)
-  - nanopb/decode (2.30909.0)
-  - nanopb/encode (2.30909.0)
+  - nanopb (2.30909.1):
+    - nanopb/decode (= 2.30909.1)
+    - nanopb/encode (= 2.30909.1)
+  - nanopb/decode (2.30909.1)
+  - nanopb/encode (2.30909.1)
   - OpenSSL-Universal (1.1.1100)
   - PromisesObjC (2.3.1)
   - PromisesSwift (2.3.1):
@@ -671,7 +671,11 @@ PODS:
   - RecaptchaInterop (100.0.0)
   - rn-fetch-blob (0.12.0):
     - React-Core
+  - RNAppleAuthentication (2.3.0):
+    - React-Core
   - RNCAsyncStorage (1.19.3):
+    - React-Core
+  - RNCClipboard (1.13.1):
     - React-Core
   - RNCMaskedView (0.3.0):
     - React-Core
@@ -855,7 +859,9 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RealmJS (from `../node_modules/realm`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
@@ -1029,8 +1035,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/realm"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
+  RNAppleAuthentication:
+    :path: "../node_modules/@invertase/react-native-apple-authentication"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
   RNCPushNotificationIOS:
@@ -1082,17 +1092,17 @@ SPEC CHECKSUMS:
   FBSDKLoginKit: 7181765f2524d7ebf82d9629066c8e6caafc99d0
   FBSDKShareKit: 0c0d51b3af47075a85ed9bea0e28b2fc70e3594b
   Firebase: 66043bd4579e5b73811f96829c694c7af8d67435
-  FirebaseAppCheckInterop: 82358cff9f33452dd44259e88eea5e562500b1cb
+  FirebaseAppCheckInterop: 37884781f3e16a1ba47e7ec80a1e805f987788e3
   FirebaseAuth: a55ec5f7f8a5b1c2dd750235c1bb419bfb642445
   FirebaseCore: 2cec518b43635f96afe7ac3a9c513e47558abd2e
   FirebaseCoreExtension: d3f1ea3725fb41f56e8fbfb29eeaff54e7ffb8f6
-  FirebaseCoreInternal: 26233f705cc4531236818a07ac84d20c333e505a
+  FirebaseCoreInternal: b444828ea7cfd594fca83046b95db98a2be4f290
   FirebaseCrashlytics: a83f26fb922a3fe181eb738fb4dcf0c92bba6455
   FirebaseDatabase: f93f1481c7e9e3d77af960cdff82a408d37693e6
   FirebaseDynamicLinks: 206d4ed3efd2b722822598017f3980d9fda89815
-  FirebaseInstallations: b822f91a61f7d1ba763e5ccc9d4f2e6f2ed3b3ee
+  FirebaseInstallations: 033d199474164db20c8350736842a94fe717b960
   FirebaseMessaging: 0c0ae1eb722ef0c07f7801e5ded8dccd1357d6d4
-  FirebaseSessions: 96e7781e545929cde06dd91088ddbb0841391b43
+  FirebaseSessions: e5f4caa188dc8bc6142abc974355be75b042215e
   Flipper: 6edb735e6c3e332975d1b17956bcc584eccf5818
   Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
   Flipper-DoubleConversion: 2dc99b02f658daf147069aad9dbd29d8feb06d30
@@ -1103,15 +1113,15 @@ SPEC CHECKSUMS:
   FlipperKit: 2efad7007d6745a3f95e4034d547be637f89d3f6
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  GoogleDataTransport: 54dee9d48d14580407f8f5fbf2f496e92437a2f2
+  GoogleDataTransport: 57c22343ab29bc686febbf7cbb13bad167c2d8fe
   GoogleSignIn: b232380cf495a429b8095d3178a8d5855b42e842
-  GoogleUtilities: 13e2c67ede716b8741c7989e26893d151b2b2084
+  GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
-  GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
+  GTMSessionFetcher: 41b9ef0b4c08a6db4b7eb51a21ae5183ec99a2c8
   hermes-engine: f6cf92a471053245614d9d8097736f6337d5b86c
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
+  nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   PromisesSwift: 28dca69a9c40779916ac2d6985a0192a5cb4a265
@@ -1162,7 +1172,9 @@ SPEC CHECKSUMS:
   RealmJS: b36dae5c0def204602827884512252a320332c69
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
+  RNAppleAuthentication: e99eaf3c4c01ad8ecb6125dd6f0cfd98871685b5
   RNCAsyncStorage: c913ede1fa163a71cea118ed4670bbaaa4b511bb
+  RNCClipboard: 90e241893de33a2f5962fc34d76ada4576033e49
   RNCMaskedView: f7c74478c83c4fdfc5cf4df51f80c0dd5cf125c6
   RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
   RNDeviceInfo: bf8a32acbcb875f568217285d1793b0e8588c974

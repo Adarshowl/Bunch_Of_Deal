@@ -1,6 +1,5 @@
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {COLORS} from '../constants/Colors';
-import {FONTS, SIZES} from '../constants/themes';
 
 export default StyleSheet.create({
   mainContainer: {
@@ -151,10 +150,10 @@ export default StyleSheet.create({
   },
   Product_image: {
     width: '100%',
-    height:260,
+    height: 260,
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    resizeMode:'cover'
+    resizeMode: 'cover',
     // height:250,
     // width: Dimensions.get('window').width,
     // resizeMode:'stretch',
@@ -220,15 +219,14 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   store_image: {
-    height:260,
-    resizeMode:'cover',
+    height: 260,
+    resizeMode: 'cover',
     // height:290,
     // // backgroundColor: COLORS.colorPrimary,
     // resizeMode: 'contain',
     //  width: Dimensions.get('window').width,
     width: '100%',
-    paddingVertical:50
-    
+    paddingVertical: 50,
   },
   Fonticon: {
     height: 56,

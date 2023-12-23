@@ -25,6 +25,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import BunchDealProgressBar from '../../utils/BunchDealProgressBar';
 import GlobalStyle from '../../styles/GlobalStyle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 const SearchDialog = ({
   show,
   onPress,
@@ -235,6 +236,7 @@ const SearchDialog = ({
                   flex: 1,
                 }}>
                 Search
+                {/* on {title} */}
               </Text>
               <Ionicons
                 onPress={() => {
@@ -384,33 +386,32 @@ const SearchDialog = ({
                 style={{
                   fontSize: 14,
                   fontFamily: 'Montserrat-SemiBold',
-                  marginTop: 10,
+                  marginTop: 5,
                   color: COLORS.black,
-                  flex: 1,
-                  //height: 36,
                 }}>
                 Location:{' '}
-                <Text
-                  onPress={onCurrentLocationPress}
+              </Text>
+              <Text
+                onPress={onCurrentLocationPress}
+                style={{
+                  fontSize: 14,
+                  fontFamily: 'Montserrat-Medium',
+                  marginTop: 5,
+                  color: COLORS.colorAccent,
+                  flex: 1,
+                  // height: 36,
+                  textAlignVertical: 'center',
+                }}
+                numberOfLines={2}>
+                <FontAwesome
+                  name="dot-circle-o"
+                  size={13}
                   style={{
-                    fontSize: 14,
-                    fontFamily: 'Montserrat-Medium',
-
-                    color: COLORS.colorAccent,
-
-                    textAlignVertical: 'center',
+                    marginEnd: 5,
                   }}
-                  numberOfLines={2}>
-                  <FontAwesome
-                    name="dot-circle-o"
-                    size={13}
-                    style={{
-                      marginEnd: 5,
-                    }}
-                    color={COLORS.colorAccent}
-                  />{' '}
-                  {STRING.SEARCH_LOCATION}
-                </Text>
+                  color={COLORS.colorAccent}
+                />{' '}
+                {STRING.SEARCH_LOCATION}
               </Text>
             </View>
 

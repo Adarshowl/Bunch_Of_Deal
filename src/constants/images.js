@@ -1,4 +1,4 @@
-export const new_login_beta = require('../assets/images/new_login_beta.png');
+export const new_login_beta = require('../assets/images/NewSplashScreen.png');
 export const app_logo = require('../assets/images/app_logo_new_512.png');
 export const def_logo = require('../assets/images/def_logo.png');
 export const bg_no_item_cactus = require('../assets/images/bg_no_item_cactus.png');
@@ -9,7 +9,7 @@ export const no_internet_found = require('../assets/images/no_internet_found.png
 export const one_splash_gif = require('../assets/images/one_splash_gif.gif');
 export const profile_placeholder = require('../assets/images/profile_placeholder.png');
 export const navigation_icon_bg = require('../assets/images/navigation_icon_bg.png');
-export const splash_new_beta = require('../assets/images/splash_new_beta.png');
+export const splash_new_beta = require('../assets/images/splash_new_beta11.png');
 export const fb_logo = require('../assets/images/fb_logo.png');
 export const google_btn = require('../assets/images/google_btn.png');
 export const intro_1 = require('../assets/images/intro/intro_1.png');

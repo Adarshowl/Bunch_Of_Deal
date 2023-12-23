@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, Modal, Text, TouchableOpacity, View} from 'react-native';
 import {AccessToken, LoginManager} from 'react-native-fbsdk';
 // import {AccessToken, LoginManager} from 'react-native-fbsdk-next';
@@ -29,12 +29,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 //apple login
 
-// import appleAuth, {
-//   AppleAuthCredentialState,
-//   AppleAuthRequestOperation,
-//   AppleAuthRequestScope,
-//   AppleButton,
-// } from "@invertase/react-native-apple-authentication";
+import {
+  appleAuth,
+  AppleAuthCredentialState,
+  AppleAuthRequestOperation,
+  AppleAuthRequestScope,
+  AppleButton,
+} from '@invertase/react-native-apple-authentication';
 
 // import {LoginButton, AccessToken} from 'react-native-fbsdk';
 GoogleSignin.configure({
@@ -46,6 +47,9 @@ const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [state, setState] = useState('');
+  let name = '';
+
+  const [appleName, setAppleName] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -465,47 +469,83 @@ const Login = ({navigation}) => {
   // };
 
   const onAppleButtonPress = async () => {
-    try {
-      // Make a request to apple.
-      // const appleAuthRequestResponse = await appleAuth.performRequest({
-      //requestedOperation: AppleAuthRequestOperation.LOGIN,
-      //   requestedScopes: [
-      //      AppleAuthRequestScope.EMAIL,
-      //      AppleAuthRequestScope.FULL_NAME,
-      //    ],
-      //   });
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: 1,
-        requestedScopes: [0, 1],
-      });
+    // try {
+    // Make a request to apple.
+    // const appleAuthRequestResponse = await appleAuth.performRequest({
+    //   requestedOperation: AppleAuthRequestOperation.LOGIN,
+    //   requestedScopes: [
+    //     AppleAuthRequestScope.EMAIL,
+    //     AppleAuthRequestScope.FULL_NAME,
+    //   ],
+    // });
+    //   const appleAuthRequestResponse = await appleAuth.performRequest({
+    //     requestedOperation: 1,
+    //     requestedScopes: [0, 1],
+    //   });
 
-      // Get the credential for the user.
-      const credentialState = await appleAuth.getCredentialStateForUser(
-        appleAuthRequestResponse.user,
-      );
+    //   // Get the credential for the user.
+    //   const credentialState = await appleAuth.getCredentialStateForUser(
+    //     appleAuthRequestResponse.user,
+    //   );
 
-      // If the Auth is authorized, we call our API and pass the authorization code.
-      //    if (credentialState === AppleAuthCredentialState.AUTHORIZED) {
-      if (credentialState === 1) {
-        console.log(
-          'apple login -> ',
-          appleAuthRequestResponse.authorizationCode,
-        );
+    //   // If the Auth is authorized, we call our API and pass the authorization code.
+    //   //    if (credentialState === AppleAuthCredentialState.AUTHORIZED) {
+    //   if (credentialState === 1) {
+    //     console.log(
+    //       'apple login -> ',
+    //       appleAuthRequestResponse.authorizationCode,
+    //     );
 
-        // Axios.post("http://172.20.10.9:3000/auth/apple", {
-        // token: appleAuthRequestResponse.authorizationCode,
-        //  }).then((res) => {
-        //   if (res?.data?.user) {
-        ////     Alert.alert('Number of connections: ' + res.data.user.nbOfConnections.toString());
-        // }
-        // });
-      }
-    } catch (error) {
-      crashlytics().recordError(error);
+    //     // Axios.post("http://172.20.10.9:3000/auth/apple", {
+    //     // token: appleAuthRequestResponse.authorizationCode,
+    //     //  }).then((res) => {
+    //     //   if (res?.data?.user) {
+    //     ////     Alert.alert('Number of connections: ' + res.data.user.nbOfConnections.toString());
+    //     // }
+    //     // });
+    //   }
+    // } catch (error) {
+    //   crashlytics().recordError(error);
 
-      ShowConsoleLogMessage('error in aple login -> ' + error);
-    }
+    //   ShowConsoleLogMessage('error in aple login -> ' + error);
+    // }
+
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      // Note: it appears putting FULL_NAME first is important, see issue #293
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    });
+    const {identityToken, nonce, fullName} = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce,
+      fullName,
+    );
+    console.log('Apple Response1 ===>' + JSON.stringify(fullName));
+    console.log('Apple Response2 ===>' + JSON.stringify(identityToken));
+    console.log('Apple Response3 ===>' + JSON.stringify(nonce));
+
+    let fullName_ = '';
+    if (fullName.namePrefix) fullName_ = fullName_ + fullName.namePrefix + ' ';
+    if (fullName.givenName) fullName_ = fullName_ + fullName.givenName + ' ';
+    if (fullName.familyName) fullName_ = fullName_ + fullName.familyName + ' ';
+    if (fullName.nickname) fullName_ = fullName_ + fullName.nickname + ' ';
+    if (fullName.middleName) fullName_ = fullName_ + fullName.middleName + ' ';
+    if (fullName.nameSuffix) fullName_ = fullName_ + fullName.nameSuffix + ' ';
+
+    console.log('name ====> ' + fullName_);
+
+    setAppleName(fullName_ + '' || '');
+
+    return auth().signInWithCredential(appleCredential);
   };
+
+  useEffect(() => {
+    name = appleName;
+
+    AsyncStorage.setItem('AppleName', name + '');
+    console.log('aplename -> ', appleName);
+  }, [appleName]);
 
   const onCreateAccountClick = () => {
     navigation.navigate('SignUp');
@@ -554,7 +594,7 @@ const Login = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+    <View style={GlobalStyle.mainContainerBgColor}>
       <View style={GlobalStyle.nav_bg}>
         <BunchDealProgressBar loading={loading} />
         <Image
@@ -716,16 +756,6 @@ const Login = ({navigation}) => {
             alignItems: 'center',
             marginTop: 15, */}
         {/* }}> */}
-        {/* <AppleButton
-        buttonStyle={AppleButton.Style.BLACK}
-        buttonType={AppleButton.Type.SIGN_IN}
-        style={{
-          height:45,
-          width:"80%"
-
-        }}
-        onPress={()=>onAppleButtonPress()}
-        /> */}
 
         {/* <TouchableOpacity
             style={{
@@ -790,7 +820,7 @@ const Login = ({navigation}) => {
             marginTop: 10,
             marginBottom: 10,
           }}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               height: 45,
               width: '80%',
@@ -812,7 +842,7 @@ const Login = ({navigation}) => {
                 resizeMode: 'cover',
               }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={{
               height: 45,
@@ -913,6 +943,97 @@ const Login = ({navigation}) => {
               }}
             />
           </TouchableOpacity>
+          <AppleButton
+            buttonStyle={AppleButton.Style.BLACK}
+            buttonType={AppleButton.Type.SIGN_IN}
+            style={{
+              height: 45,
+              width: '80%',
+              marginTop: 15,
+            }}
+            onPress={() => {
+              // setLoading(true); // Show the loading spinner
+
+              onAppleButtonPress()
+                .then(async response => {
+                  //console.log('response Apple -> ' + JSON.stringify(response));
+
+                  //   setLoading(true);
+                  // let googleImage =
+                  //   response?.additionalUserInfo?.profile?.picture + '';
+
+                  let name1 = await AsyncStorage.getItem('AppleName');
+                  let body = {
+                    email: response?.additionalUserInfo?.profile?.email,
+                    username: name1 || appleName,
+                    password: '',
+                    image: '',
+                    name: name1 || appleName,
+                    lng: userLong,
+                    lat: userLat,
+                  };
+
+                  // await AsyncStorage.setItem('login_provider', 'apple');
+                  console.log('response Body -> ' + JSON.stringify(body));
+                  // setLoading(true);
+
+                  ApiCall('post', body, API_END_POINTS.API_APPLE_SIGNUP, {
+                    Accept: 'application/json',
+                    'Content-Type': 'multipart/form-data',
+                  })
+                    .then(response => {
+                      // console.log(JSON.stringify(response), 'Apple ');
+                      if (response?.data?.result) {
+                        ShowToastMessage('Login successful');
+                        setLoading(false);
+                        let arr = [];
+                        arr.push(response?.data?.result);
+                        for (let i = 0; i < arr.length; i++) {
+                          console.log(JSON.stringify(arr[i]), ' ------ loop ');
+                          AsyncStorage.setItem(
+                            'userData',
+                            JSON.stringify(arr[i]),
+                          );
+                          // AsyncStorage.setItem('userPseudo', arr[i]['0']?.username);
+
+                          AsyncStorage.setItem(
+                            STRING.userEmail,
+                            arr[i]?.email + '',
+                          );
+                          // if (googleImage != null || '') {
+                          //   AsyncStorage.setItem(
+                          //     'userImage',
+                          //     googleImage || '',
+                          //   );
+                          // }
+                          // console.log(googleImage + ' imatgwe profile  ');
+                          // uploadImage(arr[i]?.id_user, googleImage);
+                        }
+                        // console.log(arr.length);
+                        // console.log(JSON.stringify(response));
+
+                        navigation.navigate('MainContainer');
+                      } else {
+                        ShowToastMessage('Login failed');
+                        setLoading(false);
+                      }
+                    })
+                    .catch(error => {
+                      crashlytics().recordError(error);
+
+                      setLoading(false);
+                    })
+                    .finally(() => {
+                      setLoading(false);
+                    });
+                })
+                .catch(error => {
+                  console.log('response -> ' + error);
+                  ShowToastMessage(error?.message);
+                });
+            }}
+            // onPress={() => onAppleButtonPress()}
+          />
         </View>
 
         <BunchDealCommonBtn
@@ -934,7 +1055,7 @@ const Login = ({navigation}) => {
         />
       </View>
       {renderFilterModal()}
-    </SafeAreaView>
+    </View>
   );
 };
 

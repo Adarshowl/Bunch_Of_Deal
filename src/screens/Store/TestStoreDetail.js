@@ -824,7 +824,7 @@ const TestStoreDetail = ({navigation, route}) => {
   /** gallery end */
 
   return (
-    <View
+    <SafeAreaView
       style={GlobalStyle1.mainContainerBgColor}
       showsVerticalScrollIndicator={false}>
       <ScrollView
@@ -1386,7 +1386,7 @@ const TestStoreDetail = ({navigation, route}) => {
 
       {renderImageModal()}
       {renderAddReviewModal()}
-    </View>
+    </SafeAreaView>
   );
 };
 

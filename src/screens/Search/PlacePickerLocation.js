@@ -77,31 +77,47 @@ const PlacePickerLocation = ({navigation, show, onRequestClose}) => {
   // };
 
   const handleRecentLocationSelect = (data, details) => {
-    STRING.SEARCH_LOCATION = data.description;
+    if (data.description === 'Current Location' || !STRING.SEARCH_LOCATION) {
+      STRING.SEARCH_LOCATION = data.description;
 
-    Geocoder.from(STRING.SEARCH_LOCATION)
-      .then(response => {
-        const {results} = response;
-        if (results.length > 0) {
-          // STRING.SEARCH_LOCATION = data.description;
-          ShowConsoleLogMessage(JSON.stringify(results[0]));
-          const {lat, lng} = results[0].geometry.location;
-          console.log('Geocoded Latitude:', lat);
-          console.log('Geocoded Longitude:', lng);
+      getCurrentLocationData()
+        .then(response => {
+          const {results} = response;
 
-          dispatch(fetchUserLatitude(lat));
-          dispatch(fetchUserLongitude(lng));
-          setSelectedLocation({latitude: lat, longitude: lng});
-          STRING.CURRENT_LAT = lat;
-          STRING.CURRENT_LONG = lng;
-          // STRING.SEARCH_LOCATION;
+          STRING.SEARCH_LOCATION = data.description;
 
           onRequestClose();
-        }
-      })
-      .catch(error => {
-        console.error('Geocoding Error:', error);
-      });
+        })
+        .catch(error => {
+          console.error('Error fetching current location data:', error);
+        });
+    } else {
+      STRING.SEARCH_LOCATION = data.description;
+
+      Geocoder.from(STRING.SEARCH_LOCATION)
+        .then(response => {
+          const {results} = response;
+          if (results.length > 0) {
+            // STRING.SEARCH_LOCATION = data.description;
+            ShowConsoleLogMessage(JSON.stringify(results[0]));
+            const {lat, lng} = results[0].geometry.location;
+            console.log('Geocoded Latitude:', lat);
+            console.log('Geocoded Longitude:', lng);
+
+            dispatch(fetchUserLatitude(lat));
+            dispatch(fetchUserLongitude(lng));
+            setSelectedLocation({latitude: lat, longitude: lng});
+            STRING.CURRENT_LAT = lat;
+            STRING.CURRENT_LONG = lng;
+            // STRING.SEARCH_LOCATION;
+
+            onRequestClose();
+          }
+        })
+        .catch(error => {
+          console.error('Geocoding Error:', error);
+        });
+    }
   };
 
   return (
@@ -112,13 +128,7 @@ const PlacePickerLocation = ({navigation, show, onRequestClose}) => {
       onRequestClose={() => {
         onRequestClose();
       }}>
-      <View
-        style={[
-          GlobalStyle.mainContainerBgColor,
-          {
-            marginTop: 35,
-          },
-        ]}>
+      <View style={GlobalStyle.mainContainerBgColor}>
         <AntDesign
           name="arrowleft"
           size={25}
@@ -127,6 +137,7 @@ const PlacePickerLocation = ({navigation, show, onRequestClose}) => {
             margin: 12,
           }}
           onPress={() => {
+            navigation;
             onRequestClose();
           }}
         />

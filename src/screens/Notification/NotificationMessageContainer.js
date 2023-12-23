@@ -1,21 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {
   Animated,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  Platform,
-  Image,
+  View,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {COLORS} from '../../constants/Colors';
-import PushNotification from 'react-native-push-notification';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
 
 import {useNavigation} from '@react-navigation/native';
-import {Avatar} from 'react-native-elements';
 import BunchDealImageLoader from '../../utils/BunchDealImageLoader';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
 
@@ -180,12 +175,11 @@ const NotificationMsg = ({message, title, show, data, imageUrl}) => {
           // source={uri:item?.images}
           //   source={item?.images['0']?.['560_560']?.url + ''}
           // source={item?.images['0']['560_560'] +url ''}
-
           //   styles={styles.image}
         />
 
         {/* <Avatar
-                
+
                     rounded
                     size={50}
                       source={imageUrl}
@@ -210,8 +204,7 @@ const NotificationMsg = ({message, title, show, data, imageUrl}) => {
     </Animated.View>
   );
 };
-// ab aap notifcation ke icon par notifcation se o image aa rahi set kar dena
-// thik lekin ye jo white scrren aa rhihe uoer notification se
+
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',

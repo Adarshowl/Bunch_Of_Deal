@@ -13,7 +13,6 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS} from '../../constants/Colors';
 import images from '../../constants/images';
-import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle1 from '../../styles/GlobalStyle1';
@@ -23,8 +22,6 @@ import {NotificationSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
 
 const Notification = ({navigation}) => {
-
-
   const [loading, setLoading] = useState(false);
   const [showError, setShowError] = useState(false);
   const [listData, setListData] = useState([]);
@@ -60,16 +57,16 @@ const Notification = ({navigation}) => {
 
   const getNotification = id => {
     setLoading(true);
-    
+
     let body = {user_id: /*'578'*/ id, page: 1, limit: 30};
-    // ShowConsoleLogMessage(body);
+    ShowConsoleLogMessage(body);
     ApiCall('post', body, API_END_POINTS.API_NOTIFICATIONS_GET, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
         // console.log(
-        //   'ERROR IN GET Notification List 4 res=> ',
+        //   'ERROR IN GET Notification List 4 res=> Shubham ',
         //   JSON.stringify(response),
         // );
 
@@ -421,7 +418,7 @@ const Notification = ({navigation}) => {
                 fontFamily: 'Montserrat-SemiBold',
                 color: COLORS.black,
                 flex: 1,
-                marginTop:11
+                marginTop: 11,
               }}
               numberOfLines={3}>
               {item.label_description}
@@ -485,7 +482,7 @@ const Notification = ({navigation}) => {
   };
 
   return (
-    <View style={GlobalStyle1.mainContainerBgColor}>
+    <SafeAreaView style={GlobalStyle1.mainContainerBgColor}>
       {/* <BunchDealProgressBar loading={loading} /> */}
       <View
         style={[
@@ -547,7 +544,7 @@ const Notification = ({navigation}) => {
       ) : (
         <NoResult onReloadBtn={onReloadBtn} />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

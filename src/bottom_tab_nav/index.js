@@ -1,22 +1,25 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from '../screens/Home';
-import Account from '../screens/Account';
 import {COLORS} from '../constants/Colors';
 import GeoStore from '../screens/GeoStore';
-import InvoiceList from '../screens/Invoice/InvoiceList';
 import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import crashlytics from '@react-native-firebase/crashlytics';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import MyStuffScreen from '../screens/Account/MyStuffScreen';
+import Category from '../screens/Category';
+import Octicons from 'react-native-vector-icons/Octicons';
+import Favorite from '../screens/Favorite';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNav = () => {
   const [userData, setUserData] = useState({});
   const isFocused = useIsFocused();
+  const navigation = useNavigation();
 
   useEffect(() => {
     getUserFromStorage();
@@ -49,15 +52,15 @@ const BottomTabNav = () => {
         tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: COLORS.white,
-          minHeight: 70,
-          paddingTop: 15,
-          paddingBottom: 18,
+          minHeight: 20,
+          // paddingTop: 5,
+          // paddingBottom: 15,
         },
         tabBarItemStyle: {},
       }}
       initialRouteName="Home"
       style={{
-        backgroundColor: COLORS.red,
+        // backgroundColor: COLORS.red,
       }}>
       <Tab.Screen
         name="Home"
@@ -92,7 +95,6 @@ const BottomTabNav = () => {
         component={GeoStore}
         options={{
           unmountOnBlur: true,
-
           tabBarIcon: ({focused}) => (
             <View
               style={{
@@ -100,7 +102,7 @@ const BottomTabNav = () => {
                 // marginBottom: focused ? 15 : 0,
               }}>
               <Entypo
-                name={'globe'}
+                name={'location'}
                 size={22}
                 color={focused ? COLORS.colorPrimary : COLORS.grey_20}
               />
@@ -117,69 +119,159 @@ const BottomTabNav = () => {
           ),
         }}
       />
-      {userData?.id_user == null ? null : (
-        <Tab.Screen
-          name="Orders"
-          component={InvoiceList}
-          initialParams={{item: {}}}
-          options={{
-            unmountOnBlur: true,
 
-            tabBarIcon: ({focused}) => (
-              <View
-                style={{
-                  alignItems: 'center',
-                  // marginBottom: focused ? 15 : 0,
-                }}>
-                <Ionicons
-                  name={'ios-cart'}
-                  size={22}
-                  color={focused ? COLORS.colorPrimary : COLORS.grey_20}
-                />
-                <Text
-                  style={[
-                    styles.text,
-                    {
-                      color: focused ? COLORS.colorPrimary : COLORS.grey_20,
-                    },
-                  ]}>
-                  Orders{' '}
-                </Text>
-              </View>
-            ),
-          }}
-        />
-      )}
-      {userData?.id_user == null ? null : (
-        <Tab.Screen
-          name="Account"
-          component={Account}
-          options={{
-            unmountOnBlur: true,
-            tabBarIcon: ({focused}) => (
-              <View
-                style={{
-                  alignItems: 'center',
-                }}>
-                <Ionicons
-                  name={'ios-person-sharp'}
-                  size={22}
-                  color={focused ? COLORS.colorPrimary : COLORS.grey_20}
-                />
-                <Text
-                  style={[
-                    styles.text,
-                    {
-                      color: focused ? COLORS.colorPrimary : COLORS.grey_20,
-                    },
-                  ]}>
-                  Profile
-                </Text>
-              </View>
-            ),
-          }}
-        />
-      )}
+      <Tab.Screen
+        name="Category"
+        component={Category}
+        options={{
+          unmountOnBlur: true,
+          tabBarIcon: ({focused}) => (
+            <View
+              style={{
+                alignItems: 'center',
+                // marginBottom: focused ? 15 : 0,
+              }}>
+              <Octicons
+                name={'three-bars'}
+                size={22}
+                color={focused ? COLORS.colorPrimary : COLORS.grey_20}
+              />
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color: focused ? COLORS.colorPrimary : COLORS.grey_20,
+                  },
+                ]}>
+                Category
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Favorite"
+        component={Favorite}
+        options={{
+          unmountOnBlur: true,
+          tabBarIcon: ({focused}) => (
+            <View
+              style={{
+                alignItems: 'center',
+              }}>
+              <FontAwesome
+                name={focused ? 'heart' : 'heart-o'}
+                size={22}
+                color={focused ? COLORS.colorPrimary : COLORS.grey_20}
+              />
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color: focused ? COLORS.colorPrimary : COLORS.grey_20,
+                  },
+                ]}>
+                Favorite
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      {/*{userData?.id_user == null ? null : (*/}
+      {/*  <Tab.Screen*/}
+      {/*    name="Orders"*/}
+      {/*    component={InvoiceList}*/}
+      {/*    initialParams={{item: {}}}*/}
+      {/*    options={{*/}
+      {/*      unmountOnBlur: true,*/}
+
+      {/*      tabBarIcon: ({focused}) => (*/}
+      {/*        <View*/}
+      {/*          style={{*/}
+      {/*            alignItems: 'center',*/}
+      {/*            // marginBottom: focused ? 15 : 0,*/}
+      {/*          }}>*/}
+      {/*          <Ionicons*/}
+      {/*            name={'ios-cart'}*/}
+      {/*            size={22}*/}
+      {/*            color={focused ? COLORS.colorPrimary : COLORS.grey_20}*/}
+      {/*          />*/}
+      {/*          <Text*/}
+      {/*            style={[*/}
+      {/*              styles.text,*/}
+      {/*              {*/}
+      {/*                color: focused ? COLORS.colorPrimary : COLORS.grey_20,*/}
+      {/*              },*/}
+      {/*            ]}>*/}
+      {/*            Orders{' '}*/}
+      {/*          </Text>*/}
+      {/*        </View>*/}
+      {/*      ),*/}
+      {/*    }}*/}
+      {/*  />*/}
+      {/*)}*/}
+      {/*{userData?.id_user == null ? null : (*/}
+      {/*  <Tab.Screen*/}
+      {/*    name="Account"*/}
+      {/*    component={Account}*/}
+      {/*    options={{*/}
+      {/*      unmountOnBlur: true,*/}
+      {/*      tabBarIcon: ({focused}) => (*/}
+      {/*        <View*/}
+      {/*          style={{*/}
+      {/*            alignItems: 'center',*/}
+      {/*          }}>*/}
+      {/*          <Ionicons*/}
+      {/*            name={'ios-person-sharp'}*/}
+      {/*            size={22}*/}
+      {/*            color={focused ? COLORS.colorPrimary : COLORS.grey_20}*/}
+      {/*          />*/}
+      {/*          <Text*/}
+      {/*            style={[*/}
+      {/*              styles.text,*/}
+      {/*              {*/}
+      {/*                color: focused ? COLORS.colorPrimary : COLORS.grey_20,*/}
+      {/*              },*/}
+      {/*            ]}>*/}
+      {/*            Profile*/}
+      {/*          </Text>*/}
+      {/*        </View>*/}
+      {/*      ),*/}
+      {/*    }}*/}
+      {/*  />*/}
+      {/*)}*/}
+      <Tab.Screen
+        name="My Stuff"
+        component={MyStuffScreen}
+        options={{
+          unmountOnBlur: true,
+          tabBarIcon: ({focused}) => (
+            <TouchableOpacity
+              onPress={() => {
+                navigation?.toggleDrawer();
+              }}
+              style={{
+                alignItems: 'center',
+              }}>
+              <FontAwesome
+                name={'user-o'}
+                // name={'menu'}
+                size={22}
+                color={focused ? COLORS.colorPrimary : COLORS.grey_20}
+              />
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    color: focused ? COLORS.colorPrimary : COLORS.grey_20,
+                  },
+                ]}>
+                My Stuff
+              </Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -188,8 +280,8 @@ export default BottomTabNav;
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: 14.5,
-    marginTop: 5,
+    fontSize: 11,
+    marginTop: 2,
     fontFamily: 'Montserrat-SemiBold',
     // fontWeight: 'bold',
   },

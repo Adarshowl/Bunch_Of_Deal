@@ -23,7 +23,7 @@ export const COLORS = {
   colorPromo: '#E53935',
   lightGreen: '#8BC34A',
 
-  grey_20: '#cccccc',
+  grey_20: '#a9a9a9',
   holoGreen: '#669900',
   done_green: '#157f1f',
 

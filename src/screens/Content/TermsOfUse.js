@@ -13,7 +13,7 @@ const TermsOfUse = ({navigation}) => {
   const hideSpinner = () => setWebViewLoading(false);
 
   return (
-    <View style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
       <View
         style={{
           height: 56,
@@ -56,7 +56,7 @@ const TermsOfUse = ({navigation}) => {
         scalesPageToFit={true}
         style={{marginTop: 0, flex: 1}}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

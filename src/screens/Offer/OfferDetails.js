@@ -16,11 +16,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Share,
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-//import Share from 'react-native-share';
+import Share from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
 import CountDown from 'react-native-countdown-component';
 import {Image} from 'react-native-elements';
@@ -97,7 +97,6 @@ const OfferDetails = ({navigation, route}) => {
 
   useEffect(() => {
     let {item} = route?.params;
-
     getUserFromStorage(item);
   }, []);
 
@@ -110,7 +109,7 @@ const OfferDetails = ({navigation, route}) => {
     let body = {
       latitude: userLat + '',
       longitude: userLong + '',
-      order_by: 'recent',
+      order_by: 'nearby',
       offer_ids: offer_ids,
       token: STRING.FCM_TOKEN,
       mac_adr: STRING.MAC_ADR,
@@ -121,7 +120,7 @@ const OfferDetails = ({navigation, route}) => {
       radius: '',
       date: moment().format('yyyy-MM-dd H:m:s'),
     };
-    console.log('Body Detail' + JSON.stringify(body));
+
     // ShowConsoleLogMessage(JSON.stringify(body));
 
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
@@ -129,11 +128,11 @@ const OfferDetails = ({navigation, route}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        //console.log('response .........>>>>>> ' + JSON.stringify(response));
+        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
 
         if (response?.data?.success == 1) {
-          // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
+          // ShowConsoleLogMessage(JSON.stringify(response?.data));
 
           setReceivedData(result[0]);
           setImageUrl(result[0]?.images?.['0']?.['560_560']?.url);
@@ -409,22 +408,18 @@ const OfferDetails = ({navigation, route}) => {
   useEffect(() => {
     (async function () {
       let {item} = route?.params;
-
       if (item?.intentFromNotification) {
         getSearchOfferList(item?.id_offer);
-        // getSearchOfferList(107);
-        // getSearchOfferList('107');
+
         let is_offer_save = await isOfferSaved(
           item?.id_offer || item?.offer_id,
         );
-        // ShowConsoleLogMessage(is_offer_save);
         setFavorite(is_offer_save);
       } else {
         if (item?.id_offer == undefined || null) {
           ShowConsoleLogMessage(
             'insdie inside els 111111e-> ' + JSON.stringify(item),
           );
-
           getSearchOfferList(item?.id_offer);
           let is_offer_save = await isOfferSaved(
             item?.id_offer || item?.offer_id,
@@ -441,9 +436,8 @@ const OfferDetails = ({navigation, route}) => {
             }
           } else {
             setReceivedData(item);
-            // ShowConsoleLogMessage('item details ->? ' + JSON.stringify(item));
             var res = [];
-            getSearchOfferList(item?.id_offer);
+            getSearchOfferList(item?.id_offer || item?.offer_id);
 
             try {
               Object.values(item?.images).forEach((key, index) => {
@@ -458,11 +452,7 @@ const OfferDetails = ({navigation, route}) => {
             }
 
             setImages(res);
-            // img.map(x => {
-            //   console.log(x, 'xxx');
-            //   let url = x?.url;
-            //   setImages(...images, url);
-            // });
+
             setImageUrl(item?.images?.['0']?.['560_560']?.url);
             setImageUrl200(item?.images?.['0']?.['200_200']?.url);
             setPrice(item?.offer_value + '');
@@ -497,8 +487,6 @@ const OfferDetails = ({navigation, route}) => {
               item?.id_offer || item?.offer_id,
             );
             setFavorite(is_offer_save);
-
-            // let temp = await getSavedOfferAsString();
             // ShowConsoleLogMessage(temp);
             getStoreByIdTelePhone(item?.store_id);
           }
@@ -714,6 +702,10 @@ const OfferDetails = ({navigation, route}) => {
                   marginTop: 5,
                   borderRadius: 3,
                   alignItems: 'center',
+                  shadowOpacity: 0.6,
+                  shadowColor: 'grey',
+                  shadowRadius: 4,
+                  shadowOffset: {width: 0, height: 0},
                 }}>
                 <Image
                   source={{
@@ -747,6 +739,7 @@ const OfferDetails = ({navigation, route}) => {
                       color: COLORS.colorAccent,
                     }}>
                     {receivedData?.currency?.symbol + '' + price}
+                    .0
                   </Text>
                   <View
                     style={{
@@ -801,6 +794,8 @@ const OfferDetails = ({navigation, route}) => {
                 style={{
                   marginVertical: 10,
                   marginHorizontal: 15,
+                  paddingBottom: Platform.OS == 'ios' ? 25 : 0,
+                  //backgroundColor: 'red',
                   justifyContent: 'flex-end',
                   alignItems: 'flex-end',
                   flexDirection: 'row',
@@ -907,19 +902,82 @@ const OfferDetails = ({navigation, route}) => {
   //     });
   // }, []);
 
+  const shareOfferLink = async (offerId, short_description, imageUrl) => {
+    console.log('image', imageUrl);
+    const link = await generateOfferLink(offerId, imageUrl, short_description);
+    if (link) {
+      // let image = 'data:image/jpeg;base64,' + imageUrl; // Constructing the base64 image URL for JPEG
+      const imageUrl =
+        'https://bunchofdeals.com.au/APP/uploads/images/169320675766715/560_560.png';
+
+      const shareOptions = {
+        title: 'Share via',
+        message: `Bunch of Deal - Check this offer:\n - Only on Bunch of Deals${short_description}\n${link} \n Check- Image Offer`,
+        url: imageUrl, // Set the image URL here
+        type: 'image/png',
+      };
+
+      try {
+        // Share the message and image
+        await Share.open(shareOptions);
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      console.log('Failed to generate offer link.');
+    }
+  };
+
+  // const generateOfferLink = async (offerId, short_description) => {
+
+  //   try {
+  //     const link = await dynamicLinks().buildLink({
+  //       // link:`https://bunchofdeals123.page.link/qbvQ`,
+  //       link: `https://bunchofdeals123.page.link/qbvQ/OfferDetails?offerId=${offerId}`,
+
+  //       domainUriPrefix: 'https://bunchofdeals123.page.link/qbvQ',
+  //       analytics: {
+  //         campaign: 'offer_share',
+
+  //       },
+
+  //       // social: {
+  //       //   link: `https://bunchofdealscom13.page.link/u9DC/OfferDetails?offerId=${offerId}`,
+  //       //   description: short_description, // Offer description
+  //       //   imageUrl: imageUrl, // Offer image URL
+  //       // },
+  //     });
+
+  //     return link;
+  //   } catch (error) {
+  //     console.error('Error building dynamic link:', link);
+  //     return null;
+  //   }
+  // };
+  // const shareProduct = async (offerId) => {
+  //   const getLink = await generateLink(offerId)
+  //   // console.log(offerId)
+  //   try {
+  //     Share.open({
+  //       message: getLink,
+  //     });
+  //   } catch (error) {
+  //     console.log('Sharing Error:', error)
+  //   }
+  // }
+
   const generateLink = async offerId => {
     console.log(offerId);
 
     try {
-      const longDynamicLink = `https://bunchofdeals123.page.link/qbvQ?offerDetails%2F${offerId}`;
+      const longDynamicLink = `https://bunchofdeals123.page.link/?link=https%3A%2F%2Fyour-actual-link-here.com%2FofferDetails%2F${offerId}`;
 
       const link = await dynamicLinks().buildShortLink(
         {
           link: longDynamicLink,
           domainUriPrefix: 'https://bunchofdeals123.page.link',
-          ios: {
-            appStoreId: '1572404530',
-            bundleId: 'com.bunchodDeals',
+          android: {
+            packageName: 'com.bunch.of.deals',
           },
         },
         dynamicLinks.ShortLinkType.DEFAULT,
@@ -948,6 +1006,185 @@ const OfferDetails = ({navigation, route}) => {
       console.error('Error building dynamic link:', error);
     }
   };
+  // const copyToClipboard = () => {
+  //   navigator.clipboard.writeText(generated)
+  //     .then(() => {
+  //       console.log('Link copied to clipboard:', generated);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error copying to clipboard:', error);
+  //     });
+  // };
+  const copyToClipboard = async () => {
+    try {
+      if (generated) {
+        await Clipboard.setString(generated);
+        console.log('Link copied to clipboard:', generated);
+      } else {
+        console.error('Generated link is null or empty.');
+      }
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+    }
+  };
+
+  const onShare = async () => {
+    try {
+      const dynamicLink = await dynamicLinks().buildLink({
+        link: 'https://invertase.io/offers/',
+        domainUriPrefix: 'https://bunchofdeals123.page.link/qbvQ',
+        analytics: {
+          campaign: 'banner',
+        },
+      });
+
+      const shareMessage =
+        receivedData?.name + ' - Only on Bunch of Deals\n' + dynamicLink;
+
+      const result = await Share.share({
+        message: shareMessage,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      crashlytics().recordError(error);
+      Alert.alert(error.message);
+    }
+  };
+
+  // https://bunchofdeals123.page.link/qbvQ
+
+  // console.log("recidata for share ",receivedData)
+  // const onShare = async () => {
+  //   try {
+
+  //     const appLink = 'https://play.google.com/store/apps/details?id=com.bunch.of.deals';
+  //     const offer = receivedData?.name;
+  //     const offerId = receivedData?.id_offer;
+  //     // const offerDetailsDeepLink = offerId ? 'com.bunch.of.deals://offers/' + offerId : '';
+  //     const deepLinkPath = 'offers/' + offerId;
+  //     const deepLinkUrl = `com.bunch.of.deals://offers/${offerId}`; // Correct format
+
+  //     const message =
+  //       receivedData?.name +
+  //       ' - Only on Bunch of Deals\n' +
+  //       offerId + 'Offer Details: ' + deepLinkUrl + '\n' +
+  //       appLink;
+
+  //     const result = await Share.share({
+  //       message: message,
+  //     });
+
+  //     if (result.action === Share.sharedAction) {
+  //       if (result.activityType) {
+  //         // Shared with activity type of result.activityType
+  //       } else {
+  //         // Shared
+  //       }
+  //     } else if (result.action === Share.dismissedAction) {
+  //       // Dismissed
+  //     }
+  //   } catch (error) {
+  //     crashlytics().recordError(error);
+  //     Alert.alert(error.message);
+  //   }
+  // };
+
+  // const onShare = async () => {
+  //   try {
+  //     const appLink = 'https://play.google.com/store/apps/details?id=com.bunch.of.deals';
+  //     const offer = receivedData?.name;
+  //     const offerId = receivedData?.id_offer;
+
+  //     // Check if deep linking is set up and offerId is available
+  //     if (offerId) {
+  //       // Replace 'your-custom-scheme' with the actual custom scheme used in your app
+  //       const offerDetailsDeepLink = 'com.bunch.of.deals://offers/${offerId}';
+  //       const message =
+  //         offer +
+  //         ' - Only on Bunch of Deals\n' +
+  //         'Offer Details: ' + offerDetailsDeepLink + '\n' +
+  //         'Download the app from: ' + appLink;
+
+  //       const result = await Share.share({
+  //         message: message,
+  //       });
+
+  //       if (result.action === Share.sharedAction) {
+  //         if (result.activityType) {
+  //           // Shared with activity type of result.activityType
+  //         } else {
+  //           // Shared
+  //         }
+  //       } else if (result.action === Share.dismissedAction) {
+  //         // Dismissed
+  //       }
+  //     } else {
+  //       // Handle the case where offerId is not available
+  //       // For example, you can show an error message or prevent sharing
+  //     }
+  //   } catch (error) {
+  //     crashlytics().recordError(error);
+  //     Alert.alert(error.message);
+  //   }
+  // };
+
+  // const onShare = async () => {
+  //   try {
+  //     const appLink = 'https://play.google.com/store/apps/details?id=com.bunch.of.deals';
+  //     const offer = receivedData?.name;
+  //     const offerId = receivedData?.id_offer;
+
+  //     // Check if deep linking is set up and offerId is available and a valid string
+  //     if (offerId && typeof offerId === 'string') {
+  //       // Construct the deep link with the offerId
+  //       const deepLinkPath = 'offers/' + offerId;
+  //       const deepLinkUrl = await Linking.createURL(deepLinkPath); // Await the result of createURL
+
+  //       const message =
+  //         offer +
+  //         ' - Only on Bunch of Deals\n' +
+  //         'Offer Details: ' + deepLinkUrl + '\n' +
+  //         'Download the app from: ' + appLink;
+
+  //       // Use Linking to create the deep link
+  //       const supported = await Linking.canOpenURL(deepLinkUrl);
+  //       if (supported) {
+  //         await Linking.openURL(deepLinkUrl);
+  //       } else {
+  //         console.log('Deep linking is not supported on this device.');
+  //       }
+
+  //       const result = await Share.share({
+  //         message: message,
+  //       });
+
+  //       if (result.action === Share.sharedAction) {
+  //         if (result.activityType) {
+  //           // Shared with activity type of result.activityType
+  //         } else {
+  //           // Shared
+  //         }
+  //       } else if (result.action === Share.dismissedAction) {
+  //         // Dismissed
+  //       }
+  //     } else {
+  //       // Handle the case where offerId is not available or not a valid string
+  //       // For example, you can show an error message or prevent sharing
+  //     }
+  //   } catch (error) {
+  //     crashlytics().recordError(error);
+  //     Alert.alert(error.message);
+  //   }
+  // };
 
   const [favorite, setFavorite] = useState(false);
   const [available, setAvailable] = useState(true);
@@ -1013,11 +1250,161 @@ const OfferDetails = ({navigation, route}) => {
       .finally(() => {});
   };
 
+  // const newShareOption = async (imageUrl, offerId, short_description, name) => {
+  //   setLoading(true);
+
+  //   // const link = await generateOfferLink(offerId, imageUrl, short_description, name);
+  //   const link = await generateLink(offerId)
+
+  //   console.log(link)
+  //   if (imageUrl != null && imageUrl != '') {
+  //     const fs = RNFetchBlob.fs;
+  //     let imagePath = imageUrl;
+  //     RNFetchBlob.config({
+  //       fileCache: true,
+  //     })
+  //       .fetch('GET', imagePath)
+  //       .then((response) => {
+  //         imagePath = response.path();
+  //         return response.readFile('base64');
+  //       })
+  //       .then(async (base64) => {
+  //         // console.log('BASE64 IMAG -> ', 'data:image/jpeg;base64,' + base64);
+  //         var base64Data = `data:image/png;base64,` + base64;
+  //         if (Platform.OS == 'android') {
+  //           setLoading(false);
+
+  //           const shareOptions = {
+  //             // title: item?.title ? item?.title : item?.date_added,
+  //             message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //             url: `data:image/jpeg;base64,${base64}`,
+  //             // url: imagePath,
+  //           };
+  //           try {
+  //             await Share.open(shareOptions);
+  //           } catch (error) {
+  //             console.log(error);
+  //           }
+  //         } else {
+  //           setLoading(false);
+
+  //           const shareOptions = {
+  //             // title: item?.title ? item?.title : item?.date_added,
+  //             message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //             url: `data:image/jpeg;base64,${base64}`,
+  //             // url: imagePath,
+  //           };
+  //           try {
+  //             await Share.open(shareOptions);
+  //           } catch (error) {
+  //             console.log(error);
+  //           }
+  //         }
+  //         setLoading(false);
+
+  //         return fs.unlink(imagePath);
+  //       });
+  //   } else {
+  //     if (Platform.OS == 'android') {
+  //       setLoading(false);
+
+  //       const shareOptions = {
+  //         // title: item?.title ? item?.title : item?.date_added,
+  //         message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //         url: `data:image/jpeg;base64,${base64}`,
+  //         // url: imagePath,
+  //       };
+  //       try {
+  //         await Share.open(shareOptions);
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     } else {
+  //       setLoading(false);
+
+  //       const shareOptions = {
+  //         // title: item?.title ? item?.title : item?.date_added,
+  //         message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //         url: `data:image/jpeg;base64,${base64}`,
+  //         // url: imagePath,
+  //       };
+  //       try {
+  //         await Share.open(shareOptions);
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   }
+  // };
+
+  // const newShareOption = async (imageUrl, offerId, short_description, name) => {
+  //   try {
+  //     setLoading(true); // Set loading state to true when starting the operation
+
+  //     const link = await generateLink(offerId);
+  //     console.log(link);
+
+  //     if (imageUrl != null && imageUrl !== '') {
+  //       const fs = RNFetchBlob.fs;
+  //       let imagePath = imageUrl;
+  //       RNFetchBlob.config({
+  //         fileCache: true,
+  //       })
+  //         .fetch('GET', imagePath)
+  //         .then((response) => {
+  //           imagePath = response.path();
+  //           return response.readFile('base64');
+  //         })
+  //         .then(async (base64) => {
+  //           var base64Data = `data:image/png;base64,` + base64;
+
+  //           // Delay to give time for data processing and avoid flickering
+  //           await new Promise((resolve) => setTimeout(resolve, 500));
+
+  //           if (Platform.OS == 'android') {
+  //             const shareOptions = {
+  //               message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //               url: `data:image/jpeg;base64,${base64}`,
+  //             };
+  //             await Share.open(shareOptions);
+  //           } else {
+  //             const shareOptions = {
+  //               message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //               url: `data:image/jpeg;base64,${base64}`,
+  //             };
+  //             await Share.open(shareOptions);
+  //           }
+
+  //           setLoading(false); // Set loading state to false when the operation is complete
+  //           return fs.unlink(imagePath);
+  //         });
+  //     } else {
+  //       if (Platform.OS == 'android') {
+  //         const shareOptions = {
+  //           message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //           url: `data:image/jpeg;base64,${base64}`,
+  //         };
+  //         await Share.open(shareOptions);
+  //       } else {
+  //         const shareOptions = {
+  //           message: `Bunch of Deal - Check this offer:\n${name ? `${short_description}` : ''}\n${link}`,
+  //           url: `data:image/jpeg;base64,${base64}`,
+  //         };
+  //         await Share.open(shareOptions);
+  //       }
+
+  //       setLoading(false); // Set loading state to false when the operation is complete
+  //     }
+  //   } catch (error) {
+  //     console.log('Error:', error);
+  //     setLoading(false); // Set loading state to false in case of an error
+  //   }
+  // };
+
   const newShareOption = async (imageUrl, offerId, short_description, name) => {
     try {
       const link = await generateLink(offerId);
       console.log(link);
-      console.log('Image:', imageUrl200);
 
       if (imageUrl != null && imageUrl !== '') {
         if (Platform.OS === 'android') {
@@ -1026,35 +1413,25 @@ const OfferDetails = ({navigation, route}) => {
 
             url: base64Data,
           };
-          await Share.share(shareOptions);
+          await Share.open(shareOptions);
         } else {
-          console.log('else part called');
           const shareOptions = {
-            //   message: `Bunch of Deals - checkout this exclusive offer...\n\n${name}\n\n${receivedData?.store_name}\n\n${receivedData?.address}\n\n${link}`,
-            //   url: base64Data,
-            // };
-            title: `Bunch of Deals - checkout this exclusive offer...\n\n${name}\n\n${receivedData?.store_name}\n\n${receivedData?.address}\n\n${link}`,
             message: `Bunch of Deals - checkout this exclusive offer...\n\n${name}\n\n${receivedData?.store_name}\n\n${receivedData?.address}\n\n${link}`,
-            //text: `Bunch of Deals - checkout this exclusive offer...\n\n${name}\n\n${receivedData?.store_name}\n\n${receivedData?.address}\n\n${link}`,
-            // url: base64Data,
-            // urls: [base64Data],
-            // failOnCancel: false,
-            //type: 'image/jpeg',
-            //social: Share.Social.WHATSAPP,
           };
-          await Share.share(shareOptions);
+
+          await Share.open(shareOptions);
         }
       } else {
         if (Platform.OS == 'android') {
           const shareOptions = {
             message: `Bunch of Deals - checkout this exclusive offer...\n\n${name}\n\n${receivedData?.store_name}\n\n${receivedData?.address}\n\n${link}`,
           };
-          await Share.share(shareOptions);
+          await Share.open(shareOptions);
         } else {
           const shareOptions = {
             message: `Bunch of Deals - checkout this exclusive offer...\n\n${name}\n\n${receivedData?.store_name}\n\n${receivedData?.address}\n\n${link}`,
           };
-          await Share.share(shareOptions);
+          await Share.open(shareOptions);
         }
       }
     } catch (error) {
@@ -1103,7 +1480,7 @@ const OfferDetails = ({navigation, route}) => {
             setShowDown(false);
           }
         }}
-        scrollEventThrottle={100}>
+        scrollEventThrottle={8}>
         <SafeAreaView style={GlobalStyle1.mainContainerwhiteColor}>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -1223,7 +1600,7 @@ const OfferDetails = ({navigation, route}) => {
                   <View
                     style={{
                       alignItems: 'center',
-                      alignItems: 'center',
+
                       justifyContent: 'center',
                       backgroundColor: COLORS.colorPromo,
                       borderRadius: 100,
@@ -1396,7 +1773,7 @@ const OfferDetails = ({navigation, route}) => {
                   ? receivedData?.currency?.symbol
                   : ''}
                 {receivedData?.offer_value !== undefined
-                  ? ` ${receivedData?.offer_value}`
+                  ? ` ${receivedData?.offer_value}.0`
                   : ''}
                 {receivedData?.original_price !== undefined ? (
                   <Text
@@ -1412,7 +1789,7 @@ const OfferDetails = ({navigation, route}) => {
                       (receivedData?.currency?.symbol !== undefined
                         ? receivedData?.currency?.symbol
                         : '')}{' '}
-                    {receivedData?.original_price}
+                    {receivedData?.original_price}.0
                     {/* {' ' +
                       receivedData?.currency?.symbol +
                       '' +
@@ -1441,6 +1818,20 @@ const OfferDetails = ({navigation, route}) => {
               </Text>
             ) : null} */}
           </View>
+          {/* <Text>{generated}</Text>
+          <TouchableOpacity
+            style={{
+              borderRadius: 5, borderWidth: 1, width: '50%',
+              height: 50
+            }}
+            // onPress={() => {
+            //   Clipboard.setString(generated);
+            //   // onShare();
+            // }}
+            onPress={copyToClipboard}
+          >
+            <Text>Click here to copy to Clipboard</Text>
+          </TouchableOpacity> */}
 
           <Text
             style={[
@@ -1450,7 +1841,7 @@ const OfferDetails = ({navigation, route}) => {
                 marginTop: 20,
                 color: COLORS.black,
                 marginHorizontal: 28,
-                color: COLORS.black,
+
                 fontFamily: 'Montserrat-SemiBold',
                 // fontWeight:'bold'
               },
@@ -1606,7 +1997,7 @@ const OfferDetails = ({navigation, route}) => {
                 FONTS.h5,
                 {
                   marginTop: 15,
-                  color: COLORS.black,
+
                   marginBottom: 5,
                   marginHorizontal: 22,
 
@@ -1625,13 +2016,8 @@ const OfferDetails = ({navigation, route}) => {
               activeOpacity={0.8}
               style={{
                 flexDirection: 'row',
-                //alignItems: 'center',
-                paddingHorizontal: 22,
-
-                //width: '60%',
-                flexGrow: 1,
-
-                //  backgroundColor: 'pink',
+                marginHorizontal: 22,
+                width: '60%',
               }}>
               <MaterialCommunityIcons
                 name={'storefront-outline'}
@@ -1639,42 +2025,64 @@ const OfferDetails = ({navigation, route}) => {
                 color={COLORS.colorAccent}
                 style={{
                   marginTop: 5,
-                  //backgroundColor: 'red',
-                  //// alignItems: 'flex-start',
                   // marginStart: 15,
                 }}
               />
-              <View
-                style={{
-                  flexGrow: 1,
-                  alignItems: 'flex-start',
-                  flexDirection: 'row',
-                }}>
+              <View style={{}}>
                 <Text
-                  style={[
-                    GlobalStyle1.accentColorTextUnderline,
-                    {
-                      flex: 1,
-                      textAlign: 'left',
-                    },
-                  ]}>
+                  style={[GlobalStyle1.accentColorTextUnderline]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">
                   {receivedData?.store_name}
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      textAlignVertical: 'center',
-                      marginTop: 5,
-                      marginStart: 10,
-                      color: COLORS.shimmer_loading_color_darker,
-                      fontSize: 14,
-                      fontFamily: 'Montserrat-Medium',
-                      textDecorationStyle: 'dotted',
-                      textDecorationColor: COLORS.white,
-                    }}>
-                    {/* {'  '} {`\u25CF ${receivedData?.distance_km}`} km away */}
-                    {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
-                  </Text>
                 </Text>
+              </View>
+              <View>
+                {receivedData?.distance != null ? (
+                  receivedData?.distance >= 100 ? (
+                    <View style={{flex: 1}}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          textAlign: 'center',
+                          textAlignVertical: 'center',
+                          marginTop: 5,
+                          marginStart: 10,
+                          color: COLORS.shimmer_loading_color_darker,
+                          fontSize: 14,
+                          fontFamily: 'Montserrat-Medium',
+                          // maxWidth: '90%',
+                        }}>
+                        {/*{`\u25CF ${receivedData.distance_km}`} km away*/}
+                        {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
+                      </Text>
+                    </View>
+                  ) : receivedData?.distance < 100 ? (
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          textAlign: 'center',
+                          textAlignVertical: 'center',
+                          marginTop: 5,
+                          marginStart: 10,
+                          color: COLORS.shimmer_loading_color_darker,
+                          fontSize: 14,
+                          fontFamily: 'Montserrat-Medium',
+                          // maxWidth:'90%',
+                        }}>
+                        {/*{`\u25CF ${receivedData.distance_km}`} km away*/}
+                        {`\u25CF ${receivedData?.distance_km} ${receivedData?.distance_by}`}
+                      </Text>
+                    </View>
+                  ) : null
+                ) : null}
               </View>
             </TouchableOpacity>
             <Text
@@ -2014,19 +2422,13 @@ const OfferDetails = ({navigation, route}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              //backgroundColor: 'red',
             }}>
             <Entypofrom
               name="share"
               size={22}
               color={COLORS.colorAccent}
               style={{
-                //marginHorizontal: 15,
-                marginEnd: 5,
-                // justifyContent:'flex-end',
-                // alignContent:'flex-end',
-                //marginStart: 5,
-                //backgroundColor: 'red',
+                marginHorizontal: 15,
               }}
               onPress={() => {
                 const offerId = receivedData?.id_offer; // Replace with the actual offer's ID
@@ -2034,7 +2436,7 @@ const OfferDetails = ({navigation, route}) => {
                 const name = receivedData?.name;
 
                 // shareProduct(offerId);
-                //generateLink();
+
                 newShareOption(base64Data, offerId, short_description, name);
               }}
               // onPress={() => {
@@ -2047,7 +2449,7 @@ const OfferDetails = ({navigation, route}) => {
               size={22}
               color={COLORS.colorAccent}
               style={{
-                marginHorizontal: 15,
+                marginHorizontal: 5,
               }}
               onPress={() => {
                 if (userData?.id_user == null || '') {
@@ -2114,7 +2516,6 @@ const OfferDetails = ({navigation, route}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              // backgroundColor: 'red',
             }}>
             <Entypofrom
               name="share"
@@ -2224,7 +2625,7 @@ const OfferDetails = ({navigation, route}) => {
                   ? receivedData?.currency?.symbol +
                     '' +
                     receivedData?.offer_value +
-                    ''
+                    '.0 '
                   : null}
               </Text>
               {/* {receivedData?.original_price != null ? (

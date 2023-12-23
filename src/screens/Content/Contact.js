@@ -18,7 +18,7 @@ import {STRING} from '../../constants/String';
 
 const Contact = ({navigation}) => {
   return (
-    <View style={GlobalStyle.mainContainerwhiteColor}>
+    <SafeAreaView style={GlobalStyle.mainContainerwhiteColor}>
       <View style={GlobalStyle.Header}>
         <FontAwesome
           onPress={() => {
@@ -71,7 +71,7 @@ const Contact = ({navigation}) => {
         borderRadius={1}
         textSize={18}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -159,19 +159,16 @@ import RNFetchBlob from 'rn-fetch-blob';
 import crashlytics from '@react-native-firebase/crashlytics';
 // import RNFetchBlob from 'react-native-fetch-blob';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import {ShowConsoleLogMessage, ShowToastMessage} from '../../utils/Utility';
+import {ShowToastMessage} from '../../utils/Utility';
 import RNFS from 'react-native-fs';
 import notifee, {AndroidImportance} from '@notifee/react-native';
-import {
-  downloadFile,
-  getDownloadPermissionAndroid,
-} from '../../screens/Func/index';
+
 const InvoiceDetail = ({navigation, route}) => {
   const [webViewLoading, setWebViewLoading] = useState(true);
   const [downloaded, setisdownloaded] = useState(true);
   const showSpinner = () => setWebViewLoading(true);
   const hideSpinner = () => setWebViewLoading(false);
-  const fileUrl = 'https://www.africau.edu/images/default/sample.pdf';
+
   const permissionFunc = async () => {
     if (Platform.OS == 'ios') {
       createPDF();
@@ -203,7 +200,6 @@ const InvoiceDetail = ({navigation, route}) => {
     'window.ReactNativeWebView.postMessage(document.documentElement.innerHTML)';
 
   let {url} = route?.params;
-
   let {order_id} = route?.params;
 
   const [htmlData, setHtmlData] = useState('');
@@ -229,101 +225,69 @@ const InvoiceDetail = ({navigation, route}) => {
   // console.log(url);
 
   const createPDF = async () => {
-    if (Platform.OS == 'android') {
-      // try {
-      //   const {dirs} = RNFetchBlob.fs;
-      //   const path = RNFS.ExternalStorageDirectoryPath;
-      //   const dirToSave =
-      //     Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
-      //   let options = {
-      //     html: htmlData,
-      //     fileName: 'BOD_OrderID' + '_' + order_id,
-      //     directory: Platform.OS == 'ios' ? dirToSave : path,
-      //   };
-      //   let file = await RNHTMLtoPDF.convert(options);
-      //   const destinationPath = RNFS.DownloadDirectoryPath;
-      //   const FileName = 'BOD_OrderID' + '_' + order_id + '.pdf';
-      //   const destinationFile = destinationPath + '/' + FileName;
-      //   RNFS.copyFile(file.filePath, destinationFile)
-      //     .then(result => {
-      //       // Delete a file on the project path using RNFS.unlink
-      //       return (
-      //         RNFS.unlink(file.filePath)
-      //           .then(() => {
-      //             console.log('FILE DELETED');
-      //           })
-      //           // `unlink` will throw an error, if the item to unlink does not exist
-      //           .catch(err => {
-      //             console.log(err.message);
-      //           })
-      //       );
-      //     })
-      //     .catch(err => {
-      //       console.log('err', err);
-      //     });
-      //   // ShowToastMessage('File Downloaded Successfully');
-      //   Alert.alert(
-      //     'File Downloaded Successfully',
-      //  'File saved to : Downloads/BOD_OrderID' + '_' + order_id + '.pdf',
-      //   );
-      //   await DisplayNotification('show');
-      // } catch (err) {
-      //   crashlytics().recordError(err);
-      //   ShowToastMessage('Failed to download invoice');
-      // }
-    } else {
-      // const {dirs} = RNFetchBlob.fs;
-      const {config, fs} = RNFetchBlob;
-      // const dirToSave =
-      // Platform.OS == 'ios' ? dirs.DownloadDir : dirs.DownloadDir;
-      const cacheDir = fs.dirs.DocumentDir;
+    try {
+      const {dirs} = RNFetchBlob.fs;
+      const path = RNFS.ExternalStorageDirectoryPath;
+      const dirToSave =
+        Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
 
-      // Generate a unique filename for the downloaded image
-      //const filename = url.split('/').pop();
-      const filename = 'BOD_OrderID' + '_' + order_id + '';
-      const imagePath = `${cacheDir}/${filename}`;
-
-      ShowConsoleLogMessage('cache dir path -> ' + cacheDir);
       let options = {
         html: htmlData,
-        fileName: 'BOD_OrderID' + '_' + order_id + '',
-        //directory: imagePath,
-        directory: 'Documents',
+        fileName: 'BOD_OrderID' + '_' + order_id,
+        directory: path,
       };
 
       let file = await RNHTMLtoPDF.convert(options);
 
+      const destinationPath = RNFS.DownloadDirectoryPath;
+      // const FileName = 'BOD_OrderID_' + number + '_' + order_id + '.pdf';
+      const FileName = 'BOD_OrderID' + '_' + order_id + '.pdf';
+      const destinationFile = destinationPath + '/' + FileName;
+      RNFS.copyFile(file.filePath, destinationFile)
+        .then(result => {
+          // Delete a file on the project path using RNFS.unlink
+          return (
+            RNFS.unlink(file.filePath)
+              .then(() => {
+                console.log('FILE DELETED');
+              })
+              // `unlink` will throw an error, if the item to unlink does not exist
+              .catch(err => {
+                console.log(err.message);
+              })
+          );
+        })
+        .catch(err => {
+          console.log('err', err);
+        });
+      // ShowToastMessage('File Downloaded Successfully');
       Alert.alert(
         'File Downloaded Successfully',
-        'File saved BOD_OrderID' + '_' + order_id + '.pdf',
+        'File saved to : Downloads/BOD_OrderID' + '_' + order_id + '.pdf',
       );
+      // PushNotification.localNotificationSchedule({
+      //   channelId: 'Bunch_of_deals',
+      //   title: 'Invoice Downloaded.',
+      //   message:
+      //     'BOD_OrderID' +
+      //     '_' +
+      //     order_id +
+      //     '.pdf downloaded successfully and saved to downloads.',
+      //   date: new Date(Date.now() + 5 * 1000),
+      //   vibrate: true,
+      //   vibration: 300,
+      //   priority: 'high',
+      //   visibility: 'public',
+      //   importance: 'high',
+      //   playSound: true,
+      // });
       await DisplayNotification('show');
+    } catch (err) {
+      crashlytics().recordError(err);
+      console.log(err);
+
+      ShowToastMessage('Failed to download invoice');
     }
-  };
-  const downloadHistory = async () => {
-    const {config, fs} = RNFetchBlob;
-    let PictureDir = fs.dirs.DownloadDir;
-    let date = new Date();
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        //Related to the Android only
-        useDownloadManager: true,
-        notification: true,
-        path:
-          PictureDir +
-          '/Report_Download' +
-          Math.floor(date.getTime() + date.getSeconds() / 2),
-        description: 'Risk Report Download',
-      },
-    };
-    config(options)
-      .fetch('GET', url)
-      .then(res => {
-        //Showing alert after successful downloading
-        console.log('res -> ', JSON.stringify(res));
-        alert('Report Downloaded Successfully.');
-      });
   };
 
   const DisplayNotification = async remoteMessage => {
@@ -335,7 +299,11 @@ const InvoiceDetail = ({navigation, route}) => {
 
     await notifee.displayNotification({
       title: 'Invoice Downloaded.',
-      body: 'BOD_OrderID' + '_' + order_id + '.pdf downloaded successfully.',
+      body:
+        'BOD_OrderID' +
+        '_' +
+        order_id +
+        '.pdf downloaded successfully and saved to downloads.',
 
       android: {
         channelId: channelId,
@@ -351,7 +319,7 @@ const InvoiceDetail = ({navigation, route}) => {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
       }}>
@@ -416,14 +384,11 @@ const InvoiceDetail = ({navigation, route}) => {
         textColor={COLORS.white}
         onPress={() => {
           permissionFunc();
-          // downloadFile(fileUrl).then(res => {
-          //   RNFetchBlob.ios.previewDocument(res.path());
-          // });
         }}
         borderRadius={1}
         textSize={16}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

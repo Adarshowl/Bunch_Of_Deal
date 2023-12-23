@@ -1,7 +1,7 @@
 import crashlytics from '@react-native-firebase/crashlytics';
-import {useIsFocused} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -10,15 +10,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {StoreSkeleton} from '../../utils/Skeleton';
-import NoResultLogin from '../../utils/NoResultLogin';
+import { StoreSkeleton } from '../../utils/Skeleton';
+import NoResultLogin from '../../utils/NoResultLogin'
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {STRING} from '../../constants';
-import {COLORS} from '../../constants/Colors';
-import {FONTS} from '../../constants/themes';
+import { STRING } from '../../constants';
+import { COLORS } from '../../constants/Colors';
+import { FONTS } from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
-import {API_END_POINTS} from '../../network/ApiEndPoints';
+import { API_END_POINTS } from '../../network/ApiEndPoints';
 import GlobalStyle2 from '../../styles/GlobalStyle2';
 import NoResult from '../../utils/NoResult';
 import {
@@ -26,16 +26,16 @@ import {
   getSavedOfferAsString,
   isOfferSaved,
 } from '../../utils/RealmUtility';
-import {OfferSkeleton} from '../../utils/Skeleton';
-import {ShowConsoleLogMessage} from '../../utils/Utility';
+import { OfferSkeleton } from '../../utils/Skeleton';
+import { ShowConsoleLogMessage } from '../../utils/Utility';
 import OfferCardView from '../Offer/OfferCardView';
 import SearchDialog from '../Search';
 import PlacePickerLocation from '../Search/PlacePickerLocation';
 import PlaceChooseLocation from '../Search/PlaceChooseLocation';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const FavOffer = ({navigation, showHeader = false}) => {
+const FavOffer = ({ navigation, showHeader = false }) => {
   let userLat = useSelector(state => state?.state?.latitude);
   let userLong = useSelector(state => state?.state?.longitude);
 
@@ -56,6 +56,7 @@ const FavOffer = ({navigation, showHeader = false}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+
     const checkLoginStatus = async () => {
       const userData = await AsyncStorage.getItem('userData');
       if (userData) {
@@ -122,7 +123,7 @@ const FavOffer = ({navigation, showHeader = false}) => {
           'Error in get offer recent api call: ' + err.message,
         );
       })
-      .finally(() => {});
+      .finally(() => { });
   };
 
   useEffect(() => {
@@ -247,7 +248,7 @@ const FavOffer = ({navigation, showHeader = false}) => {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: COLORS.backgroundColor, flex: 1}}>
+    <SafeAreaView style={{ backgroundColor: COLORS.backgroundColor, flex: 1 }}>
       {showHeader == false ? (
         <View
           style={[
@@ -309,15 +310,19 @@ const FavOffer = ({navigation, showHeader = false}) => {
       )} */}
 
       {!isLoggedIn ? (
-        <View style={{flex: 1}}>
+
+        <View style={{ flex: 1 }}>
           <NoResultLogin onReloadBtn={ReloadLogin} />
         </View>
-      ) : !showError ? (
-        <FlatList
+      ) : (
+        !showError ? (
+          <FlatList
           data={recentData}
           extraData={recentData}
           ListEmptyComponent={() => {
-            return loading ? <OfferSkeleton /> : null;
+            return loading ? (
+              <OfferSkeleton />
+            ) : null;
             // <Text
             //   style={{
             //     flex: 1,
@@ -330,14 +335,15 @@ const FavOffer = ({navigation, showHeader = false}) => {
             //   No data found
             // </Text>
           }}
-          renderItem={({item}) => {
+          renderItem={({ item }) => {
             return <OfferCardView item={item} />;
           }}
-        />
-      ) : (
-        <View style={{flex: 1}}>
-          <NoResult onReloadBtn={onReloadBtn} />
-        </View>
+        />   
+        ) : (
+          <View style={{ flex: 1 }}>
+            <NoResult onReloadBtn={onReloadBtn} />
+          </View>
+        )
       )}
 
       {/* <NoResult onReloadBtn={onReloadBtn} /> */}

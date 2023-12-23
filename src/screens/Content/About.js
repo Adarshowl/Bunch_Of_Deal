@@ -9,7 +9,7 @@ import GlobalStyle2 from '../../styles/GlobalStyle2';
 
 const About = ({navigation}) => {
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       <View style={GlobalStyle2.headerFooterAbout}>
         <View
           style={{
@@ -71,7 +71,7 @@ const About = ({navigation}) => {
           contact@bunchofdeals.com.au
         </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

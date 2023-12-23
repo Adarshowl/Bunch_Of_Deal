@@ -26,7 +26,6 @@ import moment from 'moment';
 import crashlytics from '@react-native-firebase/crashlytics';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 
-
 import axios from 'axios';
 import qs from 'qs';
 import {decode, encode} from 'base-64';
@@ -1207,7 +1206,7 @@ const Order = ({navigation, route}) => {
             flexDirection: 'row',
             alignItems: 'center',
             position: 'absolute',
-            bottom: 0,
+            bottom: 30,
             right: 0,
             left: 0,
           }}>
@@ -1297,6 +1296,7 @@ const Order = ({navigation, route}) => {
                 alignItems: 'center',
                 alignContent: 'center',
                 flexDirection: 'row',
+                marginBottom: 30,
               }}>
               <AntDesign name="arrowleft" size={20} color={COLORS.white} />
             </TouchableOpacity>
@@ -1332,6 +1332,7 @@ const Order = ({navigation, route}) => {
               alignItems: 'center',
               alignContent: 'center',
               flexDirection: 'row',
+              marginBottom: 30,
             }}>
             {changeOne ? (
               <Text

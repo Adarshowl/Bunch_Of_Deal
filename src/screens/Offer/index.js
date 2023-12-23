@@ -3,15 +3,11 @@ import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {FlatList, SafeAreaView, StyleSheet, View} from 'react-native';
 import TimeZone from 'react-native-timezone';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {icons, STRING} from '../../constants';
+import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
-import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
-import BunchDealImageText from '../../utils/BunchDealImageText';
-import BunchDealVectorIconText from '../../utils/BunchDealVectorIconText';
 import NoResult from '../../utils/NoResult';
 import {OfferSkeleton} from '../../utils/Skeleton';
 import {ShowConsoleLogMessage} from '../../utils/Utility';
@@ -29,6 +25,8 @@ const Offer = ({
 }) => {
   let userLat = useSelector(state => state?.state?.latitude);
   let userLong = useSelector(state => state?.state?.longitude);
+
+  // ShowConsoleLogMessage(userLat + ' /// ' + userLong);
 
   const [percent, setPercent] = useState(true);
   const [storeFront, setStoreFront] = useState(false);
@@ -158,8 +156,8 @@ const Offer = ({
       // location: location,
       location: '',
       category_id: catId,
-      //radius: changeRadius ? radius + '' : '',
-      radius: radius + '' ,
+      // radius: changeRadius ? radius + '' : '',
+      radius: radius + '',
       date: moment().format('yyyy-MM-dd H:m:s'),
       timezone: timeZone,
     };
@@ -172,7 +170,7 @@ const Offer = ({
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+        ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
         // console.log("ofereeeerrrrrrrr",response.data)
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
@@ -278,12 +276,33 @@ const Offer = ({
 
   const onReloadBtn = () => {
     getOfferList('rest');
+    // navigation.navigate('Order', {
+    //   item: {},
+    //   count: 1,
+    //   originalPrice: '5.00',
+    //   order_amount: '5.00',
+    //   price: '5.00',
+    //   telephone: '1234567890',
+    // });
   };
 
   const getOfferList = val => {
+    // let body = {
+    //   latitude: userLat + '',
+    //   longitude: userLong + '',
+    //   order_by: 'recent',
+    //   offer_ids: '0',
+    //   token: STRING.FCM_TOKEN,
+    //   mac_adr: STRING.MAC_ADR,
+    //   limit: '30',
+    //   page: '1',
+    //   search: '',
+    //   date: moment().format('yyyy-MM-dd H:m:s'),
+    //   timezone: timeZone,
+    // };
     let body = {
-      latitude: userLat,
-      longitude: userLong,
+      latitude: userLat + '',
+      longitude: userLong + '',
       order_by: 'nearby',
       offer_ids: '0',
       token: STRING.FCM_TOKEN,
@@ -291,17 +310,23 @@ const Offer = ({
       limit: '30',
       page: '1',
       search: '',
-      date: moment().format('yyyy-MM-dd H:m:s'),
+      date: moment().format('yyyy-MM-ddd HH:mm:ss'),
       timezone: timeZone,
     };
 
-     ShowConsoleLogMessage('normal request -> ' + JSON.stringify(body));
+    // ShowConsoleLogMessage('normal request Shubham -> ' + JSON.stringify(body));
+    // ShowConsoleLogMessage(
+    //   'normal request API Shubham  -> ' + API_END_POINTS.API_GET_OFFERS,
+    // );
+    // ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
     ApiCall('post', body, API_END_POINTS.API_GET_OFFERS, {
       Accept: 'application/json',
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        // ShowConsoleLogMessage('response 0> ' + JSON.stringify(response?.data));
+        // ShowConsoleLogMessage(
+        //   'response 0>  Shubham ' + JSON.stringify(response),
+        // );
         if (response?.data?.success == 1) {
           // ShowConsoleLogMessage(JSON.stringify(response?.data?.success));
           let result = Object.values(response.data?.result);
@@ -447,7 +472,6 @@ const Offer = ({
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
-        console.log('Offer Response Arun' + JSON.stringify(response));
         if (response?.data?.success === 1) {
           let result = Object.values(response.data?.result);
 
@@ -483,69 +507,68 @@ const Offer = ({
   };
 
   return (
-    <View style={GlobalStyle.mainContainerBgColor}>
-   
-      {/* <View
-        style={[
-          GlobalStyle.commonToolbarBG,
-          {
-            justifyContent: 'space-around',
-            height: 45,
-          },
-        ]}>
-        <BunchDealImageText
-          source={icons.ic_calendar}
-          text={STRING.recent}
-          textStyle={[
-            FONTS.h6,
-            {
-              color: percent
-                ? COLORS.colorAccent
-                : COLORS.shimmer_loading_color,
-              marginStart: 10,
-            },
-          ]}
-          style={[
-            {
-              tintColor: percent
-                ? COLORS.colorAccent
-                : COLORS.shimmer_loading_color,
-            },
-            GlobalStyle.homeTabImageStyle,
-          ]}
-          wrapperStyle={styles.wrapperStyle}
-          onPress={() => {
-            setPercent(true);
-            setStoreFront(false);
-            setIsNearby(false);
-            getOfferList('recent');
-          }}
-        />
-        <BunchDealVectorIconText
-          title={Ionicons}
-          name={'location-sharp'}
-          color={storeFront ? COLORS.colorAccent : COLORS.shimmer_loading_color}
-          size={20}
-          style={GlobalStyle.marginHorizontal5}
-          source={icons.ic_storefront}
-          text={STRING.nearby}
-          textStyle={[
-            FONTS.h6,
-            {
-              color: storeFront
-                ? COLORS.colorAccent
-                : COLORS.shimmer_loading_color,
-            },
-          ]}
-          wrapperStyle={styles.wrapperStyle}
-          onPress={() => {
-            setPercent(false);
-            setIsNearby(true);
-            setStoreFront(true);
-            getNearbyList('nearby');
-          }}
-        />
-      </View> */}
+    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
+      {/*<View*/}
+      {/*  style={[*/}
+      {/*    GlobalStyle.commonToolbarBG,*/}
+      {/*    {*/}
+      {/*      justifyContent: 'space-around',*/}
+      {/*      height: 45,*/}
+      {/*    },*/}
+      {/*  ]}>*/}
+      {/*  <BunchDealImageText*/}
+      {/*    source={icons.ic_calendar}*/}
+      {/*    text={STRING.recent}*/}
+      {/*    textStyle={[*/}
+      {/*      FONTS.h6,*/}
+      {/*      {*/}
+      {/*        color: percent*/}
+      {/*          ? COLORS.colorAccent*/}
+      {/*          : COLORS.shimmer_loading_color,*/}
+      {/*        marginStart: 10,*/}
+      {/*      },*/}
+      {/*    ]}*/}
+      {/*    style={[*/}
+      {/*      {*/}
+      {/*        tintColor: percent*/}
+      {/*          ? COLORS.colorAccent*/}
+      {/*          : COLORS.shimmer_loading_color,*/}
+      {/*      },*/}
+      {/*      GlobalStyle.homeTabImageStyle,*/}
+      {/*    ]}*/}
+      {/*    wrapperStyle={styles.wrapperStyle}*/}
+      {/*    onPress={() => {*/}
+      {/*      setPercent(true);*/}
+      {/*      setStoreFront(false);*/}
+      {/*      setIsNearby(false);*/}
+      {/*      getOfferList('nearby');*/}
+      {/*    }}*/}
+      {/*  />*/}
+      {/*  <BunchDealVectorIconText*/}
+      {/*    title={Ionicons}*/}
+      {/*    name={'location-sharp'}*/}
+      {/*    color={storeFront ? COLORS.colorAccent : COLORS.shimmer_loading_color}*/}
+      {/*    size={20}*/}
+      {/*    style={GlobalStyle.marginHorizontal5}*/}
+      {/*    source={icons.ic_storefront}*/}
+      {/*    text={STRING.nearby}*/}
+      {/*    textStyle={[*/}
+      {/*      FONTS.h6,*/}
+      {/*      {*/}
+      {/*        color: storeFront*/}
+      {/*          ? COLORS.colorAccent*/}
+      {/*          : COLORS.shimmer_loading_color,*/}
+      {/*      },*/}
+      {/*    ]}*/}
+      {/*    wrapperStyle={styles.wrapperStyle}*/}
+      {/*    onPress={() => {*/}
+      {/*      setPercent(false);*/}
+      {/*      setIsNearby(true);*/}
+      {/*      setStoreFront(true);*/}
+      {/*      getNearbyList('nearby');*/}
+      {/*    }}*/}
+      {/*  />*/}
+      {/*</View>*/}
       {percent ? (
         <View
           style={{
@@ -578,8 +601,8 @@ const Offer = ({
                 backgroundColor: COLORS.lightGrey,
                 marginBottom: 15,
               }}
-              renderItem={({item}) => {
-                return <OfferCardView item={item} />;
+              renderItem={({item, index}) => {
+                return <OfferCardView item={item} index={index} />;
               }}
             />
           ) : (
@@ -629,7 +652,7 @@ const Offer = ({
           )}
         </View>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 

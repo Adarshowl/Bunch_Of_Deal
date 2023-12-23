@@ -10,13 +10,12 @@ import {
   View,
 } from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
-import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {STRING} from '../../constants';
 import {COLORS} from '../../constants/Colors';
-import {FONTS, SIZES} from '../../constants/themes';
+import {FONTS} from '../../constants/themes';
 import ApiCall from '../../network/ApiCall';
 import {API_END_POINTS} from '../../network/ApiEndPoints';
 import GlobalStyle from '../../styles/GlobalStyle';
@@ -30,6 +29,7 @@ import Store from '../Store';
 import {useIsFocused} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 
 const Home = ({navigation, toolbarTitle}) => {
   // const navigation = useNavigation();
@@ -43,68 +43,64 @@ const Home = ({navigation, toolbarTitle}) => {
     }
   };
 
-  useIsFocused(
-    React.useCallback(() => {
-      let isActive = true;
-      const fetchUser = async () => {
-        await AsyncStorage.getItem('notification', async (error, value) => {
-          if (error) {
-          } else {
-            if (value !== null) {
-              let temp = JSON.parse(value);
-              console.warn('aaaaaaaa', JSON.stringify(temp));
-              // let temp = JSON.parse(value);
-              ShowConsoleLogMessage(
-                'notification home page -> ' + JSON.stringify(temp),
+  useEffect(() => {
+    let isActive = true;
+    const fetchUser = async () => {
+      await AsyncStorage.getItem('notification', async (error, value) => {
+        ShowConsoleLogMessage(
+          'notification home page -> ' + JSON.stringify(value),
+        );
+        if (error) {
+        } else {
+          if (value !== null) {
+            let temp = JSON.parse(value);
+            // let temp = JSON.parse(value);
 
-                // JSON.stringify(temp?.data?.module_name),
+            // "data":{"module_name":"offer","cam_id":"199","module_id":"111"}
+            if (temp?.data?.module_name == 'store') {
+              //   4
+              // ShowConsoleLogMessage('notification home page if -> ' + value);
+              ShowConsoleLogMessage(
+                'notification home page else if -> ' +
+                  temp?.data?.module_id +
+                  ' *** ' +
+                  temp?.data?.cam_id,
               );
-              // "data":{"module_name":"offer","cam_id":"199","module_id":"111"}
-              if (temp?.data?.module_name == 'store') {
-                //   4
-                // ShowConsoleLogMessage('notification home page if -> ' + value);
-                ShowConsoleLogMessage(
-                  'notification home page else if -> ' +
-                    temp?.data?.module_id +
-                    ' *** ' +
-                    temp?.data?.cam_id,
-                );
-                navigation.navigate('StoreDetails', {
-                  item: {
-                    store_id: temp?.data?.module_id,
-                    // store_id: 4 + '',
-                    intentFromNotification: true,
-                    cid: temp?.data?.cam_id || '',
-                  },
-                });
-              } else if (temp?.data?.module_name == 'offer') {
-                //   107
-                ShowConsoleLogMessage(
-                  'notification home page else if -> ' +
-                    temp?.data?.module_id +
-                    ' *** ' +
-                    temp?.data?.cam_id,
-                );
-                navigation.navigate('OfferDetails', {
-                  item: {
-                    id_offer: temp?.data?.module_id,
-                    intentFromNotification: true,
-                    cid: temp?.data?.cam_id || '',
-                  },
-                });
-              }
-            } else {
-              ShowConsoleLogMessage('notification home page else -> ' + value);
+              navigation.navigate('StoreDetails', {
+                item: {
+                  store_id: temp?.data?.module_id,
+                  // store_id: 4 + '',
+                  intentFromNotification: true,
+                  cid: temp?.data?.cam_id || '',
+                },
+              });
+            } else if (temp?.data?.module_name == 'offer') {
+              //   107
+              ShowConsoleLogMessage(
+                'notification home page else if -> ' +
+                  temp?.data?.module_id +
+                  ' *** ' +
+                  temp?.data?.cam_id,
+              );
+              navigation.navigate('OfferDetails', {
+                item: {
+                  id_offer: temp?.data?.module_id,
+                  intentFromNotification: true,
+                  cid: temp?.data?.cam_id || '',
+                },
+              });
             }
+          } else {
+            ShowConsoleLogMessage('notification home page else -> ' + value);
           }
-        });
-      };
-      fetchUser();
-      return () => {
-        isActive = false;
-      };
-    }, []),
-  );
+        }
+      });
+    };
+    // fetchUser();
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   // useEffect(() => {
   //   // Register event listener for notification clicks
@@ -281,23 +277,16 @@ const Home = ({navigation, toolbarTitle}) => {
     setShowSearchModal(!showSearchModal);
   };
   const closePlacePickModal = () => {
-    // if (showPlaceChooseModal) {
-    //   setShowSearchModal(!showSearchModal);
-    //   setShowPlaceChooseModal(false);
-    // }
-    setShowPlacePickModal(false);
-    setShowPlaceChooseModal(false);
-    setShowSearchModal(true);
+    if (showPlaceChooseModal) {
+      setShowSearchModal(!showSearchModal);
+      setShowPlaceChooseModal(false);
+    }
+    setShowPlacePickModal(!showPlacePickModal);
+    setShowSearchModal(!showSearchModal);
   };
   const closePlaceChooseModal = () => {
     setShowPlaceChooseModal(!showPlaceChooseModal);
-  };
-
-  const closePlaceChooseModalRequestClose = () => {
-    setShowPlaceChooseModal(false);
-
-    setShowSearchModal(false);
-    setShowPlacePickModal(!showPlacePickModal);
+    // setShowSearchModal(!showSearchModal);
   };
 
   const [update, setUpdate] = useState(false);
@@ -320,9 +309,32 @@ const Home = ({navigation, toolbarTitle}) => {
   const [userData, setUserData] = useState({});
 
   useEffect(() => {
+    // DisplayNotification('were');
     getUserFromStorage();
   }, []);
+  const DisplayNotification = async remoteMessage => {
+    const channelId = await notifee.createChannel({
+      id: 'BUNCH_OF_DEALS',
+      name: 'BUNCH_OF_DEALS',
+      importance: AndroidImportance.HIGH,
+    });
 
+    await notifee.displayNotification({
+      title: 'Invoice Downloaded.',
+      body: 'BOD_OrderID',
+
+      android: {
+        channelId: channelId,
+        loopSound: false,
+        sound: 'default',
+        smallIcon: 'ic_launcher_full_latest',
+      },
+    });
+
+    notifee.onBackgroundEvent(event => {
+      console.log('on background event notifee -=> ' + JSON.stringify(event));
+    });
+  };
   const getUserFromStorage = async () => {
     try {
       await AsyncStorage.getItem(STRING.isFirstTime, async (error, value) => {
@@ -345,7 +357,7 @@ const Home = ({navigation, toolbarTitle}) => {
           if (value !== null) {
             // ShowConsoleLogMessage(value);
             setUserData(JSON.parse(value));
-            getNotificationCount(JSON.parse(value)?.user_id); // for now using static
+            // getNotificationCount(JSON.parse(value)?.id_user); // for now using static
           } else {
           }
         }
@@ -357,40 +369,6 @@ const Home = ({navigation, toolbarTitle}) => {
     }
   };
 
-  // useFocusEffect(() => {
-  // (async () => {
-  //   await AsyncStorage.getItem('userData', (error, value) => {
-  //     if (error) {
-  //     } else {
-  //       if (value !== null) {
-  //         ShowConsoleLogMessage("called on focus");
-  //         setUserData(JSON.parse(value));
-  //         // getNotificationCount(JSON.parse(value)?.user_id); // for now using static
-  //       } else {
-  //       }
-  //     }
-  //   });
-  // })()
-  // })
-
-  // useEffect(() => {
-  //   if (isFocused) {
-  //     (async () => {
-  //       await AsyncStorage.getItem('userData', (error, value) => {
-  //         if (error) {
-  //         } else {
-  //           if (value !== null) {
-  //             ShowConsoleLogMessage("called on focus");
-  //             // setUserData(JSON.parse(value));
-  //             getNotificationCount(JSON.parse(value)?.id_user); // for now using static
-  //           } else {
-  //           }
-  //         }
-  //       });
-  //     })()
-  //   }
-  // }, [isFocused])
-
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {
@@ -399,7 +377,6 @@ const Home = ({navigation, toolbarTitle}) => {
           if (error) {
           } else {
             if (value !== null) {
-              ShowConsoleLogMessage('called on focus');
               // setUserData(JSON.parse(value));
               getNotificationCount(JSON.parse(value)?.id_user); // for now using static
             } else {
@@ -497,6 +474,10 @@ const Home = ({navigation, toolbarTitle}) => {
       'Content-Type': 'multipart/form-data',
     })
       .then(response => {
+        // console.log(
+        //   'ERROR IN GET Notification List 4 res=> Shubham ',
+        //   JSON.stringify(response),
+        // );
         if (response?.data?.status == 1) {
           let count = 0;
           let result = Object.values(response?.data?.result);
@@ -506,7 +487,6 @@ const Home = ({navigation, toolbarTitle}) => {
             }
           });
 
-          console.log('mm', count);
           setNotificationCount(count);
         } else {
           setNotificationCount(0);
@@ -523,12 +503,11 @@ const Home = ({navigation, toolbarTitle}) => {
 
         //   // Only update the count if there are notifications
         //   if (count > 0) {
-        //     console.log('mmnn', count);
+        //     console.log("mmnn", count);
         //     setNotificationCount(count);
         //   } else {
         //     setNotificationCount(0); // No notifications, set count to 0
         //   }
-        // }
       })
       .catch(err => {
         crashlytics().recordError(err);
@@ -573,7 +552,7 @@ const Home = ({navigation, toolbarTitle}) => {
           alignItems: 'center',
           // backgroundColor: 'rgba(0,0,0,0.5)',
         }}>
-        <View
+        <SafeAreaView
           style={{
             flex: 1,
             alignItems: 'center',
@@ -584,13 +563,12 @@ const Home = ({navigation, toolbarTitle}) => {
           }}>
           <View
             style={{
-              width: SIZES.width - 35,
+              width: 340,
               // height: 170,
               backgroundColor: COLORS.white,
-              // elevation: 20,
+              elevation: 20,
               alignSelf: 'center',
-              // marginVertical: 320,
-              paddingBottom: 10,
+              marginVertical: 320,
             }}>
             <View
               style={{
@@ -610,7 +588,12 @@ const Home = ({navigation, toolbarTitle}) => {
                 Privacy & Policy
               </Text>
             </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                // backgroundColor: 'red',
+              }}>
               <Text
                 style={[
                   FONTS.body4,
@@ -620,8 +603,8 @@ const Home = ({navigation, toolbarTitle}) => {
                     paddingHorizontal: 3,
                   },
                 ]}>
-                By using this App you agree to be bound by the Terms &
-                Conditions and Privacy Policy
+                By using this App you agree to be bound by the Terms Conditions
+                and Privacy Policy
               </Text>
             </View>
             <View
@@ -630,6 +613,7 @@ const Home = ({navigation, toolbarTitle}) => {
                 alignSelf: 'flex-end',
                 marginTop: 30,
                 marginHorizontal: 20,
+                marginBottom: 15,
               }}>
               <Text
                 onPress={async () => {
@@ -641,12 +625,7 @@ const Home = ({navigation, toolbarTitle}) => {
                 }}
                 style={[
                   FONTS.body4,
-                  {
-                    color: COLORS.colorPrimary,
-                    marginHorizontal: 20,
-
-                    paddingBottom: 5,
-                  },
+                  {color: COLORS.colorPrimary, marginHorizontal: 20},
                 ]}>
                 DECLINE
               </Text>
@@ -656,38 +635,35 @@ const Home = ({navigation, toolbarTitle}) => {
                   setRecentData('');
                   closeFilterModal();
                 }}
-                style={[
-                  FONTS.body4,
-                  {color: COLORS.colorPrimary, paddingBottom: 5},
-                ]}>
+                style={[FONTS.body4, {color: COLORS.colorPrimary}]}>
                 ACCEPT
               </Text>
             </View>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
     );
   };
   // code for privacy popup end
 
   return (
-    <View style={GlobalStyle.mainContainerBgColor}>
+    <SafeAreaView style={GlobalStyle.mainContainerBgColor}>
       <View style={GlobalStyle.commonToolbarBG}>
-        <BunchDealVectorIcon
-          title={Entypo}
-          name={'menu'}
-          color={COLORS.colorPrimary}
-          size={25}
-          style={GlobalStyle.marginHorizontal15}
-          onPress={() => {
-            navigation.toggleDrawer();
-          }}
-        />
+        {/*<BunchDealVectorIcon*/}
+        {/*  title={Entypo}*/}
+        {/*  name={'menu'}*/}
+        {/*  color={COLORS.colorPrimary}*/}
+        {/*  size={25}*/}
+        {/*  style={GlobalStyle.marginHorizontal15}*/}
+        {/*  onPress={() => {*/}
+        {/*    navigation.toggleDrawer();*/}
+        {/*  }}*/}
+        {/*/>*/}
         {/* <Button title="Test Crash" onPress={() => crashlytics().crash()} /> */}
         {/* <BunchDealCommonToolBar title={toolbarTitle} /> */}
         <View
           style={[
-            GlobalStyle.commonToolbarBG,
+            // GlobalStyle.commonToolbarBG,
             {
               justifyContent: 'space-between',
               // height: 45,
@@ -715,9 +691,9 @@ const Home = ({navigation, toolbarTitle}) => {
               activeOpacity={0.8}
               style={{
                 flexGrow: 1,
-                height: 60,
-                alignItems: 'center',
+                // height: 60,
                 justifyContent: 'center',
+                alignItems: 'center',
                 marginStart: 10,
               }}
               onPress={() => {
@@ -743,7 +719,7 @@ const Home = ({navigation, toolbarTitle}) => {
             <View
               style={{
                 backgroundColor: COLORS.lightGrey,
-                height: 40,
+                // height: 40,
                 width: 0.5,
               }}
             />
@@ -751,7 +727,7 @@ const Home = ({navigation, toolbarTitle}) => {
               activeOpacity={0.8}
               style={{
                 flexGrow: 1,
-                height: 60,
+                // height: 60,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginEnd: 10,
@@ -789,11 +765,7 @@ const Home = ({navigation, toolbarTitle}) => {
               name={'search'}
               color={COLORS.colorPrimary}
               size={18}
-              style={[
-                GlobalStyle.marginHorizontal10,
-                GlobalStyle.paddingHorizontal10,
-                GlobalStyle.paddingVertical10,
-              ]}
+              style={GlobalStyle.marginHorizontal10}
               onPress={() => {
                 // ShowToastMessage('Coming soon!');
                 setSearchText('');
@@ -893,6 +865,21 @@ const Home = ({navigation, toolbarTitle}) => {
       <SearchDialog
         show={showSearchModal}
         onPress={handleSearch}
+        // onPress={
+        //   // percent ?handleSearchButtonClick  : handleStoreSearchButtonClick
+        //   () => {
+        //     console.log(changeTabOne + " ----------- changeTabTwo --  " + changeTabTwo)
+        //     if (changeTabOne) {
+        //       setPercent(true)
+        //       setStoreFront(false)
+        //       handleSearchButtonClick()
+        //     } else if (changeTabTwo) {
+        //       setPercent(false)
+        //       setStoreFront(true)
+        //       handleStoreSearchButtonClick()
+        //     }
+        //   }
+        // }
         title={percent ? 'offers' : 'stores'}
         onRequestClose={closeSearchModal}
         searchText={searchText}
@@ -901,9 +888,15 @@ const Home = ({navigation, toolbarTitle}) => {
         }}
         onCurrentLocationPress={() => {
           closeSearchModal();
+          closePlacePickModal();
           closePlaceChooseModal();
         }}
-        selectedTab={changeTabOne ? 1 : 2}
+        // onSearchSelection={(isPercentSelected) => {
+        //   setPercent(isPercentSelected);
+        //   setStoreFront(!isPercentSelected);
+        //   // updateToolbarTitle(isPercentSelected ? 'Offers' : 'Stores'); // Update toolbarTitle
+        // }}
+        selectedTab={changeTabOne ? 1 : 2} // Pass the selected tab state as a prop
         handleTabChange={handleTabChange}
         onChangeRadius={val => {
           setChangeRadius(true);
@@ -919,17 +912,19 @@ const Home = ({navigation, toolbarTitle}) => {
       <PlacePickerLocation
         navigation={navigation}
         onRequestClose={closePlacePickModal}
+        // onChangeLocation={closePlacePickModal}
+
         show={showPlacePickModal}
       />
 
       <PlaceChooseLocation
         navigation={navigation}
-        onRequestClose={closePlaceChooseModalRequestClose}
+        onRequestClose={closePlaceChooseModal}
         onChangeLocation={closePlacePickModal}
         show={showPlaceChooseModal}
       />
-      {/* {renderFilterModal()} */}
-    </View>
+      {renderFilterModal()}
+    </SafeAreaView>
   );
 };
 

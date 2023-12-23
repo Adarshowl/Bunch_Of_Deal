@@ -81,11 +81,11 @@
 //   GET_PAYMENT_LINK: `${BASE_URL}/order_payment/get_payment_link`,
 //   LINK_CALL: `${BASE_URL}/order_payment/link_call`,
 // };
-// export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP_CLONE/index.php';
 export const CLONE_BASE_URL = 'https://bunchofdeals.com.au/APP/index.php';
 // export const CLONE_BASE_URL =
 //   'https://bunchofdeals.com.au/backup/APP/index.php';
 export const BASE_URL = 'https://bunchofdeals.com.au/APP/index.php';
+// https://bunchofdeals.com.au/APP/index.php/api/user/verifygoogleplus
 
 export const API = '/api/';
 export const API_VERSION = '/1.0/';
@@ -101,8 +101,6 @@ export const API_END_POINTS = {
 
   API_SAVE_STORE: CLONE_BASE_URL + API + 'store/saveStore',
   API_REMOVE_STORE: CLONE_BASE_URL + API + 'store/removeStore',
-
-  API_GET_FAV_STORE_OFFER: CLONE_BASE_URL + API + 'offer/getofferbook',
 
   //event API's
   API_USER_GET_EVENTS: CLONE_BASE_URL + API + 'event/getEvents',
@@ -121,7 +119,13 @@ export const API_END_POINTS = {
   API_FACEBOOK_SIGNUP: CLONE_BASE_URL + API + 'user/verifyfacebook',
 
   // https://bunchofdeals.com.au/APP/index.php/api/user/verifygoogleplus
+  //https://bunchofdeals.com.au/APP/index.php/user/Api/signupIphoneforApple
+  //https://bunchofdeals.com.au/APP/index.php
   API_GOOGLE_SIGNUP: CLONE_BASE_URL + API + 'user/verifygoogleplus',
+
+  API_APPLE_SIGNUP:
+    'https://bunchofdeals.com.au/APP/index.php/user/Api/signupIphoneforApple',
+
   API_USER_CHECK_CONNECTION: CLONE_BASE_URL + API + 'user/checkUserConnection',
   API_BLOCK_USER: CLONE_BASE_URL + API + 'user/blockUser',
   API_GET_USERS: CLONE_BASE_URL + API + 'user/getUsers',
@@ -143,7 +147,7 @@ export const API_END_POINTS = {
   API_GET_OFFERS: CLONE_BASE_URL + API + 'offer/getOffers',
   API_SAVE_OFFER: CLONE_BASE_URL + API + 'offer/saveOffer',
   API_REMOVE_OFFER: CLONE_BASE_URL + API + 'offer/removeOffer',
-
+  API_GET_FAV_STORE_OFFER: CLONE_BASE_URL + API + 'offer/getofferbook',
   //campaign API's
   API_MARK_VIEW: CLONE_BASE_URL + API + 'campaign/markView',
   API_MARK_RECEIVE: CLONE_BASE_URL + API + 'campaign/markReceive',
@@ -179,3 +183,7 @@ export const API_END_POINTS = {
   PRIVACY_POLICY_URL: 'https://bunchofdeals.com.au/privacypolicy.php',
 };
 //
+/**
+ *
+
+ */
