@@ -162,6 +162,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import {ShowToastMessage} from '../../utils/Utility';
 import RNFS from 'react-native-fs';
 import notifee, {AndroidImportance} from '@notifee/react-native';
+import moment from 'moment';
 
 const InvoiceDetail = ({navigation, route}) => {
   const [webViewLoading, setWebViewLoading] = useState(true);
@@ -227,10 +228,14 @@ const InvoiceDetail = ({navigation, route}) => {
   const createPDF = async () => {
     try {
       const {dirs} = RNFetchBlob.fs;
-      const path = RNFS.ExternalStorageDirectoryPath;
+      // const path = RNFS.ExternalStorageDirectoryPath;
+      const path =
+        Platform.OS === 'ios' ? dirs.DocumentDir : dirs.ExternalStorageDir;
+
       const dirToSave =
         Platform.OS == 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
 
+      console.log('Path Inovie ==== ', path);
       let options = {
         html: htmlData,
         fileName: 'BOD_OrderID' + '_' + order_id,
@@ -239,27 +244,74 @@ const InvoiceDetail = ({navigation, route}) => {
 
       let file = await RNHTMLtoPDF.convert(options);
 
-      const destinationPath = RNFS.DownloadDirectoryPath;
+      console.log('Generated PDF Path:', file.filePath);
+
+      // const destinationPath = RNFS.DownloadDirectoryPath;
+      const destinationPath =
+        Platform.OS === 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
+      console.log('destinationFile ==== ', destinationPath);
+      // await RNFS.copyFile(file.filePath, destinationFile);
       // const FileName = 'BOD_OrderID_' + number + '_' + order_id + '.pdf';
       const FileName = 'BOD_OrderID' + '_' + order_id + '.pdf';
       const destinationFile = destinationPath + '/' + FileName;
-      RNFS.copyFile(file.filePath, destinationFile)
-        .then(result => {
-          // Delete a file on the project path using RNFS.unlink
-          return (
-            RNFS.unlink(file.filePath)
-              .then(() => {
-                console.log('FILE DELETED');
-              })
-              // `unlink` will throw an error, if the item to unlink does not exist
-              .catch(err => {
-                console.log(err.message);
-              })
-          );
-        })
-        .catch(err => {
-          console.log('err', err);
-        });
+
+      // RNFS.copyFile(file.filePath, destinationFile)
+      //   .then(result => {
+      //     // Delete a file on the project path using RNFS.unlink
+      //     return (
+      //       RNFS.unlink(file.filePath)
+      //         .then(() => {
+      //           console.log('FILE DELETED');
+      //         })
+      //         // `unlink` will throw an error, if the item to unlink does not exist
+      //         .catch(err => {
+      //           console.log(err.message);
+      //         })
+      //     );
+      //   })
+      //   .catch(err => {
+      //     console.log('err.....', err);
+      //   });
+
+      // const fileExists = await RNFS.exists(file.filePath);
+
+      // if (fileExists) {
+      //   await RNFS.copyFile(file.filePath, destinationFile);
+      //   console.log('File copied successfully to:', destinationFile);
+
+      //   await RNFS.unlink(file.filePath);
+      //   console.log('Original file deleted successfully');
+      // } else {
+      //   console.log('File does not exist:', file.filePath);
+      // }
+
+      const fileExists = await RNFS.exists(file.filePath);
+
+      if (fileExists) {
+        // Check if the destination file already exists
+        const destinationFileExists = await RNFS.exists(destinationFile);
+
+        // If the destination file already exists, append a timestamp to the file name
+        if (destinationFileExists) {
+          const timestamp = moment().format('YYYYMMDD_HHmmss');
+          const newFileName = `BOD_OrderID_${order_id}_${timestamp}.pdf`;
+          const newDestinationFile = destinationPath + '/' + newFileName;
+
+          await RNFS.copyFile(file.filePath, newDestinationFile);
+          console.log('File copied successfully to:', newDestinationFile);
+        } else {
+          // If the destination file does not exist, proceed with the regular copy operation
+          await RNFS.copyFile(file.filePath, destinationFile);
+          console.log('File copied successfully to:', destinationFile);
+        }
+
+        // Delete the original file
+        await RNFS.unlink(file.filePath);
+        console.log('Original file deleted successfully');
+      } else {
+        console.log('File does not exist:', file.filePath);
+      }
+
       // ShowToastMessage('File Downloaded Successfully');
       Alert.alert(
         'File Downloaded Successfully',

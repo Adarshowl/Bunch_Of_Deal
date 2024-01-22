@@ -691,7 +691,7 @@ const Login = ({navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 Linking.openURL(
-                  'https://bunchofdeals.com.au/terms&services.php',
+                  'https://bunchofdeals.com.au/terms&services_ios.php',
                 );
               }}>
               <Text
@@ -726,7 +726,7 @@ const Login = ({navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 Linking.openURL(
-                  'https://bunchofdeals.com.au/privacypolicy.php',
+                  'https://bunchofdeals.com.au/privacypolicy_ios.php',
                 );
               }}>
               <Text

@@ -13,6 +13,7 @@ import {
   StatusBar,
   Alert,
   Platform,
+  AppRegistry,
 } from 'react-native';
 import {COLORS} from './src/constants/Colors';
 import {requestUserPermission} from './src/firebase/notificationService';
@@ -32,6 +33,9 @@ import OfferDetails from './src/screens/Offer/OfferDetails';
 import configureStore from './src/redux/store/configureStore';
 import {Provider} from 'react-redux';
 import {ShowConsoleLogMessage} from './src/utils/Utility';
+import UpdateNotification from './src/screens/CheckVersionUpdate/indax';
+// import {checkVersion} from 'react-native-appstore-version-checker';
+// import codePush from 'react-native-code-push';
 
 PushNotification.configure({
   onNotifications: notification => {},
@@ -42,6 +46,27 @@ LogBox.ignoreLogs([
 ]);
 const Stack = createNativeStackNavigator();
 const store = configureStore();
+// const [isUpdateAvailable, setUpdateAvailable] = useState(false);
+
+// useEffect(() => {
+//   const checkForUpdate = async () => {
+//     try {
+//       const updateAvailable = await checkVersion({
+//         bundleId: 'com.bunchodDeals',
+//       });
+
+//       setUpdateAvailable(updateAvailable);
+//     } catch (error) {
+//       console.error('Error checking for updates:', error);
+//     }
+//   };
+//   checkForUpdate();
+// }, []);
+
+// const codePushOptions = {deploymentKey: 'App'};
+// const UpdatedApp = codePush(codePushOptions)(UpdateNotification);
+
+// AppRegistry.registerComponent(App, () => UpdatedApp);
 
 const Auth = () => {
   return (
@@ -332,6 +357,7 @@ const App = ({navigation}) => {
         </NavigationContainer>
 
         {/* <NoInternetConnection show={isOffline} /> */}
+        <UpdateNotification />
       </View>
     </Provider>
   );

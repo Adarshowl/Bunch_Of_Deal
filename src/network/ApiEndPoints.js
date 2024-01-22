@@ -178,9 +178,15 @@ export const API_END_POINTS = {
   API_PAYMENT_LINK: CLONE_BASE_URL + API + 'order_payment/get_payment_link',
   API_PAYMENT_LINK_CALL: CLONE_BASE_URL + API + 'order_payment/link_call',
 
-  // content
-  TERMS_OF_USE_URL: 'https://bunchofdeals.com.au/terms&services.php',
-  PRIVACY_POLICY_URL: 'https://bunchofdeals.com.au/privacypolicy.php',
+  // content 'https://bunchofdeals.com.au/terms&services_ios.php'
+  TERMS_OF_USE_URL: 'https://bunchofdeals.com.au/terms&services_ios.php',
+  PRIVACY_POLICY_URL: 'https://bunchofdeals.com.au/privacypolicy_ios.php',
+  // TERMS_OF_USE_URL: 'https://bunchofdeals.com.au/terms&services.php',
+  // PRIVACY_POLICY_URL: 'https://bunchofdeals.com.au/privacypolicy.php',
+
+  //Delete Account Api
+  DELETE_ACCOUNT_USER:
+    'https://bunchofdeals.com.au/APP/index.php/user/Api/DeleteUser',
 };
 //
 /**

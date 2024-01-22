@@ -20,7 +20,10 @@ export const intro_5 = require('../assets/images/intro/intro_5.png');
 export const intro_6 = require('../assets/images/intro/intro_6.png');
 export const intro_7 = require('../assets/images/intro/intro_7.png');
 export const intro_8 = require('../assets/images/intro/intro_8.png');
-export const intro_9 = require('../assets/images/intro/intro_9.png');
+export const intro_9 = require('../assets/images/intro/Intro_9.png');
+// export const intro_9 = require('../assets/images/intro/intro_9.png');
+// export const intro_10 = require('../assets/images/intro/intro_10.png');
+export const intro_10 = require('../assets/images/intro/Intro_10.png');
 
 export default {
   app_logo,
@@ -34,6 +37,7 @@ export default {
   profile_placeholder,
   navigation_icon_bg,
   splash_new_beta,
+  intro_10,
   intro_9,
   intro_8,
   intro_7,

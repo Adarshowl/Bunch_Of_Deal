@@ -20,12 +20,16 @@ import {FONTS} from '../constants/themes';
 import GlobalStyle from '../styles/GlobalStyle';
 import BunchDealImageLoader from '../utils/BunchDealImageLoader';
 import BunchDealVectorIcon from '../utils/BunchDealVectorIcon';
-import {ShowToastMessage} from '../utils/Utility';
+import {ShowConsoleLogMessage, ShowToastMessage} from '../utils/Utility';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LoginManager} from 'react-native-fbsdk';
 import {clearRealm} from '../utils/RealmUtility';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import crashlytics from '@react-native-firebase/crashlytics';
+import {API_END_POINTS} from '../network/ApiEndPoints';
+import ApiCall from '../network/ApiCall';
+// import ApiCall from '../../network/ApiCall';
 
 const DrawerContent = ({navigation, props}) => {
   const [userData, setUserData] = useState({});
@@ -103,6 +107,40 @@ const DrawerContent = ({navigation, props}) => {
           .catch(error => {})
       : ShowToastMessage('Logout Failed');
     navigation.replace('MainContainer');
+  };
+
+  const getCategoryList = () => {
+    let body = {
+      user_id: userData?.id_user,
+    };
+    console.log('Delete Body ======= ', JSON.stringify(body));
+    ApiCall('post', body, API_END_POINTS.DELETE_ACCOUNT_USER, {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    })
+      .then(response => {
+        console.log('response delete ==== ', JSON.stringify(response));
+
+        console.log(
+          'response delete 2 ==== ',
+          JSON.stringify(response?.data?.success),
+        );
+
+        if (response?.data?.success == 1) {
+          onLogouClick();
+          // ShowConsoleLogMessage(JSON.stringify(response?.data));
+          // let result = Object.values(response.data?.result);
+          // setCategoryData(result);
+        } else {
+          // setCategoryData([]);
+        }
+      })
+      .catch(err => {
+        // crashlytics().recordError(err);
+
+        ShowConsoleLogMessage('Error in get offer recent api call: ' + err);
+      })
+      .finally(() => {});
   };
 
   // const clearRealm = () => {
@@ -279,6 +317,37 @@ const DrawerContent = ({navigation, props}) => {
         onPress={() => {
           // props?.navigation?.navigate('About');
           navigation?.navigate('About');
+        }}
+      />
+
+      <DrawerItem
+        name={'Delete Account '}
+        title={AntDesign}
+        iconName="delete"
+        onPress={() => {
+          // props?.navigation?.navigate('About');
+          // navigation?.navigate('About');
+
+          Alert.alert(
+            'Account delete confirmation',
+            'Are you sure want to delete your account your all activity and data will permanently delete with your account from our database.',
+            [
+              {
+                text: 'Cancel',
+                onPress: () => {
+                  return null;
+                },
+              },
+              {
+                text: 'Confirm',
+                onPress: () => {
+                  // deleteUserAccountAfterConfirm(apiToken);
+                  getCategoryList();
+                },
+              },
+            ],
+            {cancelable: false},
+          );
         }}
       />
 

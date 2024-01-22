@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>BGTaskSchedulerPermittedIdentifiers</key>
-      <array>
-        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-      </array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	</array>
 	<key> UIFileSharingEnabled</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -23,7 +23,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.4</string>
+	<string>1.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -31,7 +31,6 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-      
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.719363581249-gsrd2mqkgnrffo1ib4q2t0tjqi87pn6e</string>
@@ -57,7 +56,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>1</string>
 	<key>FacebookAppID</key>
 	<string>326107840273547</string>
 	<key>FacebookClientToken</key>
@@ -91,23 +90,23 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera</string>
+	<string>$(PRODUCT_NAME) Our app uses the camera to capture photos for updating and sharing on your gardener profile.</string>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>App wants to access your documents folder</string>
+	<string>$(PRODUCT_NAME) We require access to your documents to save and retrieve files related to your app activities. This enables you to create, edit, and manage your documents seamlessly within the app.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
-	<string>App wants to access your downloads folder</string>
+	<string>$(PRODUCT_NAME) We need access to your Downloads folder to save and manage files downloaded through our app. This allows you to easily retrieve and view downloaded content within the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location lets us show you which stores you can order from and helps to ensure an accurate delivery.</string>
+	<string>$(PRODUCT_NAME) Your location is used to determine the recommended route to your destination and to provide turn-by-turn directions.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Your location lets us show you which stores you can order from and helps to ensure an accurate delivery.</string>
+	<string>$(PRODUCT_NAME) Your location is used to determine the recommended route to your destination and to provide turn-by-turn directions.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Your location lets us show you which stores you can order from and helps to ensure an accurate delivery.</string>
+	<string>$(PRODUCT_NAME) Your location is used to determine the recommended route to your destination and to provide turn-by-turn directions.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location lets us show you which stores you can order from and helps to ensure an accurate delivery.</string>
+	<string>$(PRODUCT_NAME) Your location is used to determine the recommended route to your destination and to provide turn-by-turn directions.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera</string>
+	<string>$(PRODUCT_NAME) We need access to your photos to enable you to upload and share images within the app. Your photos will only be used for this purpose and will not be shared or used for any other reason.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
+	<string>$(PRODUCT_NAME) We need access to your photos to enable you to upload and share images within the app. Your photos will only be used for this purpose and will not be shared or used for any other reason.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>montserrat_bold.ttf</string>

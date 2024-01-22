@@ -26,10 +26,10 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   loginAppIcon: {
-    height: 100,
-    width: 120,
+    height: 200,
+    width: 200,
     position: 'absolute',
-    top: 50,
+    top: 10,
     borderRadius: 10,
   },
   loginCard: {

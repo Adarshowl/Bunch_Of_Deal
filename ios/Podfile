@@ -24,6 +24,8 @@ end
 target 'BunchOfDeals' do
   config = use_native_modules!
 
+ 
+
 pod 'FirebaseCoreInternal', :modular_headers => true
 pod 'GoogleUtilities', :modular_headers => true
 pod 'FirebaseSessions', :modular_headers => true
@@ -32,6 +34,13 @@ pod 'FirebaseCoreExtension', :modular_headers => true
 pod 'FirebaseInstallations', :modular_headers => true
 pod 'GoogleDataTransport', :modular_headers => true
 pod 'nanopb', :modular_headers => true
+
+pod 'FirebaseDatabase', :modular_headers => true
+pod 'leveldb-library', :modular_headers => true
+pod 'FirebaseAppCheckInterop', :modular_headers => true
+pod "AdobeMobileSDK"
+pod 'react-native-version-check', :path => '../node_modules/react-native-version-check'
+
 
 
   # Flags change depending on the env values.
@@ -58,12 +67,14 @@ pod 'nanopb', :modular_headers => true
     # Pods for testing
   end
 
+
   post_install do |installer|
     react_native_post_install(
       installer,
       # Set `mac_catalyst_enabled` to `true` in order to apply patches
       # necessary for Mac Catalyst builds
       :mac_catalyst_enabled => false
+
     )
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end

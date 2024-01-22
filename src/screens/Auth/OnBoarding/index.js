@@ -74,6 +74,10 @@ const OnBoarding = ({navigation}) => {
       image: images.intro_9,
       selected: false,
     },
+    {
+      image: images.intro_10,
+      selected: false,
+    },
   ]);
 
   const renderItems = ({item}) => {
