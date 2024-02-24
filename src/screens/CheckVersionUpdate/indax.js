@@ -21,13 +21,25 @@ const UpdateNotification = () => {
   //   console.log(latestVersion); // 0.1.2
   // });
 
-  VersionCheck.needUpdate().then(async res => {
-    console.log('resssss ==== ', res.isNeeded); // true
-    if (res.isNeeded) {
-      setUpdateAvailable(res.isNeeded);
-      // Linking.openURL(res.storeUrl); // open store if update is needed.
-    }
-  });
+  // VersionCheck.needUpdate().then(async res => {
+  //   console.log('resssss ==== ', res.isNeeded); // true
+  //   if (res.isNeeded) {
+  //     setUpdateAvailable(res.isNeeded);
+  //     // Linking.openURL(res.storeUrl); // open store if update is needed.
+  //   }
+  // });
+
+  useEffect(() => {
+    const checkUpdate = async () => {
+      const res = await VersionCheck.needUpdate();
+      console.log('resssss ==== ', res.isNeeded); // true
+      if (res.isNeeded) {
+        setUpdateAvailable(res.isNeeded);
+      }
+    };
+
+    checkUpdate();
+  }, []);
 
   // const handleUpdatePress = () => {
   //   Alert.alert(
